@@ -521,13 +521,14 @@ X_test_scaled = scaler.transform(X_test)`
                     ]
                 },
                 {
-                    id: 'regression_models',
-                    title: '2.1 Modèles de Régression',
-                    description: 'Prédire une valeur continue',
+                    id: 'models',
+                    title: '2. Modèles (Catalogue)',
+                    description: 'Régression et Classification',
                     snippets: [
                         {
                             id: 'linear_regression',
                             title: 'Régression Linéaire',
+                            subCategory: '2.1 Modèles de Régression',
                             description: `Type : Régression
                             Concept : Trace une ligne droite qui passe au plus près de tous les points.
                             Quand l'utiliser ?
@@ -545,6 +546,7 @@ predictions = model.predict(X_test)`
                         {
                             id: 'ridge_lasso',
                             title: 'Régression Ridge & Lasso',
+                            subCategory: '2.1 Modèles de Régression',
                             description: `Type : Régression (Régularisée)
                             Concept : Comme la Linéaire, mais pénalise les coefficients trop grands pour éviter le sur-apprentissage.
                             - Ridge (L2) : Réduit les coefficients (jamais à 0).
@@ -564,6 +566,7 @@ lasso.fit(X_train, y_train)`
                         {
                             id: 'svr',
                             title: 'SVR (Support Vector Regression)',
+                            subCategory: '2.1 Modèles de Régression',
                             description: `Type : Régression
                             Concept : Trouve un "tube" qui contient un maximum de points avec une marge d'erreur tolérée.
                             Quand l'utiliser ?
@@ -580,6 +583,7 @@ model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`
                         {
                             id: 'mlp_regressor',
                             title: 'Réseau de Neurones (MLP Regressor)',
+                            subCategory: '2.1 Modèles de Régression',
                             description: `Type : Régression (Deep Learning)
                             Concept : Couches de neurones connectés pour apprendre des relations très complexes.
                             Quand l'utiliser ?
@@ -593,17 +597,11 @@ model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`
 model = MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
 model.fit(X_train_scaled, y_train)
 predictions = model.predict(X_test_scaled)`
-                        }
-                    ]
-                },
-                {
-                    id: 'classification_models',
-                    title: '2.2 Modèles de Classification',
-                    description: 'Prédire une classe / catégorie',
-                    snippets: [
+                        },
                         {
                             id: 'logistic_regression',
                             title: 'Régression Logistique',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification
                             Concept : Sépare deux groupes par une frontière linéaire (utilise une fonction sigmoïde).
                             Quand l'utiliser ?
@@ -621,6 +619,7 @@ predictions = model.predict(X_test_scaled)`
                         {
                             id: 'knn',
                             title: 'K-Nearest Neighbors (KNN)',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification (et Régression)
                             Concept : "Dis-moi qui sont tes voisins, je te dirai qui tu es". Regarde les k points les plus proches.
                             Quand l'utiliser ?
@@ -637,6 +636,7 @@ predictions = model.predict(X_test_scaled)`
                         {
                             id: 'svm',
                             title: 'SVM (Support Vector Machine)',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification
                             Concept : Cherche l'hyperplan qui sépare le mieux les classes avec la plus grande marge possible.
                             Quand l'utiliser ?
@@ -653,6 +653,7 @@ predictions = model.predict(X_test_scaled)`
                         {
                             id: 'decision_tree',
                             title: 'Arbre de Décision',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification & Régression
                             Concept : Série de questions (Si Age > 25 alors...) pour diviser les données.
                             Quand l'utiliser ?
@@ -671,6 +672,7 @@ model.fit(X_train, y_train)
                         {
                             id: 'random_forest',
                             title: 'Random Forest',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification & Régression
                             Concept : Une forêt d'arbres de décision où chaque arbre vote pour la prédiction finale.
                             Quand l'utiliser ?
@@ -689,6 +691,7 @@ predictions = model.predict(X_test)`
                         {
                             id: 'gradient_boosting',
                             title: 'Gradient Boosting (XGBoost/LGBM)',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification & Régression
                             Concept : Construit les arbres séquentiellement, chaque nouvel arbre corrige les erreurs du précédent.
                             Quand l'utiliser ?
@@ -705,6 +708,7 @@ predictions = model.predict(X_test)`
                         {
                             id: 'mlp_classifier',
                             title: 'Réseau de Neurones (MLP Classifier)',
+                            subCategory: '2.2 Modèles de Classification',
                             description: `Type : Classification (Deep Learning)
                             Concept : Couches de neurones connectés pour apprendre des relations très complexes.
                             Quand l'utiliser ?

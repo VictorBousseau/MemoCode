@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
 
-export default function CodeCard({ snippet }) {
+export default function CodeCard({ snippet, language = 'python' }) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -41,7 +41,7 @@ export default function CodeCard({ snippet }) {
 
             <div className="relative group">
                 <SyntaxHighlighter
-                    language="python"
+                    language={language}
                     style={vscDarkPlus}
                     customStyle={{
                         margin: 0,

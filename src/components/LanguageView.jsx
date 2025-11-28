@@ -17,6 +17,10 @@ export default function LanguageView({ content }) {
     const activeTheme = content.themes.find(t => t.id === activeThemeId);
     const activeCategory = activeTheme?.categories.find(c => c.id === activeCategoryId);
 
+    // Determine language based on content structure (simple heuristic)
+    // If themes have 'sql_basics', it's SQL, otherwise Python
+    const language = content.themes.some(t => t.id === 'sql_basics') ? 'sql' : 'python';
+
     // Reset category when theme changes
     useEffect(() => {
         if (activeTheme && activeTheme.categories.length > 0) {
@@ -35,8 +39,8 @@ export default function LanguageView({ content }) {
                             key={theme.id}
                             onClick={() => setActiveThemeId(theme.id)}
                             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeThemeId === theme.id
-                                    ? 'bg-zinc-800 text-white shadow-sm ring-1 ring-zinc-700'
-                                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                                ? 'bg-zinc-800 text-white shadow-sm ring-1 ring-zinc-700'
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                                 }`}
                         >
                             <Icon className="w-4 h-4" />
@@ -58,8 +62,8 @@ export default function LanguageView({ content }) {
                                 key={category.id}
                                 onClick={() => setActiveCategoryId(category.id)}
                                 className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between group ${activeCategoryId === category.id
-                                        ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
-                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                                    ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
                                     }`}
                             >
                                 <span className="truncate">{category.title}</span>
@@ -85,9 +89,25 @@ export default function LanguageView({ content }) {
                             </div>
 
                             <div className="grid gap-8">
-                                {activeCategory.snippets.map((snippet) => (
-                                    <CodeCard key={snippet.id} snippet={snippet} />
-                                ))}
+                                {activeCategory.snippets.map((snippet, index) => {
+                                    // Check if we need to render a sub-category header
+                                    const showSubHeader = snippet.subCategory && (
+                                        index === 0 || activeCategory.snippets[index - 1].subCategory !== snippet.subCategory
+                                    );
+
+                                    return (
+                                        <React.Fragment key={snippet.id}>
+                                            {showSubHeader && (
+                                                <h3 className="text-xl font-semibold text-blue-400 mt-4 mb-2 flex items-center gap-2">
+                                                    <div className="h-px flex-1 bg-zinc-800 mr-4"></div>
+                                                    {snippet.subCategory}
+                                                    <div className="h-px flex-1 bg-zinc-800 ml-4"></div>
+                                                </h3>
+                                            )}
+                                            <CodeCard snippet={snippet} language={language} />
+                                        </React.Fragment>
+                                    );
+                                })}
                                 {activeCategory.snippets.length === 0 && (
                                     <div className="text-zinc-500 italic">
                                         Aucun snippet pour le moment.
