@@ -27,6 +27,18 @@ export default function CodeCard({ snippet }) {
                     {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                 </button>
             </div>
+
+            {/* Theoretical Visual Image */}
+            {snippet.image && (
+                <div className="border-b border-zinc-800 bg-black/20 p-4 flex justify-center">
+                    <img
+                        src={snippet.image}
+                        alt={`Visualisation pour ${snippet.title}`}
+                        className="max-h-64 rounded-lg shadow-lg opacity-90 hover:opacity-100 transition-opacity"
+                    />
+                </div>
+            )}
+
             <div className="relative group">
                 <SyntaxHighlighter
                     language="python"

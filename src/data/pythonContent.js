@@ -294,21 +294,40 @@ df_large = pd.concat([df_infos, df_metrics], axis=1)`
                             id: 'histplot',
                             title: 'Histogramme',
                             description: 'Distribution numérique (kde=True pour la densité).',
-                            code: `sns.histplot(data=df, x='colonne_numerique', kde=True)
+                            image: '/MemoCode/images/histogram.png',
+                            code: `# Histogramme avec courbe de densité (KDE)
+# kde=True : ajoute la courbe de densité lissée
+# bins=30 : définit le nombre de barres
+sns.histplot(data=df, x='colonne_numerique', kde=True, bins=30)
+plt.title('Distribution de la variable numérique')
 plt.show()`
                         },
                         {
                             id: 'boxplot',
                             title: 'Boxplot',
                             description: 'Détection d\'outliers et quartiles.',
-                            code: `sns.boxplot(data=df, x='colonne_numerique')
+                            image: '/MemoCode/images/boxplot.png',
+                            code: `# Boîte à moustaches (Boxplot)
+# Permet de voir la médiane, les quartiles et les outliers (points)
+# x : la variable numérique à analyser
+sns.boxplot(data=df, x='colonne_numerique')
+plt.title('Détection des outliers')
 plt.show()`
                         },
                         {
                             id: 'countplot',
                             title: 'Countplot',
                             description: 'Fréquence des catégories.',
-                            code: `sns.countplot(data=df, x='colonne_categorie')
+                            image: '/MemoCode/images/countplot.png',
+                            code: `# Diagramme en barres pour variables catégorielles
+# Compte automatiquement le nombre d'occurrences de chaque catégorie
+# order : permet de trier les barres (ici par fréquence décroissante)
+sns.countplot(
+    data=df, 
+    x='colonne_categorie', 
+    order=df['colonne_categorie'].value_counts().index
+)
+plt.title('Fréquence par catégorie')
 plt.show()`
                         }
                     ]
@@ -322,26 +341,43 @@ plt.show()`
                             id: 'scatterplot',
                             title: 'Scatter Plot',
                             description: 'Relation numérique vs numérique.',
-                            code: `sns.scatterplot(
+                            image: '/MemoCode/images/scatterplot.png',
+                            code: `# Nuage de points (Scatter Plot)
+# Idéal pour voir la corrélation entre deux variables numériques
+# hue : colore les points selon une variable catégorielle
+# alpha : transparence des points (utile si beaucoup de données)
+sns.scatterplot(
     data=df, 
     x='col_num_1', 
     y='col_num_2', 
-    hue='categorie'
+    hue='categorie',
+    alpha=0.7
 )
+plt.title('Relation entre deux variables numériques')
 plt.show()`
                         },
                         {
                             id: 'lineplot',
                             title: 'Line Plot',
                             description: 'Séries temporelles.',
-                            code: `sns.lineplot(data=df, x='date', y='valeur')
+                            image: '/MemoCode/images/lineplot.png',
+                            code: `# Graphique linéaire (Line Plot)
+# Parfait pour les séries temporelles ou l'évolution continue
+# ci=None : désactive l'intervalle de confiance (zone ombrée) pour alléger
+sns.lineplot(data=df, x='date', y='valeur', ci=None)
+plt.title('Évolution temporelle')
 plt.show()`
                         },
                         {
                             id: 'barplot',
                             title: 'Bar Plot',
                             description: 'Comparaison numérique par catégorie.',
-                            code: `sns.barplot(data=df, x='categorie', y='valeur')
+                            image: '/MemoCode/images/barplot.png',
+                            code: `# Bar Plot (Comparaison de moyennes)
+# Affiche la moyenne (par défaut) d'une variable numérique par catégorie
+# La petite barre noire au sommet est l'intervalle de confiance (erreur)
+sns.barplot(data=df, x='categorie', y='valeur_numerique')
+plt.title('Moyenne par catégorie')
 plt.show()`
                         }
                     ]
@@ -355,15 +391,29 @@ plt.show()`
                             id: 'heatmap',
                             title: 'Heatmap de Corrélation',
                             description: 'Matrice de corrélation.',
-                            code: `corr = df.corr()
-sns.heatmap(corr, annot=True, cmap='coolwarm')
+                            image: '/MemoCode/images/heatmap.png',
+                            code: `# Heatmap de Corrélation
+# 1. Calculer la matrice de corrélation
+corr = df.corr()
+
+# 2. Afficher la heatmap
+# annot=True : affiche les valeurs dans les cases
+# cmap='coolwarm' : dégradé bleu (négatif) -> rouge (positif)
+# fmt='.2f' : formatage à 2 décimales
+plt.figure(figsize=(10, 8))
+sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
+plt.title('Matrice de Corrélation')
 plt.show()`
                         },
                         {
                             id: 'pairplot',
                             title: 'Pairplot',
                             description: 'Vue d\'ensemble des relations.',
-                            code: `sns.pairplot(df, hue='target')
+                            code: `# Pairplot (Grille de graphiques)
+# Affiche les relations bivariées pour toutes les paires de variables
+# Diagonale : distribution univariée (histogramme/KDE)
+# hue : sépare les groupes par couleur
+sns.pairplot(df, hue='target_variable')
 plt.show()`
                         }
                     ]
@@ -378,6 +428,10 @@ plt.show()`
                             title: 'Matrice de Manque',
                             description: 'Localiser les données manquantes.',
                             code: `import missingno as msno
+
+# Matrice de visualisation des manquants
+# Les lignes blanches représentent les valeurs manquantes
+# Utile pour voir si les manques sont corrélés entre colonnes
 msno.matrix(df)
 plt.show()`
                         },
@@ -385,7 +439,10 @@ plt.show()`
                             id: 'msno_bar',
                             title: 'Barplot des Manquants',
                             description: 'Quantité de manquants par colonne.',
-                            code: `msno.bar(df)
+                            code: `# Barplot des données présentes
+# Affiche le nombre de valeurs non-nulles par colonne
+# Permet d'identifier rapidement les colonnes très vides
+msno.bar(df)
 plt.show()`
                         }
                     ]
