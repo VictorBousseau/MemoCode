@@ -18,8 +18,13 @@ export default function LanguageView({ content }) {
     const activeCategory = activeTheme?.categories.find(c => c.id === activeCategoryId);
 
     // Determine language based on content structure (simple heuristic)
-    // If themes have 'sql_basics', it's SQL, otherwise Python
-    const language = content.themes.some(t => t.id === 'sql_basics') ? 'sql' : 'python';
+    // If themes have 'sql_basics', it's SQL. If 'git_basics', it's Bash. Otherwise Python.
+    let language = 'python';
+    if (content.themes.some(t => t.id === 'sql_basics')) {
+        language = 'sql';
+    } else if (content.themes.some(t => t.id === 'git_basics')) {
+        language = 'bash';
+    }
 
     // Reset category when theme changes
     useEffect(() => {
