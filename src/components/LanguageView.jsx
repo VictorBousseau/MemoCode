@@ -26,6 +26,16 @@ export default function LanguageView({ content }) {
         language = 'bash';
     }
 
+    // Reset state when content changes (i.e., when language changes)
+    useEffect(() => {
+        if (content && content.themes.length > 0) {
+            setActiveThemeId(content.themes[0].id);
+            if (content.themes[0].categories.length > 0) {
+                setActiveCategoryId(content.themes[0].categories[0].id);
+            }
+        }
+    }, [content]);
+
     // Reset category when theme changes
     useEffect(() => {
         if (activeTheme && activeTheme.categories.length > 0) {
