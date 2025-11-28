@@ -272,6 +272,103 @@ df_total = pd.concat([df_janvier, df_fevrier], axis=0)
 df_large = pd.concat([df_infos, df_metrics], axis=1)`
                 }
             ]
+        },
+        {
+            id: 'visualization',
+            title: 'Visualisation (Seaborn)',
+            description: 'Analyse Exploratoire (EDA) avec Seaborn et Missingno',
+            snippets: [
+                {
+                    id: 'histplot',
+                    title: '1. Histogramme (Univarié)',
+                    description: 'Pour voir la distribution d\'une variable numérique. Paramètres clés: kde (courbe), bins (barres).',
+                    code: `# Distribution avec courbe de densité
+sns.histplot(data=df, x='colonne_numerique', kde=True)
+plt.show()`
+                },
+                {
+                    id: 'boxplot',
+                    title: '2. Boxplot (Univarié)',
+                    description: 'Pour détecter les outliers et voir les quartiles. Paramètres clés: x (variable), y (groupe).',
+                    code: `# Boîte à moustaches
+sns.boxplot(data=df, x='colonne_numerique')
+plt.show()`
+                },
+                {
+                    id: 'countplot',
+                    title: '3. Countplot (Univarié)',
+                    description: 'Pour voir la fréquence des catégories. Paramètres clés: order (tri).',
+                    code: `# Compte des occurrences par catégorie
+sns.countplot(data=df, x='colonne_categorie')
+plt.show()`
+                },
+                {
+                    id: 'scatterplot',
+                    title: '4. Scatter Plot (Bivarié)',
+                    description: 'Relation entre deux variables numériques. Paramètres clés: hue (couleur par catégorie), style (forme).',
+                    code: `# Nuage de points avec dimension couleur
+sns.scatterplot(
+    data=df, 
+    x='colonne_numerique_1', 
+    y='colonne_numerique_2', 
+    hue='colonne_categorie'
+)
+plt.show()`
+                },
+                {
+                    id: 'lineplot',
+                    title: '5. Line Plot (Bivarié)',
+                    description: 'Pour les séries temporelles ou données ordonnées. Paramètres clés: markers (points).',
+                    code: `# Courbe d'évolution
+sns.lineplot(data=df, x='date', y='valeur')
+plt.show()`
+                },
+                {
+                    id: 'barplot',
+                    title: '6. Bar Plot (Bivarié)',
+                    description: 'Comparaison numérique par catégorie (moyenne par défaut). Paramètres clés: estimator (fonction d\'agrégation).',
+                    code: `# Moyenne de la variable cible par catégorie
+sns.barplot(data=df, x='colonne_categorie', y='target_variable')
+plt.show()`
+                },
+                {
+                    id: 'heatmap',
+                    title: '7. Heatmap de Corrélation',
+                    description: 'Matrice de corrélation pour voir les liens entre variables. Paramètres clés: annot (valeurs), cmap (couleurs).',
+                    code: `# Calcul de la matrice de corrélation
+corr_matrix = df.corr()
+
+# Visualisation
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.show()`
+                },
+                {
+                    id: 'pairplot',
+                    title: '8. Pairplot (Multivarié)',
+                    description: 'Vue d\'ensemble des relations deux à deux. Paramètres clés: hue (catégorie).',
+                    code: `# Grille de graphiques croisés
+sns.pairplot(df, hue='target_variable')
+plt.show()`
+                },
+                {
+                    id: 'msno_matrix',
+                    title: '9. Matrice de Manque (Qualité)',
+                    description: 'Visualiser où sont les données manquantes dans le DataFrame.',
+                    code: `import missingno as msno
+
+# Matrice des valeurs manquantes (blanc = manquant)
+msno.matrix(df)
+plt.show()`
+                },
+                {
+                    id: 'msno_bar',
+                    title: '10. Barplot des Manquants',
+                    description: 'Nombre de valeurs manquantes par colonne.',
+                    code: `# Barres des données présentes/manquantes
+msno.bar(df)
+plt.show()`
+                }
+            ]
         }
     ]
 };
