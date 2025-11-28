@@ -1,138 +1,275 @@
 export const pythonContent = {
     categories: [
         {
-            id: 'pandas',
-            title: 'Pandas',
-            description: 'Data manipulation and analysis',
+            id: 'io',
+            title: '1. Chargement & Export',
+            description: 'Lecture et écriture de fichiers (CSV, Excel, Pickle)',
             snippets: [
                 {
-                    id: 'load_data',
-                    title: 'Loading Data',
-                    description: 'Reading files from different paths.',
+                    id: 'read_csv',
+                    title: 'Lire un CSV',
+                    description: 'Chargement classique et options utiles.',
                     code: `import pandas as pd
 
-# Relative path
+# Chargement simple
 df = pd.read_csv('data.csv')
 
-# From a specific data folder
-df_data = pd.read_excel('./data/données.xlsx')`
-                },
-                {
-                    id: 'filtering',
-                    title: 'Filtering Data',
-                    description: 'Using .query() with simple and complex conditions.',
-                    code: `# Simple filtering
-filtered_df = df.query('column_name > 50')
+# Avec chemin relatif
+df = pd.read_csv('./data/mon_fichier.csv')
 
-# Complex conditions (AND / OR)
-# Note: Use backticks for column names with spaces
-complex_filter = df.query('age > 25 and (department == "Sales" or salary > 50000)')`
-                },
-                {
-                    id: 'columns',
-                    title: 'Column Management',
-                    description: 'Selecting and dropping columns.',
-                    code: `# Select specific columns
-subset = df[['name', 'age', 'salary']]
-
-# Drop columns
-# axis=1 denotes columns
-df_dropped = df.drop(columns=['unnecessary_col'], axis=1)`
-                },
-                {
-                    id: 'dtypes',
-                    title: 'Data Types',
-                    description: 'Converting data types.',
-                    code: `# Convert to specific types
-df['age'] = df['age'].astype(int)
-df['salary'] = df['salary'].astype(float)
-df['is_active'] = df['is_active'].astype(bool)
-df['category'] = df['category'].astype('category')
-
-# Convert to datetime
-df['date'] = pd.to_datetime(df['date'])`
-                },
-                {
-                    id: 'missing_values',
-                    title: 'Missing Values',
-                    description: 'Handling NaN values.',
-                    code: `# Drop rows with missing values
-df_clean = df.dropna()
-
-# Fill missing values
-df_filled = df.fillna({
-    'score': 0,
-    'category': 'Unknown'
-})`
-                },
-                {
-                    id: 'aggregation',
-                    title: 'Aggregation',
-                    description: 'Groupby and Pivot Tables.',
-                    code: `# GroupBy
-avg_salary = df.groupby('department')['salary'].mean()
-
-# Pivot Table
-pivot = df.pivot_table(
-    values='sales',
-    index='date',
-    columns='region',
-    aggfunc='sum'
+# Options courantes
+df = pd.read_csv('data.csv', 
+    sep=';',              # Séparateur
+    index_col=0,          # Colonne d'index
+    parse_dates=['date']  # Parsing des dates
 )`
                 },
                 {
-                    id: 'joins',
-                    title: 'Joins',
-                    description: 'Merging and Joining DataFrames.',
-                    code: `# Merge (SQL-style join)
-merged_df = pd.merge(df1, df2, on='key_column', how='inner')
+                    id: 'read_excel',
+                    title: 'Lire un Excel',
+                    description: 'Chargement depuis un fichier Excel.',
+                    code: `# Lire une feuille spécifique
+df = pd.read_excel('data.xlsx', sheet_name='Feuille1')
 
-# Join (Index-based join)
-joined_df = df1.join(df2, lsuffix='_left', rsuffix='_right')`
+# Lire toutes les feuilles (retourne un dictionnaire)
+dfs = pd.read_excel('data.xlsx', sheet_name=None)`
                 },
                 {
                     id: 'export',
-                    title: 'Exporting Data',
-                    description: 'Saving DataFrames to files.',
-                    code: `# Export to CSV (without index)
+                    title: 'Exporter des données',
+                    description: 'Sauvegarder en CSV, Excel ou Pickle.',
+                    code: `# CSV (sans l'index)
 df.to_csv('output.csv', index=False)
 
-# Export to Excel
-df.to_excel('output.xlsx', sheet_name='Sheet1', index=False)`
+# Excel
+df.to_excel('output.xlsx', sheet_name='Resultats', index=False)
+
+# Pickle (format binaire rapide pour Python)
+df.to_pickle('data.pkl')`
                 }
             ]
         },
         {
-            id: 'visualization',
-            title: 'Visualization',
-            description: 'Plotting with Matplotlib and Seaborn',
+            id: 'exploration',
+            title: '2. Découverte (EDA)',
+            description: 'Aperçu, statistiques et analyse de distribution',
             snippets: [
                 {
-                    id: 'simple_plot',
-                    title: 'Line Plot',
-                    description: 'Basic line plot using Matplotlib.',
-                    code: `import matplotlib.pyplot as plt
+                    id: 'overview',
+                    title: 'Aperçu Global',
+                    description: 'Premières commandes à lancer.',
+                    code: `# Début et fin
+df.head()  # 5 premières lignes
+df.tail()  # 5 dernières lignes
 
-plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
-plt.title('Simple Plot')
-plt.show()`
+# Infos techniques (types, mémoire, non-null)
+df.info()
+
+# Dimensions (lignes, colonnes)
+print(df.shape)`
+                },
+                {
+                    id: 'stats',
+                    title: 'Statistiques & Valeurs',
+                    description: 'Comprendre la distribution des données.',
+                    code: `# Résumé statistique (numérique)
+df.describe()
+
+# Compter les occurrences (catégoriel)
+# Indispensable pour comprendre une colonne
+df['categorie'].value_counts()
+
+# Valeurs uniques
+uniques = df['categorie'].unique()
+nb_uniques = df['categorie'].nunique()`
                 }
             ]
         },
         {
-            id: 'ml',
-            title: 'Machine Learning',
-            description: 'Scikit-learn basics',
+            id: 'cleaning',
+            title: '3. Nettoyage',
+            description: 'Renommage, types, valeurs manquantes et texte',
             snippets: [
                 {
-                    id: 'train_test_split',
-                    title: 'Train Test Split',
-                    description: 'Split data into training and testing sets.',
-                    code: `from sklearn.model_selection import train_test_split
+                    id: 'rename',
+                    title: 'Renommer',
+                    description: 'Changer le nom des colonnes.',
+                    code: `df = df.rename(columns={
+    'old_name': 'new_name',
+    'Date de Naissance': 'date_naissance'
+})`
+                },
+                {
+                    id: 'types',
+                    title: 'Changer les Types',
+                    description: 'Conversion explicite des types.',
+                    code: `# Vers numérique
+df['prix'] = pd.to_numeric(df['prix'], errors='coerce')
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+# Vers datetime
+df['date'] = pd.to_datetime(df['date'])
+
+# Vers catégorie (optimisation mémoire)
+df['statut'] = df['statut'].astype('category')`
+                },
+                {
+                    id: 'missing',
+                    title: 'Valeurs Manquantes',
+                    description: 'Gestion des NaN.',
+                    code: `# Voir les manquants
+print(df.isna().sum())
+
+# Supprimer les lignes avec manquants
+df_clean = df.dropna()
+
+# Remplacer les manquants
+df_filled = df.fillna({
+    'score': 0,
+    'commentaire': 'Aucun'
+})`
+                },
+                {
+                    id: 'duplicates',
+                    title: 'Doublons',
+                    description: 'Gestion des lignes dupliquées.',
+                    code: `# Supprimer les doublons
+df = df.drop_duplicates()
+
+# Supprimer les doublons sur une colonne spécifique
+df = df.drop_duplicates(subset=['id_client'], keep='last')`
+                },
+                {
+                    id: 'strings',
+                    title: 'Manipulation de Texte',
+                    description: 'Nettoyage via l\'accesseur .str',
+                    code: `# Tout en minuscules
+df['ville'] = df['ville'].str.lower()
+
+# Contient un texte
+paris_df = df[df['ville'].str.contains('paris', na=False)]
+
+# Remplacer des caractères
+df['prix'] = df['prix'].str.replace('€', '').astype(float)
+
+# Splitter une colonne
+df[['prenom', 'nom']] = df['nom_complet'].str.split(' ', expand=True)`
+                }
+            ]
+        },
+        {
+            id: 'subsetting',
+            title: '4. Sélection & Filtrage',
+            description: 'Query, loc, iloc et masques',
+            snippets: [
+                {
+                    id: 'columns_select',
+                    title: 'Sélection de Colonnes',
+                    description: 'Garder uniquement ce qui est utile.',
+                    code: `# Liste de colonnes
+subset = df[['nom', 'age', 'ville']]
+
+# Exclure des colonnes
+df = df.drop(columns=['id_interne', 'temp'])`
+                },
+                {
+                    id: 'query',
+                    title: 'Filtrage avec .query()',
+                    description: 'Syntaxe lisible pour filtrer.',
+                    code: `# Filtrage simple
+df_adultes = df.query("age >= 18")
+
+# Conditions multiples (and / or)
+# Note : on utilise "and"/"or" dans query, pas "&"/"|"
+df_cible = df.query("age > 25 and (ville == 'Paris' or salaire > 50000)")
+
+# Utiliser une variable externe avec @
+min_score = 80
+df_top = df.query("score >= @min_score")`
+                },
+                {
+                    id: 'loc',
+                    title: 'Filtrage classique (.loc)',
+                    description: 'Filtrage par masque booléen.',
+                    code: `# Masque booléen
+mask = (df['age'] > 25) & (df['ville'] == 'Paris')
+df_filtered = df.loc[mask]`
+                }
+            ]
+        },
+        {
+            id: 'transformation',
+            title: '5. Transformation',
+            description: 'Apply, Groupby et Pivot Tables',
+            snippets: [
+                {
+                    id: 'apply',
+                    title: 'Apply & Map',
+                    description: 'Appliquer des fonctions personnalisées.',
+                    code: `# Appliquer une fonction sur une colonne
+df['nom_long'] = df['nom'].apply(len)
+
+# Avec une lambda
+df['prix_ttc'] = df['prix_ht'].apply(lambda x: x * 1.2)
+
+# Mapper des valeurs
+mapping = {'H': 'Homme', 'F': 'Femme'}
+df['genre_label'] = df['genre'].map(mapping)`
+                },
+                {
+                    id: 'groupby',
+                    title: 'Agrégation (GroupBy)',
+                    description: 'Calculs par groupes.',
+                    code: `# Moyenne par groupe
+df.groupby('ville')['salaire'].mean()
+
+# Plusieurs métriques
+df.groupby('ville').agg({
+    'salaire': 'mean',
+    'age': ['min', 'max'],
+    'id': 'count'
+})`
+                },
+                {
+                    id: 'pivot',
+                    title: 'Pivot Table',
+                    description: 'Tableaux croisés dynamiques.',
+                    code: `pivot = df.pivot_table(
+    values='ventes',
+    index='date',
+    columns='region',
+    aggfunc='sum',
+    fill_value=0
 )`
+                }
+            ]
+        },
+        {
+            id: 'combine',
+            title: '6. Combinaison',
+            description: 'Merge et Concat',
+            snippets: [
+                {
+                    id: 'merge',
+                    title: 'Jointures (Merge)',
+                    description: 'Fusionner deux DataFrames (comme SQL JOIN).',
+                    code: `# Inner Join (par défaut)
+df_merged = pd.merge(df_clients, df_commandes, on='client_id')
+
+# Left Join
+df_merged = pd.merge(df_clients, df_commandes, 
+    on='client_id', 
+    how='left'
+)`
+                },
+                {
+                    id: 'concat',
+                    title: 'Concaténation',
+                    description: 'Empiler des DataFrames.',
+                    code: `# Empiler verticalement (ajout de lignes)
+df_total = pd.concat([df_janvier, df_fevrier], axis=0)
+
+# Empiler horizontalement (ajout de colonnes)
+df_large = pd.concat([df_infos, df_metrics], axis=1)`
                 }
             ]
         }

@@ -15,7 +15,7 @@ export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     MemoCode
                 </h1>
-                <p className="text-xs text-zinc-400 mt-1">Data Science Snippets</p>
+                <p className="text-xs text-zinc-400 mt-1">Snippets Data Science</p>
             </div>
             <nav className="flex-1 p-4 space-y-2">
                 {languages.map((lang) => (
