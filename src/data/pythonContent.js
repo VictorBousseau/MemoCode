@@ -795,6 +795,188 @@ plt.show()`
                     ]
                 }
             ]
+        },
+        {
+            id: 'python_basics',
+            title: '4. Python Basics',
+            description: 'Les fondamentaux du langage',
+            categories: [
+                {
+                    id: 'control_flow',
+                    title: 'Contrôle de Flux',
+                    description: 'Boucles et Conditions',
+                    snippets: [
+                        {
+                            id: 'loops',
+                            title: 'Boucles For & While',
+                            description: 'Itérer sur des séquences ou tant qu\'une condition est vraie.',
+                            code: `# Boucle FOR (Itération définie)
+fruits = ["pomme", "banane", "cerise"]
+for fruit in fruits:
+    print(f"J'aime la {fruit}")
+
+# Avec range()
+for i in range(5): # 0 à 4
+    print(i)
+
+# Boucle WHILE (Itération indéfinie)
+compteur = 0
+while compteur < 5:
+    print(compteur)
+    compteur += 1`
+                        },
+                        {
+                            id: 'conditions',
+                            title: 'Conditions (If/Elif/Else)',
+                            description: 'Exécuter du code selon des critères.',
+                            code: `age = 20
+
+if age < 18:
+    print("Mineur")
+elif age == 18:
+    print("Tout juste majeur")
+else:
+    print("Majeur")
+
+# Opérateur ternaire (One-liner)
+statut = "Majeur" if age >= 18 else "Mineur"`
+                        },
+                        {
+                            id: 'break_continue',
+                            title: 'Break & Continue',
+                            description: 'Contrôler l\'exécution dans les boucles.',
+                            code: `for i in range(10):
+    if i == 3:
+        continue # Passe à l'itération suivante (saute 3)
+    if i == 8:
+        break # Arrête complètement la boucle
+    print(i)`
+                        }
+                    ]
+                },
+                {
+                    id: 'functions',
+                    title: 'Fonctions',
+                    description: 'Définir et utiliser des blocs de code réutilisables',
+                    snippets: [
+                        {
+                            id: 'def_function',
+                            title: 'Définition (def)',
+                            description: 'Créer une fonction simple avec paramètres.',
+                            code: `def saluer(nom, message="Bonjour"):
+    """
+    Affiche un message de salutation.
+    message est un paramètre optionnel (valeur par défaut).
+    """
+    return f"{message}, {nom} !"
+
+print(saluer("Alice"))
+print(saluer("Bob", "Salut"))`
+                        },
+                        {
+                            id: 'args_kwargs',
+                            title: 'Args & Kwargs',
+                            description: 'Fonctions avec un nombre variable d\'arguments.',
+                            code: `def somme_tout(*args):
+    # args est un tuple
+    return sum(args)
+
+print(somme_tout(1, 2, 3, 4)) # 10
+
+def afficher_infos(**kwargs):
+    # kwargs est un dictionnaire
+    for cle, valeur in kwargs.items():
+        print(f"{cle}: {valeur}")
+
+afficher_infos(nom="Alice", age=30, ville="Paris")`
+                        },
+                        {
+                            id: 'lambda',
+                            title: 'Fonctions Lambda',
+                            description: 'Fonctions anonymes en une ligne.',
+                            code: `# Syntaxe : lambda arguments : expression
+carre = lambda x: x ** 2
+
+print(carre(5)) # 25
+
+# Souvent utilisé avec map() ou filter()
+nombres = [1, 2, 3, 4]
+pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`
+                        }
+                    ]
+                },
+                {
+                    id: 'data_structures',
+                    title: 'Structures de Données',
+                    description: 'Listes, Dictionnaires, Sets, Tuples',
+                    snippets: [
+                        {
+                            id: 'lists',
+                            title: 'Listes (List)',
+                            description: 'Collection ordonnée et modifiable.',
+                            code: `ma_liste = [1, 2, 3]
+
+# Ajout
+ma_liste.append(4) # [1, 2, 3, 4]
+
+# Slicing (Découpage)
+print(ma_liste[1:3]) # [2, 3] (Indice de début inclus, fin exclu)
+
+# List Comprehension (Puissant !)
+carres = [x**2 for x in range(5)] # [0, 1, 4, 9, 16]`
+                        },
+                        {
+                            id: 'dicts',
+                            title: 'Dictionnaires (Dict)',
+                            description: 'Paires Clé-Valeur.',
+                            code: `mon_dict = {"nom": "Alice", "age": 25}
+
+# Accès sécurisé (évite l'erreur si la clé n'existe pas)
+print(mon_dict.get("ville", "Inconnu"))
+
+# Parcourir
+for cle, valeur in mon_dict.items():
+    print(f"{cle} -> {valeur}")`
+                        },
+                        {
+                            id: 'sets',
+                            title: 'Ensembles (Set)',
+                            description: 'Collection non-ordonnée d\'éléments UNIQUES.',
+                            code: `nombres = [1, 2, 2, 3, 3, 3]
+uniques = set(nombres) # {1, 2, 3}
+
+# Opérations ensemblistes
+a = {1, 2, 3}
+b = {3, 4, 5}
+
+print(a.intersection(b)) # {3}
+print(a.union(b)) # {1, 2, 3, 4, 5}`
+                        }
+                    ]
+                },
+                {
+                    id: 'error_handling',
+                    title: 'Gestion d\'Erreurs',
+                    description: 'Try, Except, Finally',
+                    snippets: [
+                        {
+                            id: 'try_except',
+                            title: 'Bloc Try / Except',
+                            description: 'Gérer les exceptions pour éviter que le programme plante.',
+                            code: `try:
+    resultat = 10 / 0
+except ZeroDivisionError:
+    print("Erreur : Division par zéro impossible !")
+except Exception as e:
+    print(f"Une autre erreur est survenue : {e}")
+else:
+    print("Tout s'est bien passé (si pas d'erreur)")
+finally:
+    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };

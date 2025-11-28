@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
-import { ChevronRight, Layers, BarChart, BrainCircuit } from 'lucide-react';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode } from 'lucide-react';
 
 const themeIcons = {
     pandas: Layers,
     visualization: BarChart,
-    ml: BrainCircuit
+    ml: BrainCircuit,
+    python_basics: FileCode
 };
 
 export default function LanguageView({ content }) {
