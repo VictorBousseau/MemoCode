@@ -468,12 +468,15 @@ plt.show()`
 # X : Features (Variables explicatives)
 # y : Target (Variable cible)
 
-# random_state=42 : Assure la reproductibilité du split
-# test_size=0.2 : 20% des données pour le test
+# stratify=y : Indispensable pour la Classification !
+# Assure que la proportion des classes est conservée dans le Train et le Test.
+# Ex: Si y a 10% de "Fraude", y_train et y_test auront aussi 10% de "Fraude".
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, 
     test_size=0.2, 
-    random_state=42
+    random_state=42,
+    stratify=y  # À retirer pour une Régression
 )`
                         },
                         {
@@ -483,12 +486,17 @@ X_train, X_test, y_train, y_test = train_test_split(
                             code: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
+# --- Exemple Avant / Après ---
+# Avant : Colonne 'Couleur' -> ['Rouge', 'Bleu', 'Rouge']
+# Après (OneHot) : 
+#    Couleur_Bleu : [0, 1, 0]
+#    Couleur_Rouge : [1, 0, 1]
+
 # 1. Approche rapide (Pandas get_dummies)
-# Idéal pour l'analyse rapide, moins pour la prod
 X_encoded = pd.get_dummies(X, drop_first=True)
 
 # 2. Approche Robuste (Scikit-Learn OneHotEncoder)
-# Idéal pour les pipelines et la mise en prod
+# drop='first' : Évite la colinéarité (Dummy Variable Trap)
 encoder = OneHotEncoder(drop='first', sparse_output=False)
 X_encoded_array = encoder.fit_transform(X[['categorie']])`
                         },
@@ -498,15 +506,16 @@ X_encoded_array = encoder.fit_transform(X[['categorie']])`
                             description: 'Standardiser les variables numériques.',
                             code: `from sklearn.preprocessing import StandardScaler
 
-# Indispensable pour : Régression Logistique, KNN, SVM, Réseaux de Neurones
-# (Moins critique pour les Arbres/Forêts aléatoires)
+# --- Exemple Avant / Après ---
+# Avant : Age [20, 60], Salaire [2000, 5000] -> Échelles très différentes
+# Après : Age [-1.2, 1.5], Salaire [-0.8, 1.1] -> Centré sur 0, écart-type de 1
 
 scaler = StandardScaler()
 
 # Fit uniquement sur le Train pour éviter la fuite de données (Data Leakage)
 X_train_scaled = scaler.fit_transform(X_train)
 
-# Transform uniquement sur le Test (utilise la moyenne/écart-type du Train)
+# Transform uniquement sur le Test
 X_test_scaled = scaler.transform(X_test)`
                         }
                     ]
@@ -516,6 +525,7 @@ X_test_scaled = scaler.transform(X_test)`
                     title: '2. Modèles (Catalogue)',
                     description: 'Régression et Classification',
                     snippets: [
+                        // --- RÉGRESSION ---
                         {
                             id: 'linear_regression',
                             title: 'Régression Linéaire',
@@ -534,6 +544,43 @@ model.fit(X_train, y_train)
 predictions = model.predict(X_test)`
                         },
                         {
+                            id: 'ridge_lasso',
+                            title: 'Régression Ridge & Lasso',
+                            description: `Type : Régression (Régularisée)
+                            Concept : Comme la Linéaire, mais pénalise les coefficients trop grands pour éviter le sur-apprentissage.
+                            - Ridge (L2) : Réduit les coefficients (jamais à 0).
+                            - Lasso (L1) : Peut mettre des coefficients à 0 (sélection de variables).
+                            Quand l'utiliser ?
+                            - Quand il y a beaucoup de variables (risque d'overfitting).
+                            - Lasso : Pour sélectionner les variables importantes.`,
+                            code: `from sklearn.linear_model import Ridge, Lasso
+
+# alpha : Force de la régularisation (plus grand = plus de contrainte)
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train, y_train)`
+                        },
+                        {
+                            id: 'svr',
+                            title: 'SVR (Support Vector Regression)',
+                            description: `Type : Régression
+                            Concept : Trouve un "tube" qui contient un maximum de points avec une marge d'erreur tolérée.
+                            Quand l'utiliser ?
+                            - Données non-linéaires (avec kernel='rbf').
+                            - Petits datasets complexes.
+                            Input : Scaling OBLIGATOIRE.`,
+                            code: `from sklearn.svm import SVR
+
+# kernel='rbf' : Pour capturer des relations non-linéaires
+# C : Pénalité (grand C = moins d'erreur tolérée sur le train)
+model = SVR(kernel='rbf', C=1.0)
+model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`
+                        },
+
+                        // --- CLASSIFICATION ---
+                        {
                             id: 'logistic_regression',
                             title: 'Régression Logistique',
                             description: `Type : Classification
@@ -547,8 +594,58 @@ predictions = model.predict(X_test)`
                             code: `from sklearn.linear_model import LogisticRegression
 
 model = LogisticRegression()
+model.fit(X_train_scaled, y_train) # Scaling recommandé
+predictions = model.predict(X_test_scaled)`
+                        },
+                        {
+                            id: 'knn',
+                            title: 'K-Nearest Neighbors (KNN)',
+                            description: `Type : Classification (et Régression)
+                            Concept : "Dis-moi qui sont tes voisins, je te dirai qui tu es". Regarde les k points les plus proches.
+                            Quand l'utiliser ?
+                            - Classification simple, intuitive.
+                            - Petits datasets.
+                            Input : Scaling OBLIGATOIRE (car basé sur la distance).`,
+                            code: `from sklearn.neighbors import KNeighborsClassifier
+
+# n_neighbors=5 : Nombre de voisins à considérer
+model = KNeighborsClassifier(n_neighbors=5)
+model.fit(X_train_scaled, y_train)
+predictions = model.predict(X_test_scaled)`
+                        },
+                        {
+                            id: 'svm',
+                            title: 'SVM (Support Vector Machine)',
+                            description: `Type : Classification
+                            Concept : Cherche l'hyperplan qui sépare le mieux les classes avec la plus grande marge possible.
+                            Quand l'utiliser ?
+                            - Données complexes, haute dimension.
+                            - Classification binaire ou multi-classes.
+                            Input : Scaling OBLIGATOIRE.`,
+                            code: `from sklearn.svm import SVC
+
+# probability=True : Pour avoir predict_proba()
+model = SVC(kernel='rbf', C=1.0, probability=True)
+model.fit(X_train_scaled, y_train)
+predictions = model.predict(X_test_scaled)`
+                        },
+                        {
+                            id: 'decision_tree',
+                            title: 'Arbre de Décision',
+                            description: `Type : Classification & Régression
+                            Concept : Série de questions (Si Age > 25 alors...) pour diviser les données.
+                            Quand l'utiliser ?
+                            - Besoin d'explicabilité totale (règles claires).
+                            - Pas besoin de scaling.
+                            Attention : Tendance au sur-apprentissage (overfitting) si trop profond.`,
+                            code: `from sklearn.tree import DecisionTreeClassifier, plot_tree
+
+# max_depth : Limite la profondeur pour éviter l'overfitting
+model = DecisionTreeClassifier(max_depth=5, random_state=42)
 model.fit(X_train, y_train)
-predictions = model.predict(X_test)`
+
+# Visualiser l'arbre (optionnel)
+# plot_tree(model, filled=True)`
                         },
                         {
                             id: 'random_forest',
@@ -565,6 +662,22 @@ predictions = model.predict(X_test)`
 
 # n_estimators=100 : Nombre d'arbres
 model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)`
+                        },
+                        {
+                            id: 'gradient_boosting',
+                            title: 'Gradient Boosting (XGBoost/LGBM)',
+                            description: `Type : Classification & Régression
+                            Concept : Construit les arbres séquentiellement, chaque nouvel arbre corrige les erreurs du précédent.
+                            Quand l'utiliser ?
+                            - Compétitions Kaggle, recherche de performance pure.
+                            - Données tabulaires structurées.
+                            Avantages : Souvent le plus précis.`,
+                            code: `from sklearn.ensemble import GradientBoostingClassifier
+
+# Il existe aussi XGBoost, LightGBM, CatBoost (librairies externes)
+model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)`
                         }
