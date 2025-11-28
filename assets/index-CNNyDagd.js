@@ -46,7 +46,10 @@ df.tail()  # 5 dernières lignes
 df.info()
 
 # Dimensions (lignes, colonnes)
-print(df.shape)`},{id:"stats",title:"Statistiques & Valeurs",description:"Comprendre la distribution des données.",code:`# Résumé statistique (numérique)
+print(df.shape)
+
+# Liste des colonnes (utile pour copier-coller)
+print(df.columns.tolist())`},{id:"stats",title:"Statistiques & Valeurs",description:"Comprendre la distribution des données.",code:`# Résumé statistique (numérique)
 df.describe()
 
 # Compter les occurrences (catégoriel)
@@ -55,7 +58,10 @@ df['categorie'].value_counts()
 
 # Valeurs uniques
 uniques = df['categorie'].unique()
-nb_uniques = df['categorie'].nunique()`}]},{id:"cleaning",title:"3. Nettoyage",description:"Renommage, types, valeurs manquantes et texte",snippets:[{id:"rename",title:"Renommer",description:"Changer le nom des colonnes.",code:`df = df.rename(columns={
+nb_uniques = df['categorie'].nunique()
+
+# Pourcentage de valeurs manquantes
+print(df.isna().mean())`}]},{id:"cleaning",title:"3. Nettoyage",description:"Renommage, types, valeurs manquantes et texte",snippets:[{id:"rename",title:"Renommer",description:"Changer le nom des colonnes.",code:`df = df.rename(columns={
     'old_name': 'new_name',
     'Date de Naissance': 'date_naissance'
 })`},{id:"types",title:"Changer les Types",description:"Conversion explicite des types.",code:`# Vers numérique
@@ -75,7 +81,10 @@ df_clean = df.dropna()
 df_filled = df.fillna({
     'score': 0,
     'commentaire': 'Aucun'
-})`},{id:"duplicates",title:"Doublons",description:"Gestion des lignes dupliquées.",code:`# Supprimer les doublons
+})
+
+# Remplacer par la médiane (pour les numériques)
+df['age'] = df['age'].fillna(df['age'].median())`},{id:"duplicates",title:"Doublons",description:"Gestion des lignes dupliquées.",code:`# Supprimer les doublons
 df = df.drop_duplicates()
 
 # Supprimer les doublons sur une colonne spécifique
@@ -104,7 +113,25 @@ df_cible = df.query("age > 25 and (ville == 'Paris' or salaire > 50000)")
 min_score = 80
 df_top = df.query("score >= @min_score")`},{id:"loc",title:"Filtrage classique (.loc)",description:"Filtrage par masque booléen.",code:`# Masque booléen
 mask = (df['age'] > 25) & (df['ville'] == 'Paris')
-df_filtered = df.loc[mask]`}]},{id:"transformation",title:"5. Transformation",description:"Apply, Groupby et Pivot Tables",snippets:[{id:"apply",title:"Apply & Map",description:"Appliquer des fonctions personnalisées.",code:`# Appliquer une fonction sur une colonne
+df_filtered = df.loc[mask]`},{id:"iloc_basics",title:"Sélection par Position (.iloc)",description:"Sélectionner par index (numéro de ligne/colonne).",code:`# | Ce que tu veux faire    | Code avec iloc              |
+# | ----------------------- | ----------------------------- |
+# | Ligne par position      | df.iloc[i]                  |
+# | Colonnes par position   | df.iloc[:, j]               |
+# | Plage de lignes         | df.iloc[i:j]                |
+# | Ligne x colonne         | df.iloc[i, j]               |
+# | Indexer avec des listes | df.iloc[[i1, i2], [j1, j2]] |
+
+# 1ère ligne
+first_row = df.iloc[0]
+
+# 3 premières lignes
+first_three = df.iloc[:3]
+
+# Toutes les lignes, 2ème colonne
+col_2 = df.iloc[:, 1]
+
+# Valeur précise (ligne 0, colonne 2)
+val = df.iloc[0, 2]`}]},{id:"transformation",title:"5. Transformation",description:"Apply, Groupby et Pivot Tables",snippets:[{id:"apply",title:"Apply & Map",description:"Appliquer des fonctions personnalisées.",code:`# Appliquer une fonction sur une colonne
 df['nom_long'] = df['nom'].apply(len)
 
 # Avec une lambda
