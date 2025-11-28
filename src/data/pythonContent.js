@@ -521,11 +521,10 @@ X_test_scaled = scaler.transform(X_test)`
                     ]
                 },
                 {
-                    id: 'models',
-                    title: '2. Modèles (Catalogue)',
-                    description: 'Régression et Classification',
+                    id: 'regression_models',
+                    title: '2.1 Modèles de Régression',
+                    description: 'Prédire une valeur continue',
                     snippets: [
-                        // --- RÉGRESSION ---
                         {
                             id: 'linear_regression',
                             title: 'Régression Linéaire',
@@ -578,8 +577,30 @@ lasso.fit(X_train, y_train)`
 model = SVR(kernel='rbf', C=1.0)
 model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`
                         },
+                        {
+                            id: 'mlp_regressor',
+                            title: 'Réseau de Neurones (MLP Regressor)',
+                            description: `Type : Régression (Deep Learning)
+                            Concept : Couches de neurones connectés pour apprendre des relations très complexes.
+                            Quand l'utiliser ?
+                            - Données très complexes, non-linéaires.
+                            - Beaucoup de données disponibles.
+                            Input : Scaling OBLIGATOIRE.`,
+                            code: `from sklearn.neural_network import MLPRegressor
 
-                        // --- CLASSIFICATION ---
+# hidden_layer_sizes=(100, 50) : 2 couches cachées de 100 et 50 neurones
+# max_iter=500 : Nombre d'époques d'entraînement
+model = MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
+model.fit(X_train_scaled, y_train)
+predictions = model.predict(X_test_scaled)`
+                        }
+                    ]
+                },
+                {
+                    id: 'classification_models',
+                    title: '2.2 Modèles de Classification',
+                    description: 'Prédire une classe / catégorie',
+                    snippets: [
                         {
                             id: 'logistic_regression',
                             title: 'Régression Logistique',
@@ -680,6 +701,22 @@ predictions = model.predict(X_test)`
 model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)`
+                        },
+                        {
+                            id: 'mlp_classifier',
+                            title: 'Réseau de Neurones (MLP Classifier)',
+                            description: `Type : Classification (Deep Learning)
+                            Concept : Couches de neurones connectés pour apprendre des relations très complexes.
+                            Quand l'utiliser ?
+                            - Données très complexes (images, sons, texte, ou tabulaire complexe).
+                            - Beaucoup de données.
+                            Input : Scaling OBLIGATOIRE.`,
+                            code: `from sklearn.neural_network import MLPClassifier
+
+# hidden_layer_sizes=(100, 50) : 2 couches cachées
+model = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
+model.fit(X_train_scaled, y_train)
+predictions = model.predict(X_test_scaled)`
                         }
                     ]
                 },

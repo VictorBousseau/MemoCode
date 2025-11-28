@@ -6,7 +6,7 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage })
         <div className="flex min-h-screen bg-black text-zinc-100 font-sans selection:bg-blue-500/30">
             <Sidebar selectedLanguage={selectedLanguage} onSelectLanguage={onSelectLanguage} />
             <main className="flex-1 overflow-y-auto h-screen">
-                <div className="max-w-5xl mx-auto p-8">
+                <div className="w-full p-8">
                     {children}
                 </div>
             </main>
