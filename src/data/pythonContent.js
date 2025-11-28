@@ -977,6 +977,120 @@ finally:
                     ]
                 }
             ]
+        },
+        {
+            id: 'python_tips',
+            title: '5. Python Tips',
+            description: 'Astuces et Bonnes Pratiques',
+            categories: [
+                {
+                    id: 'string_formatting',
+                    title: 'Formatage de Chaînes (f-strings)',
+                    description: 'La méthode moderne pour formater du texte.',
+                    snippets: [
+                        {
+                            id: 'f_strings_basic',
+                            title: 'Bases des f-strings',
+                            description: 'Insérer des variables directement dans les chaînes.',
+                            code: `nom = "Alice"
+age = 30
+
+# Avant (vieux)
+print("Bonjour " + nom + ", tu as " + str(age) + " ans.")
+
+# Avec f-string (moderne)
+print(f"Bonjour {nom}, tu as {age} ans.")`
+                        },
+                        {
+                            id: 'f_strings_advanced',
+                            title: 'Formatage Avancé',
+                            description: 'Arrondis, dates, alignement.',
+                            code: `prix = 19.9999
+pourcentage = 0.1234
+
+# Arrondir à 2 décimales
+print(f"Prix : {prix:.2f}€") # 20.00€
+
+# Afficher en pourcentage
+print(f"Taux : {pourcentage:.1%}") # 12.3%
+
+# Debug facile (affiche nom_variable = valeur)
+x = 10
+print(f"{x=}") # x=10`
+                        }
+                    ]
+                },
+                {
+                    id: 'documentation',
+                    title: 'Documentation',
+                    description: 'Docstrings et Commentaires',
+                    snippets: [
+                        {
+                            id: 'docstrings',
+                            title: 'Docstrings ("""...""")',
+                            description: 'Documenter vos fonctions pour les autres (et vous-même).',
+                            code: `def calcul_complexe(x, y):
+    """
+    Effectue un calcul complexe entre x et y.
+
+    Args:
+        x (int): Le premier nombre.
+        y (int): Le deuxième nombre.
+
+    Returns:
+        int: Le résultat du calcul.
+    """
+    return x * y + 10
+
+# Accéder à la doc
+help(calcul_complexe)`
+                        }
+                    ]
+                },
+                {
+                    id: 'pythonic_idioms',
+                    title: 'Astuces "Pythoniques"',
+                    description: 'Écrire du code plus élégant et concis.',
+                    snippets: [
+                        {
+                            id: 'unpacking',
+                            title: 'Unpacking (Déballage)',
+                            description: 'Assigner plusieurs variables en une ligne.',
+                            code: `coords = (10, 20)
+x, y = coords # x=10, y=20
+
+# Échanger deux variables sans variable temporaire
+a = 5
+b = 10
+a, b = b, a # a=10, b=5`
+                        },
+                        {
+                            id: 'enumerate',
+                            title: 'Enumerate',
+                            description: 'Avoir l\'index ET la valeur dans une boucle.',
+                            code: `fruits = ["pomme", "banane", "cerise"]
+
+# Pas terrible :
+# for i in range(len(fruits)):
+#     print(i, fruits[i])
+
+# Pythonique :
+for i, fruit in enumerate(fruits):
+    print(f"{i}: {fruit}")`
+                        },
+                        {
+                            id: 'zip',
+                            title: 'Zip',
+                            description: 'Boucler sur deux listes en parallèle.',
+                            code: `noms = ["Alice", "Bob"]
+ages = [25, 30]
+
+for nom, age in zip(noms, ages):
+    print(f"{nom} a {age} ans")`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
