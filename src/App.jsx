@@ -4,6 +4,9 @@ import LanguageView from './components/LanguageView';
 import { pythonContent } from './data/pythonContent';
 import { sqlContent } from './data/sqlContent';
 import { gitContent } from './data/gitContent';
+import { pysparkContent } from './data/pysparkContent';
+import { daxContent } from './data/daxContent';
+import { rContent } from './data/rContent';
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('Python');
@@ -16,6 +19,12 @@ export default function App() {
         return sqlContent;
       case 'Git':
         return gitContent;
+      case 'PySpark':
+        return pysparkContent;
+      case 'DAX':
+        return daxContent;
+      case 'R':
+        return rContent;
       default:
         return pythonContent;
     }

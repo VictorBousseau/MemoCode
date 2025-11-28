@@ -25,6 +25,10 @@ export default function LanguageView({ content }) {
         language = 'sql';
     } else if (content.themes.some(t => t.id === 'git_basics')) {
         language = 'bash';
+    } else if (content.themes.some(t => t.id === 'dax_basics')) {
+        language = 'sql'; // SyntaxHighlighter might not have 'dax', 'sql' is close enough
+    } else if (content.themes.some(t => t.id === 'r_basics')) {
+        language = 'r';
     }
 
     // Reset state when content changes (i.e., when language changes)
