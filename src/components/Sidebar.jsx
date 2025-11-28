@@ -1,8 +1,24 @@
+import React from 'react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch } from 'lucide-react';
+
+const languages = [
+    { name: 'Python', icon: FileCode2 },
+    { name: 'R', icon: BarChart3 },
+    { name: 'SQL', icon: Database },
+    { name: 'Git', icon: GitBranch },
+    { name: 'PySpark', icon: Zap },
+    { name: 'DAX', icon: TrendingUp },
+];
+
+export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
+    return (
+        <aside className="w-64 bg-zinc-900 text-white flex flex-col border-r border-zinc-800 h-screen sticky top-0">
+            <div className="p-6 border-b border-zinc-800">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     MemoCode
                 </h1>
                 <p className="text-xs text-zinc-400 mt-1">Snippets Data Science</p>
-            </div >
+            </div>
             <nav className="flex-1 p-4 space-y-2">
                 {languages.map((lang) => (
                     <button
@@ -23,6 +39,6 @@
                     v1.0.0 • Built with ❤️
                 </div>
             </div>
-        </aside >
+        </aside>
     );
 }

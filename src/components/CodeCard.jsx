@@ -17,7 +17,7 @@ export default function CodeCard({ snippet }) {
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-start">
                 <div>
                     <h3 className="text-lg font-semibold text-zinc-100">{snippet.title}</h3>
-                    <p className="text-sm text-zinc-400 mt-1">{snippet.description}</p>
+                    <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
                 </div>
                 <button
                     onClick={handleCopy}
