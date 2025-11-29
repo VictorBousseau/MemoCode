@@ -1143,39 +1143,60 @@ def sample_data():
 
 def test_data_name(sample_data):
     # Le test reçoit le résultat de la fixture
-    assert sample_data["name"] == "Test"`},{id:"pytest_parametrize",title:"Parametrize",description:"Tester plusieurs cas en une seule fonction.",code:`import pytest
+    assert sample_data["name"] == "Test"`},{id:"pytest_parametrize",title:"Parametrize (Le Super-Pouvoir)",description:"Tester 10 cas sans copier-coller 10 fois le code.",markdown:'### 💡 Pourquoi Parametrize ?\nSans parametrize, pour tester une fonction qui classe les âges, vous feriez :\n```python\ndef test_enfant(): assert classer_age(10) == "Enfant"\ndef test_adulte(): assert classer_age(30) == "Adulte"\ndef test_senior(): assert classer_age(70) == "Senior"\n```\nC\'est répétitif et difficile à maintenir. Avec `@pytest.mark.parametrize`, vous définissez une **liste de cas** et Pytest génère les tests pour vous.',code:`import pytest
 
-# On définit les entrées et le résultat attendu
-@pytest.mark.parametrize("input_a, input_b, expected", [
-    (1, 2, 3),
-    (0, 0, 0),
-    (-1, 1, 0),
-    (100, 200, 300),
+def classer_age(age):
+    if age < 18: return "Enfant"
+    elif age < 65: return "Adulte"
+    else: return "Senior"
+
+# On définit nos cas de test : (Entrée, Sortie Attendue)
+@pytest.mark.parametrize("age_input, expected_label", [
+    (10, "Enfant"),  # Cas 1
+    (30, "Adulte"),  # Cas 2
+    (70, "Senior"),  # Cas 3
+    (17, "Enfant"),  # Cas Limite
+    (18, "Adulte"),  # Cas Limite
 ])
-def test_addition_multi(input_a, input_b, expected):
-    assert input_a + input_b == expected`}]},{id:"logging",title:"3. Logging (vs Print)",description:"Arrêtez d'utiliser print() en production !",snippets:[{id:"logging_basics",title:"Les Niveaux de Log",description:"Debug, Info, Warning, Error, Critical.",code:`import logging
+def test_classer_age(age_input, expected_label):
+    # Ce test sera lancé 5 fois avec des valeurs différentes
+    assert classer_age(age_input) == expected_label`}]},{id:"logging",title:"3. Logging (vs Print)",description:"Pourquoi Print est dangereux en production.",snippets:[{id:"logging_vs_print",title:"Avant/Après : Print vs Log",description:"Comparaison directe.",markdown:`### ❌ AVANT (Print)
+\`\`\`python
+print("Début du traitement") 
+# Problème : On ne sait pas QUAND ça s'est passé, ni si c'est grave.
+# Si le script tourne la nuit, ce message est perdu dans la console.
+\`\`\`
 
-# Configuration de base (à faire au début du script)
-logging.basicConfig(level=logging.INFO)
+### ✅ APRÈS (Logging)
+\`\`\`python
+logging.info("Début du traitement")
+# Résultat dans le fichier : "2023-10-27 14:00:01 - INFO - Début du traitement"
+# Avantages :
+# 1. Horodatage automatique (Timestamp)
+# 2. Niveau de gravité (INFO, ERROR...)
+# 3. Persistance (écrit dans un fichier)
+\`\`\``},{id:"logging_practice",title:"Mise en place Complète",description:"Le code prêt à l'emploi.",code:`import logging
 
-logging.debug("Détail technique pour le dév") # Ne s'affichera pas (niveau INFO > DEBUG)
-logging.info("Le script a démarré")
-logging.warning("Attention, espace disque faible")
-logging.error("Échec de la connexion BDD")
-logging.critical("Le système va s'arrêter !")`},{id:"logging_config",title:"Configuration Avancée",description:"Écrire dans un fichier et formater.",code:`import logging
+# 1. Configuration (À faire une seule fois au début)
+logging.basicConfig(
+    filename='mon_app.log',       # Fichier de sortie
+    level=logging.INFO,           # Niveau minimum (DEBUG < INFO < WARNING < ERROR)
+    format='%(asctime)s - %(levelname)s - %(message)s' # Format : Date - Niveau - Message
+)
 
-# On crée un logger
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+def division(a, b):
+    logging.info(f"Tentative de division : {a} / {b}")
+    try:
+        result = a / b
+        logging.info(f"Succès : {result}")
+        return result
+    except ZeroDivisionError:
+        logging.error("Erreur : Division par zéro détectée !")
+        return None
 
-# Handler pour écrire dans un fichier
-file_handler = logging.FileHandler('app.log')
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-
-logger.info("Ce message ira dans le fichier app.log avec la date")`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+# Test
+division(10, 2) # Écrira INFO dans le fichier
+division(5, 0)  # Écrira ERROR dans le fichier`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
@@ -1188,19 +1209,24 @@ df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 df['c'] = df['a'] + df['b']
 
 # ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Optimisation)",description:"Garder la connexion ouverte (Cookies, Auth).",code:`import requests
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Le Navigateur)",description:"Garder la connexion et les cookies.",markdown:`### 🧠 L'Analogie du Navigateur
+*   **Requests.get()** simple : C'est comme ouvrir une fenêtre de **Navigation Privée**, aller sur un site, et fermer la fenêtre immédiatement. Vous perdez tout (cookies, connexion).
+*   **Session()** : C'est comme ouvrir **Chrome**. Vous vous connectez une fois, et le navigateur retient qui vous êtes pour les pages suivantes.`,code:`import requests
 
-# Sans Session : Ouvre et ferme une connexion TCP à chaque appel (Lent)
-# requests.get('https://api.github.com/user')
-# requests.get('https://api.github.com/user/repos')
-
-# Avec Session : Réutilise la connexion (Rapide)
+# Création de la session (Ouverture du navigateur)
 with requests.Session() as s:
-    s.headers.update({'Authorization': 'Bearer MON_TOKEN'})
+    # 1. Configuration Commune (ex: Token d'authentification)
+    # Ces headers seront envoyés pour TOUTES les requêtes de la session
+    s.headers.update({'Authorization': 'Bearer MON_SUPER_TOKEN'})
     
-    # Les headers sont envoyés automatiquement
-    r1 = s.get('https://api.github.com/user')
-    r2 = s.get('https://api.github.com/user/repos')`},{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
+    # 2. Premier appel (ex: Login ou Récupération profil)
+    # La connexion TCP est ouverte et gardée au chaud (Keep-Alive)
+    r1 = s.get('https://api.example.com/me')
+    
+    # 3. Deuxième appel
+    # Plus rapide car on réutilise la même connexion !
+    # Les cookies reçus au premier appel sont renvoyés automatiquement ici.
+    r2 = s.get('https://api.example.com/my-orders')`},{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
 
 url = "https://api.github.com/search/repositories"
 
@@ -1618,23 +1644,35 @@ git rebase main
 ⚠️ **Règle d'or** : Ne jamais rebaser une branche partagée (déjà pushée) !`},{id:"cherry_pick",title:"Cherry-Pick",description:"Picorer un commit spécifique.",code:`# Vous voulez juste le commit "Fix bug" de la branche "dev" sur votre branche "main"
 # sans tout fusionner.
 
-git cherry-pick <hash_du_commit>`}]},{id:"ignoring",title:"2. Ignorer des fichiers",description:"Le fichier .gitignore.",snippets:[{id:"gitignore_rules",title:"Règles .gitignore",description:"Ce qu'il ne faut JAMAIS commiter.",code:`# Fichiers système
+git cherry-pick <hash_du_commit>`}]},{id:"ignoring",title:"2. Ignorer des fichiers (.gitignore)",description:"Ne polluez pas votre dépôt !",snippets:[{id:"gitignore_guide",title:"Guide : Créer son .gitignore",description:"Pas à pas pour exclure les fichiers indésirables.",markdown:`### 📝 La Procédure
+1.  Créez un fichier nommé exactement \`.gitignore\` à la racine du projet.
+2.  Listez les fichiers/dossiers à ignorer (un par ligne).
+
+### ⚠️ Le Piège Classique
+Si un fichier a **déjà été commité** (suivi par Git), l'ajouter au .gitignore ne suffit pas ! Il continuera d'être suivi.
+Il faut le retirer de l'index Git (sans le supprimer de votre disque) :
+\`\`\`bash
+git rm --cached mon_fichier_secret.json
+git commit -m "Stop tracking secret file"
+\`\`\``,code:`# Exemple de contenu .gitignore standard Python :
+
+# 1. Fichiers Système (Inutiles pour les autres)
 .DS_Store
 Thumbs.db
 
-# Environnements virtuels Python
+# 2. Environnements Virtuels (Lourds, on les recrée)
 .venv/
 env/
 __pycache__/
 
-# Fichiers de configuration locaux / Secrets
+# 3. Secrets & Config Locale (DANGER !)
 .env
 config_local.json
+secrets.yaml
 
-# Dossiers de build
+# 4. Dossiers de Build/Dist
 dist/
-build/
-node_modules/`}]}]},{id:"git_panic",title:"Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"1. Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
+build/`}]}]},{id:"git_panic",title:"Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"1. Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
 git stash
 
 # Récupérer ce qu'on a mis de côté
