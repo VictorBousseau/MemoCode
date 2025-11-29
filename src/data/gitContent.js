@@ -182,6 +182,59 @@ git pull origin main
                     ]
                 }
             ]
+        },
+        {
+            id: 'git_panic',
+            title: '5. Sauvetage (Panic Mode)',
+            description: 'Quand ça tourne mal...',
+            categories: [
+                {
+                    id: 'stash',
+                    title: 'Mettre de côté (Stash)',
+                    description: 'Sauvegarder temporairement sans commiter.',
+                    snippets: [
+                        {
+                            id: 'git_stash',
+                            title: 'Git Stash',
+                            description: 'Très utile quand on doit changer de branche en urgence.',
+                            code: `# Mettre de côté les modifications en cours
+git stash
+
+# Récupérer ce qu'on a mis de côté
+git stash pop
+
+# Voir la liste des stashs
+git stash list`
+                        }
+                    ]
+                },
+                {
+                    id: 'undo',
+                    title: 'Annuler des choses',
+                    description: 'Reset et Revert.',
+                    snippets: [
+                        {
+                            id: 'git_reset',
+                            title: 'Git Reset (Attention !)',
+                            description: 'Revenir en arrière dans l\'historique.',
+                            code: `# Soft Reset : Annule le commit mais GARDE les fichiers modifiés (Staging)
+git reset --soft HEAD~1
+
+# Hard Reset : Annule TOUT (Commit + Fichiers). Destructeur !
+git reset --hard HEAD~1`
+                        },
+                        {
+                            id: 'git_revert',
+                            title: 'Git Revert (Safe)',
+                            description: 'Annuler un commit en créant un commit inverse.',
+                            code: `# Crée un nouveau commit qui annule les changements du commit spécifié
+git revert <commit_hash>
+
+# C'est la bonne façon d'annuler si on a déjà pushé !`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };

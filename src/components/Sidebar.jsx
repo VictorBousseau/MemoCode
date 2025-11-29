@@ -8,6 +8,7 @@ const languages = [
     { name: 'Git', icon: GitBranch },
     { name: 'PySpark', icon: Zap },
     { name: 'DAX', icon: TrendingUp },
+    { name: 'Exemples', icon: FileCode2 },
 ];
 
 export default function Sidebar({ selectedLanguage, onSelectLanguage }) {

@@ -5,6 +5,7 @@ export const pythonContent = {
             title: 'Pandas',
             description: 'Manipulation et Analyse de Données',
             categories: [
+
                 {
                     id: 'io',
                     title: '1. Chargement & Export',
@@ -71,7 +72,10 @@ df.tail()  # 5 dernières lignes
 df.info()
 
 # Dimensions (lignes, colonnes)
-print(df.shape)`
+print(df.shape)
+
+# Liste des colonnes (utile pour copier-coller)
+print(df.columns.tolist())`
                         },
                         {
                             id: 'stats',
@@ -81,12 +85,24 @@ print(df.shape)`
 df.describe()
 
 # Compter les occurrences (catégoriel)
-# Indispensable pour comprendre une colonne
 df['categorie'].value_counts()
 
 # Valeurs uniques
 uniques = df['categorie'].unique()
-nb_uniques = df['categorie'].nunique()`
+nb_uniques = df['categorie'].nunique() # Nombre de valeurs distinctes
+
+# Types et Mémoire
+print(df.dtypes)        # Types des colonnes
+print(df.memory_usage()) # Mémoire utilisée par colonne
+
+# Statistiques spécifiques
+print(df['age'].mean())     # Moyenne
+print(df['age'].median())   # Médiane
+print(df['age'].std())      # Écart-type (Standard Deviation)
+print(df['age'].var())      # Variance
+print(df['age'].min())      # Minimum
+print(df['age'].max())      # Maximum
+print(df['age'].quantile([0.25, 0.75])) # Quartiles`
                         }
                     ]
                 },
@@ -131,7 +147,10 @@ df_clean = df.dropna()
 df_filled = df.fillna({
     'score': 0,
     'commentaire': 'Aucun'
-})`
+})
+
+# Remplacer par la médiane (pour les numériques)
+df['age'] = df['age'].fillna(df['age'].median())`
                         },
                         {
                             id: 'duplicates',
@@ -198,6 +217,62 @@ df_top = df.query("score >= @min_score")`
                             code: `# Masque booléen
 mask = (df['age'] > 25) & (df['ville'] == 'Paris')
 df_filtered = df.loc[mask]`
+                        },
+                        {
+                            id: 'iloc_basics',
+                            title: 'Sélection par Position (.iloc)',
+                            description: 'Sélectionner par index (numéro de ligne/colonne).',
+                            code: `# | Ce que tu veux faire    | Code avec iloc              |
+# | ----------------------- | ----------------------------- |
+# | Ligne par position      | df.iloc[i]                  |
+# | Colonnes par position   | df.iloc[:, j]               |
+# | Plage de lignes         | df.iloc[i:j]                |
+# | Ligne x colonne         | df.iloc[i, j]               |
+# | Indexer avec des listes | df.iloc[[i1, i2], [j1, j2]] |
+
+# 1ère ligne
+first_row = df.iloc[0]
+
+# 3 premières lignes
+first_three = df.iloc[:3]
+
+# Toutes les lignes, 2ème colonne
+col_2 = df.iloc[:, 1]
+
+# Valeur précise (ligne 0, colonne 2)
+val = df.iloc[0, 2]`
+                        },
+                        {
+                            id: 'logic_regex_cheat',
+                            title: 'Cheat Sheet : Logique & Regex',
+                            description: 'Opérateurs de comparaison et expressions régulières.',
+                            markdown: `### 🧠 Logique en Python (et Pandas)
+
+| Opérateur | Signification | Pandas Equivalent |
+| :--- | :--- | :--- |
+| \`<\` | Strictement inférieur | \`lt\` |
+| \`>\` | Strictement supérieur | \`gt\` |
+| \`==\` | Égal à | \`eq\` |
+| \`<=\` | Inférieur ou égal | \`le\` |
+| \`>=\` | Supérieur ou égal | \`ge\` |
+| \`!=\` | Différent de | \`ne\` |
+| \`&\` | ET (Logique) | \`df[(c1) & (c2)]\` |
+| \`\|\` | OU (Logique) | \`df[(c1) \| (c2)]\` |
+| \`~\` | NON (Négation) | \`df[~condition]\` |
+| \`^\` | XOR (Ou exclusif) | |
+| \`isin\` | Appartient à la liste | \`df['col'].isin([1, 2])\` |
+| \`isnull\` | Est manquant (NaN) | \`pd.isnull(obj)\` |
+| \`notnull\` | N'est pas manquant | \`pd.notnull(obj)\` |
+
+### 🔍 Regex (Expressions Régulières)
+
+| Pattern | Signification | Exemple |
+| :--- | :--- | :--- |
+| \`\\.\` | Contient un point littéral | \`'file\\.txt'\` |
+| \`Length$\` | Termine par "Length" | \`'Sepal Length'\` |
+| \`^Sepal\` | Commence par "Sepal" | \`'Sepal Width'\` |
+| \`^x[1-5]$\` | Commence par x, finit par 1-5 | \`'x1', 'x5'\` |
+| \`^(?!Species$).*\` | Tout sauf "Species" | Colonnes sauf target |`
                         }
                     ]
                 },
@@ -245,6 +320,37 @@ df.groupby('ville').agg({
     aggfunc='sum',
     fill_value=0
 )`
+                        },
+                        {
+                            id: 'sorting',
+                            title: 'Tri (Sort Values/Index)',
+                            description: 'Ordonner les données.',
+                            code: `# Trier par valeurs (Croissant)
+df = df.sort_values(by='age')
+
+# Trier par valeurs (Décroissant)
+df = df.sort_values(by='salaire', ascending=False)
+
+# Trier par plusieurs colonnes
+# D'abord par Ville (A-Z), puis par Age (Décroissant)
+df = df.sort_values(by=['ville', 'age'], ascending=[True, False])
+
+# Trier par Index (remettre les lignes dans l'ordre original)
+df = df.sort_index()`
+                        },
+                        {
+                            id: 'reset_index',
+                            title: 'Reset Index',
+                            description: 'Réinitialiser l\'index (souvent après un filtre ou un tri).',
+                            code: `# Cas d'usage classique :
+# Après un filtrage, les index sont "troués" (ex: 1, 5, 8...).
+# reset_index() recrée un index propre (0, 1, 2...).
+
+# drop=True : Ne garde pas l'ancien index comme colonne (le supprime).
+# inplace=True : Modifie le DataFrame directement (pas besoin de df = ...)
+df.reset_index(drop=True, inplace=True)
+
+# Sans drop=True, l'ancien index devient une colonne nommée "index".`
                         }
                     ]
                 },
@@ -257,14 +363,43 @@ df.groupby('ville').agg({
                             id: 'merge',
                             title: 'Jointures (Merge)',
                             description: 'Fusionner deux DataFrames (comme SQL JOIN).',
-                            code: `# Inner Join (par défaut)
-df_merged = pd.merge(df_clients, df_commandes, on='client_id')
+                            markdown: `### 🧩 Comprendre les Jointures
 
-# Left Join
-df_merged = pd.merge(df_clients, df_commandes, 
-    on='client_id', 
-    how='left'
-)`
+Imaginez deux tables : **A (Gauche)** et **B (Droite)**.
+
+| Type | SQL Equivalent | Description | Résultat |
+| :--- | :--- | :--- | :--- |
+| **Inner** | \`INNER JOIN\` | Garde uniquement les clés présentes dans **les deux** tables. | Intersection (A ∩ B) |
+| **Left** | \`LEFT JOIN\` | Garde **tout A**, et ajoute B là où ça matche. (NaN sinon) | Tout A + B correspondants |
+| **Right** | \`RIGHT JOIN\` | Garde **tout B**, et ajoute A là où ça matche. | Tout B + A correspondants |
+| **Outer** | \`FULL OUTER JOIN\` | Garde **tout**, remplit les trous avec NaN. | Union (A ∪ B) |
+
+**Exemple Visuel :**
+\`\`\`text
+   adf (A)      bdf (B)
+  x1  x2       x1  x3
+  A   1        A   T
+  B   2        B   F
+  C   3        D   T
+\`\`\`
+`,
+                            code: `import pandas as pd
+
+# Inner Join (Défaut : intersection)
+# Résultat : A (1, T), B (2, F) -> C et D sont exclus
+df_inner = pd.merge(adf, bdf, on='x1', how='inner')
+
+# Left Join (Tout A)
+# Résultat : A, B, C (avec NaN pour C en x3)
+df_left = pd.merge(adf, bdf, on='x1', how='left')
+
+# Right Join (Tout B)
+# Résultat : A, B, D (avec NaN pour D en x2)
+df_right = pd.merge(adf, bdf, on='x1', how='right')
+
+# Outer Join (Tout le monde)
+# Résultat : A, B, C, D (avec des NaN partout où ça manque)
+df_outer = pd.merge(adf, bdf, on='x1', how='outer')`
                         },
                         {
                             id: 'concat',
@@ -285,6 +420,7 @@ df_large = pd.concat([df_infos, df_metrics], axis=1)`
             title: 'Visualisation',
             description: 'Graphiques et EDA avec Seaborn',
             categories: [
+
                 {
                     id: 'univariate',
                     title: '1. Analyse Univariée',
@@ -295,7 +431,10 @@ df_large = pd.concat([df_infos, df_metrics], axis=1)`
                             title: 'Histogramme',
                             description: 'Distribution numérique (kde=True pour la densité).',
                             image: '/MemoCode/images/histogram.png',
-                            code: `# Histogramme avec courbe de densité (KDE)
+                            code: `import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Histogramme avec courbe de densité (KDE)
 # kde=True : ajoute la courbe de densité lissée
 # bins=30 : définit le nombre de barres
 sns.histplot(data=df, x='colonne_numerique', kde=True, bins=30)
@@ -455,6 +594,80 @@ plt.show()`
             description: 'Modélisation avec Scikit-Learn',
             categories: [
                 {
+                    id: 'pipelines',
+                    title: '0. Pipelines & Workflow',
+                    description: 'Automatiser et sécuriser le ML.',
+                    snippets: [
+                        {
+                            id: 'pipeline_concept',
+                            title: 'Comprendre les Pipelines',
+                            description: 'Pourquoi utiliser un Pipeline ?',
+                            markdown: `### ⛓️ Le Pipeline Scikit-Learn
+
+Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traitement des données jusqu'au modèle final.
+
+**Pourquoi est-ce indispensable ?**
+1.  **Zéro Fuite de Données (Data Leakage)** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises *uniquement* sur le train set et appliquées aveuglément sur le test set.
+2.  **Reproductibilité** : Tout le processus est contenu dans un seul objet.
+3.  **Simplicité** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
+
+\`\`\`mermaid
+graph LR
+    %% Nodes
+    A[Données Brutes] --> B(Preprocessing)
+    B --> C{Modèle}
+    C --> D[Prédiction]
+    
+    %% Subgraph
+    subgraph Pipeline [Pipeline Scikit-Learn]
+        direction LR
+        B -- Scaling / Encodage --> C
+    end
+    
+    %% Styles
+    classDef default fill:#27272a,stroke:#52525b,stroke-width:1px,color:#f4f4f5;
+    classDef input fill:#3f3f46,stroke:#71717a,color:#fff,stroke-width:2px;
+    classDef output fill:#059669,stroke:#10b981,color:#fff,stroke-width:2px;
+    classDef process fill:#2563eb,stroke:#3b82f6,color:#fff,stroke-width:2px;
+    
+    class A input;
+    class D output;
+    class B,C process;
+    
+    style Pipeline fill:none,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5,color:#93c5fd
+\`\`\`
+`
+                        },
+                        {
+                            id: 'make_pipeline',
+                            title: 'Créer un Pipeline',
+                            description: 'Exemple simple avec make_pipeline.',
+                            code: `from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+# 1. Séparer les données
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
+
+# 2. Créer le Pipeline
+# Le pipeline va d'abord mettre les données à l'échelle (StandardScaler)
+# Puis entraîner le modèle (LogisticRegression)
+pipe = make_pipeline(
+    StandardScaler(),
+    LogisticRegression()
+)
+
+# 3. Entraîner tout le flux en une ligne
+pipe.fit(X_train, y_train)
+
+# 4. Prédire (le scaling est appliqué automatiquement !)
+y_pred = pipe.predict(X_test)`
+                        }
+                    ]
+                },
+
+                {
                     id: 'preprocessing',
                     title: '1. Préparation (Preprocessing)',
                     description: 'Split, Encodage et Scaling',
@@ -463,7 +676,13 @@ plt.show()`
                             id: 'train_test_split',
                             title: 'Séparation Train / Test',
                             description: 'Diviser les données pour évaluer le modèle.',
-                            code: `from sklearn.model_selection import train_test_split
+                            code: `import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+
+from sklearn.model_selection import train_test_split
 
 # X : Features (Variables explicatives)
 # y : Target (Variable cible)
@@ -801,6 +1020,128 @@ plt.show()`
             title: '4. Python Basics',
             description: 'Les fondamentaux du langage',
             categories: [
+
+                {
+                    id: 'std_libs',
+                    title: 'Modules Standards',
+                    description: 'Math, Random, Datetime, OS...',
+                    snippets: [
+                        {
+                            id: 'math_lib',
+                            title: 'Mathématiques (math)',
+                            description: 'Fonctions mathématiques de base.',
+                            code: `import math
+
+# Constantes
+print(math.pi)  # 3.14159...
+print(math.e)   # 2.71828...
+
+# Fonctions usuelles
+print(math.sqrt(16))    # 4.0 (Racine carrée)
+print(math.ceil(4.2))   # 5 (Arrondi supérieur)
+print(math.floor(4.8))  # 4 (Arrondi inférieur)
+print(math.factorial(5)) # 120 (5!)`
+                        },
+                        {
+                            id: 'random_lib',
+                            title: 'Aléatoire (random)',
+                            description: 'Générer des nombres et choix aléatoires.',
+                            code: `import random
+
+# Fixer la graine (pour la reproductibilité)
+random.seed(42)
+
+# Nombres
+print(random.random())          # Float entre 0.0 et 1.0
+print(random.randint(1, 10))    # Entier entre 1 et 10 (inclus)
+print(random.uniform(1.5, 5.5)) # Float entre 1.5 et 5.5
+
+# Séquences
+fruits = ["pomme", "banane", "cerise"]
+print(random.choice(fruits))    # Un élément au hasard
+random.shuffle(fruits)          # Mélanger la liste sur place
+print(fruits)
+
+# Échantillon (sans remise)
+print(random.sample(range(100), 5))`
+                        },
+                        {
+                            id: 'datetime_lib',
+                            title: 'Dates & Heures (datetime)',
+                            description: 'Manipuler le temps.',
+                            code: `from datetime import datetime, timedelta
+
+# Maintenant
+now = datetime.now()
+print(f"Date actuelle : {now}")
+
+# Créer une date spécifique
+dt = datetime(2023, 12, 25, 10, 30) # 25 Déc 2023 à 10h30
+
+# Formatage (Date -> String)
+print(now.strftime("%d/%m/%Y %H:%M")) # "29/11/2025 09:45"
+
+# Parsing (String -> Date)
+date_str = "2023-01-01"
+date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+
+# Arithmétique (Ajouter du temps)
+demain = now + timedelta(days=1)
+dans_une_heure = now + timedelta(hours=1)`
+                        },
+                        {
+                            id: 'os_sys_lib',
+                            title: 'Système (os, sys)',
+                            description: 'Interagir avec l\'OS et le système de fichiers.',
+                            code: `import os
+import sys
+
+# --- OS (Operating System) ---
+# Chemin actuel
+print(os.getcwd())
+
+# Lister les fichiers
+# print(os.listdir('.'))
+
+# Construire des chemins (Compatible Windows/Mac/Linux)
+path = os.path.join("dossier", "sous_dossier", "fichier.txt")
+
+# Vérifier si un fichier existe
+if os.path.exists("data.csv"):
+    print("Fichier trouvé !")
+
+# --- SYS (System) ---
+# Arguments de la ligne de commande
+# print(sys.argv)
+
+# Chemin de recherche des modules
+# print(sys.path)
+
+# Quitter le script
+# sys.exit(0)`
+                        },
+                        {
+                            id: 'collections_lib',
+                            title: 'Collections Utiles',
+                            description: 'Counter et defaultdict.',
+                            code: `from collections import Counter, defaultdict
+
+# --- Counter ---
+# Compte les occurrences automatiquement
+liste = ['a', 'b', 'a', 'c', 'b', 'a']
+compteur = Counter(liste)
+print(compteur) # Counter({'a': 3, 'b': 2, 'c': 1})
+print(compteur.most_common(1)) # [('a', 3)]
+
+# --- DefaultDict ---
+# Dictionnaire avec valeur par défaut (évite les KeyError)
+d = defaultdict(int) # Valeur par défaut : 0
+d['a'] += 1
+print(d['a']) # 1
+print(d['z']) # 0 (créé automatiquement)`
+                        }
+                    ]
+                },
                 {
                     id: 'control_flow',
                     title: 'Contrôle de Flux',
@@ -810,7 +1151,13 @@ plt.show()`
                             id: 'loops',
                             title: 'Boucles For & While',
                             description: 'Itérer sur des séquences ou tant qu\'une condition est vraie.',
-                            code: `# Boucle FOR (Itération définie)
+                            code: `import math
+import random
+import datetime
+import os
+import sys
+
+# Boucle FOR (Itération définie)
 fruits = ["pomme", "banane", "cerise"]
 for fruit in fruits:
     print(f"J'aime la {fruit}")
@@ -983,6 +1330,7 @@ finally:
             title: '5. Python Tips',
             description: 'Astuces et Bonnes Pratiques',
             categories: [
+
                 {
                     id: 'string_formatting',
                     title: 'Formatage de Chaînes (f-strings)',
@@ -992,7 +1340,9 @@ finally:
                             id: 'f_strings_basic',
                             title: 'Bases des f-strings',
                             description: 'Insérer des variables directement dans les chaînes.',
-                            code: `nom = "Alice"
+                            code: `from pprint import pprint
+
+nom = "Alice"
 age = 30
 
 # Avant (vieux)
@@ -1087,6 +1437,742 @@ ages = [25, 30]
 
 for nom, age in zip(noms, ages):
     print(f"{nom} a {age} ans")`
+                        }
+                    ]
+                },
+                {
+                    id: 'jupyter_magic',
+                    title: 'Jupyter & Notebooks',
+                    description: 'Magics commands pour gagner du temps.',
+                    snippets: [
+                        {
+                            id: 'timeit',
+                            title: 'Mesurer le temps (%timeit)',
+                            description: 'Chronometrer une ligne de code.',
+                            code: `# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
+%timeit [x**2 for x in range(1000)]
+
+# Pour une cellule entière :
+# %%timeit`
+                        },
+                        {
+                            id: 'autoreload',
+                            title: 'Rechargement Auto (%autoreload)',
+                            description: 'Plus besoin de redémarrer le kernel quand on modifie un module externe.',
+                            code: `# À mettre au début du notebook
+%load_ext autoreload
+%autoreload 2
+
+import mon_module_perso
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'python_production',
+            title: '6. Production & Engineering',
+            description: 'Qualité, Tests et Performance',
+            categories: [
+
+                {
+                    id: 'environment',
+                    title: 'Environnement Virtuel',
+                    description: 'Isoler ses projets (Indispensable !)',
+                    snippets: [
+                        {
+                            id: 'venv',
+                            title: 'Venv (Standard)',
+                            description: 'Créer et activer un environnement virtuel.',
+                            code: `import pytest
+
+# 1. Créer l'environnement (dans le dossier du projet)
+python -m venv .venv
+
+# 2. Activer l'environnement
+# Windows :
+.venv\\Scripts\\activate
+# Mac/Linux :
+source .venv/bin/activate
+
+# 3. Installer des paquets
+pip install pandas
+
+# 4. Sauvegarder les dépendances
+pip freeze > requirements.txt`
+                        }
+                    ]
+                },
+                {
+                    id: 'testing',
+                    title: 'Tests Unitaires (Pytest)',
+                    description: 'Vérifier que le code fait ce qu\'il doit faire.',
+                    snippets: [
+                        {
+                            id: 'pytest_basic',
+                            title: 'Premier Test avec Pytest',
+                            description: 'Simple, lisible et puissant.',
+                            code: `# fichier: test_calcul.py
+
+def addition(a, b):
+    return a + b
+
+def test_addition():
+    assert addition(2, 3) == 5
+    assert addition(-1, 1) == 0
+
+# Lancer les tests dans le terminal :
+# pytest`
+                        }
+                    ]
+                },
+                {
+                    id: 'optimization',
+                    title: 'Optimisation & Performance',
+                    description: 'Écrire du code rapide.',
+                    snippets: [
+                        {
+                            id: 'vectorization',
+                            title: 'Vectorisation vs Boucles',
+                            description: 'Pourquoi il ne faut JAMAIS boucler sur un DataFrame.',
+                            code: `import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
+
+# ❌ LENT (Boucle for)
+# for i in range(len(df)):
+#     df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
+
+# ✅ RAPIDE (Vectorisation)
+df['c'] = df['a'] + df['b']
+
+# ✅ ENCORE PLUS RAPIDE (Numpy)
+df['c'] = df['a'].values + df['b'].values`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'polars',
+            title: 'Polars',
+            description: 'DataFrame haute performance (Rust)',
+            categories: [
+                {
+                    id: 'polars_intro',
+                    title: '1. Pourquoi Polars ?',
+                    description: 'Comprendre les avantages par rapport à Pandas.',
+                    snippets: [
+                        {
+                            id: 'pl_advantages',
+                            title: 'Pourquoi utiliser Polars ?',
+                            description: 'Vitesse, Parallélisme et Lazy Evaluation.',
+                            markdown: `🚀 **Pourquoi Polars est plus rapide ?**
+
+1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
+2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
+3. **Apache Arrow** : Format mémoire colonnaire standard (zéro copie).
+4. **Lazy Evaluation** : Optimise la requête AVANT de l'exécuter (comme SQL).
+
+💡 **Mental Model : Polars vs Pandas**
+*   **Pandas (Eager)** : "Fais ça, puis fais ça, puis fais ça..." (Exécution ligne par ligne)
+*   **Polars (Lazy)** : "Voici ce que je veux, trouve le meilleur moyen de le faire." (Optimisation globale)`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_io',
+                    title: '2. Chargement & Export (I/O)',
+                    description: 'Lecture optimisée (scan vs read).',
+                    snippets: [
+                        {
+                            id: 'pl_read_scan',
+                            title: 'Read vs Scan (Lazy)',
+                            description: 'La différence fondamentale.',
+                            code: `import polars as pl
+
+# 1. Mode Eager (Classique, comme Pandas)
+# Charge TOUT en mémoire immédiatement.
+df = pl.read_csv("data.csv") 
+
+# 2. Mode Lazy (Recommandé pour gros fichiers)
+# Ne charge RIEN. Crée un plan d'exécution.
+# Permet de traiter des fichiers plus gros que la RAM.
+q = pl.scan_csv("data.csv")
+
+# Pour voir le plan : q.explain()
+# Pour exécuter : q.collect()`
+                        },
+                        {
+                            id: 'pl_parquet',
+                            title: 'Parquet (Format Roi)',
+                            description: 'Le format natif idéal pour Polars.',
+                            code: `# Lecture
+df = pl.read_parquet("data.parquet")
+q = pl.scan_parquet("data.parquet")
+
+# Écriture
+# Polars est extrêmement rapide pour écrire du Parquet
+df.write_parquet("output.parquet", compression="snappy")`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_exploration',
+                    title: '3. Découverte (EDA)',
+                    description: 'Inspecter les données.',
+                    snippets: [
+                        {
+                            id: 'pl_glimpse',
+                            title: 'Glimpse & Schema',
+                            description: 'Aperçu dense des données.',
+                            code: `# Aperçu des premières/dernières lignes
+print(df.head())
+print(df.tail())
+
+# Glimpse (Inspiré de R) : Affiche type + premières valeurs de chaque colonne
+print(df.glimpse())
+
+# Schéma (Types de données)
+print(df.schema)`
+                        },
+                        {
+                            id: 'pl_describe',
+                            title: 'Describe',
+                            description: 'Statistiques descriptives.',
+                            code: `# Statistiques sommaires
+print(df.describe())
+
+# Compter les valeurs uniques (Value Counts)
+print(df["categorie"].value_counts())`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_subset',
+                    title: '4. Sélection & Filtrage',
+                    description: 'Select, Filter et Expressions.',
+                    snippets: [
+                        {
+                            id: 'pl_select',
+                            title: 'Select (Colonnes)',
+                            description: 'Choisir et transformer des colonnes.',
+                            code: `# Sélection simple
+df.select(["nom", "age"])
+
+# Sélection avec Expressions (Puissant !)
+# pl.col("x") est la base de tout en Polars
+df.select([
+    pl.col("nom"),
+    pl.col("age"),
+    (pl.col("salaire") * 1.2).alias("salaire_augmente"), # Calcul à la volée
+    pl.col("ville").str.to_uppercase() # Manipulation de string
+])
+
+# Sélection par type
+df.select(pl.col(pl.Int64))`
+                        },
+                        {
+                            id: 'pl_filter',
+                            title: 'Filter (Lignes)',
+                            description: 'Filtrer les données.',
+                            code: `# Filtrage simple
+df.filter(pl.col("age") > 18)
+
+# Conditions multiples (& = ET, | = OU)
+df.filter(
+    (pl.col("age") > 18) & 
+    (pl.col("ville") == "Paris")
+)
+
+# Filtrer sur une liste (is_in)
+villes_cibles = ["Paris", "Lyon"]
+df.filter(pl.col("ville").is_in(villes_cibles))`
+                        },
+                        {
+                            id: 'pl_with_columns',
+                            title: 'With Columns (Ajout)',
+                            description: 'Ajouter ou modifier des colonnes.',
+                            code: `# Pandas : df['new'] = ...
+# Polars : .with_columns()
+
+df = df.with_columns([
+    (pl.col("prix") * 0.2).alias("tva"),
+    (pl.col("prix") * 1.2).alias("prix_ttc"),
+    pl.lit("En stock").alias("statut") # Valeur littérale (constante)
+])`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_transformation',
+                    title: '5. Transformation',
+                    description: 'GroupBy, Agg et Sort.',
+                    snippets: [
+                        {
+                            id: 'pl_groupby',
+                            title: 'GroupBy & Agg',
+                            description: 'Agrégations performantes.',
+                            code: `# Syntaxe : group_by -> agg
+df.group_by("ville").agg([
+    pl.col("salaire").mean().alias("salaire_moyen"),
+    pl.col("salaire").max().alias("salaire_max"),
+    pl.len().alias("nb_habitants") # pl.len() = count
+])
+
+# Note : group_by (avec underscore) est la nouvelle syntaxe (vs groupby)`
+                        },
+                        {
+                            id: 'pl_window',
+                            title: 'Window Functions (Over)',
+                            description: 'Calculs par groupe sans réduire le nombre de lignes.',
+                            code: `# Ajouter la moyenne de la ville à chaque habitant
+# Pandas : transform()
+# Polars : .over()
+
+df.with_columns([
+    pl.col("salaire").mean().over("ville").alias("moyenne_ville")
+])`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_combine',
+                    title: '6. Combinaison',
+                    description: 'Join et Concat.',
+                    snippets: [
+                        {
+                            id: 'pl_join',
+                            title: 'Join (Jointures)',
+                            description: 'Fusionner des DataFrames.',
+                            code: `# Join
+# how : 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
+df_merged = df_clients.join(df_commandes, on="client_id", how="left")
+
+# Anti Join (Lignes de A qui ne sont PAS dans B)
+# Très pratique pour trouver les "non-matchs"
+df_non_trouve = df_clients.join(df_commandes, on="client_id", how="anti")`
+                        },
+                        {
+                            id: 'pl_concat',
+                            title: 'Concat',
+                            description: 'Empiler des données.',
+                            code: `# Vertical (Lignes)
+pl.concat([df1, df2], how="vertical")
+
+# Horizontal (Colonnes)
+pl.concat([df1, df2], how="horizontal")`
+                        }
+                    ]
+                },
+                {
+                    id: 'polars_advanced',
+                    title: '7. Polars Avancé',
+                    description: 'Lazy API, Streaming et SQL.',
+                    snippets: [
+                        {
+                            id: 'pl_lazy_flow',
+                            title: 'Le Flux Lazy Complet',
+                            description: 'L\'exemple canonique d\'optimisation.',
+                            code: `q = (
+    pl.scan_csv("data.csv")
+    .filter(pl.col("date") > "2023-01-01")
+    .group_by("categorie")
+    .agg(pl.col("montant").sum())
+    .sort("montant", descending=True)
+)
+
+# Voir le plan optimisé
+print(q.explain())
+
+# Exécuter
+df_result = q.collect()`
+                        },
+                        {
+                            id: 'pl_streaming',
+                            title: 'Streaming (Out-of-Core)',
+                            description: 'Traiter des données plus grosses que la RAM.',
+                            code: `# Si le dataset est trop gros pour la RAM,
+# Polars peut le traiter par morceaux (chunks).
+
+q = pl.scan_csv("big_data.csv")
+
+# streaming=True active le moteur de streaming
+df_result = q.collect(streaming=True)`
+                        },
+                        {
+                            id: 'pl_sql',
+                            title: 'SQL Context',
+                            description: 'Utiliser du SQL sur des DataFrames Polars.',
+                            code: `ctx = pl.SQLContext()
+ctx.register("clients", df_clients)
+ctx.register("ventes", df_ventes)
+
+result = ctx.execute("""
+    SELECT c.nom, SUM(v.montant) as total
+    FROM clients c
+    LEFT JOIN ventes v ON c.id = v.client_id
+    GROUP BY c.nom
+    ORDER BY total DESC
+""")
+
+print(result.collect())`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'skrub',
+            title: 'Skrub',
+            description: 'Préparation de données tabulaires (ex-DirtyCat)',
+            categories: [
+                {
+                    id: 'skrub_intro',
+                    title: '1. Introduction & Installation',
+                    description: 'Pourquoi Skrub ?',
+                    snippets: [
+                        {
+                            id: 'skrub_install',
+                            title: 'Installation & Contexte',
+                            description: 'Skrub facilite le preprocessing pour le Machine Learning.',
+                            markdown: `### 🧼 Skrub (ex-DirtyCat)
+
+Développé par l'équipe de **scikit-learn**, Skrub est conçu pour combler le fossé entre les données brutes (bases de données, CSV sales) et les modèles de Machine Learning.
+
+**💡 Pourquoi l'utiliser ? Quelle est la plus-value ?**
+Contrairement à un preprocessing manuel fastidieux (nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub **automatise** ces tâches ingrates.
+*   **Gain de temps** : Il détecte automatiquement les types de données.
+*   **Performance** : Il transforme les "mauvaises" catégories (fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
+*   **Simplicité** : Il s'intègre directement dans vos Pipelines scikit-learn.
+
+\`\`\`bash
+pip install skrub
+\`\`\`
+`
+                        }
+                    ]
+                },
+                {
+                    id: 'skrub_reporting',
+                    title: '2. Reporting Interactif',
+                    description: 'Comprendre ses données en une ligne.',
+                    snippets: [
+                        {
+                            id: 'table_report',
+                            title: 'TableReport',
+                            description: 'Génère un rapport HTML interactif complet.',
+                            code: `from skrub import TableReport
+import pandas as pd
+
+# Affiche un rapport interactif directement dans le notebook
+# - Détection automatique des types
+# - Histogrammes et distributions
+# - Valeurs manquantes et corrélations
+TableReport(df)`
+                        }
+                    ]
+                },
+                {
+                    id: 'skrub_preprocessing',
+                    title: '3. Preprocessing Automatique',
+                    description: 'Le tout-en-un : TableVectorizer.',
+                    snippets: [
+                        {
+                            id: 'table_vectorizer',
+                            title: 'TableVectorizer',
+                            description: 'Transforme tout un DataFrame en nombres pour le ML.',
+                            code: `from skrub import TableVectorizer
+from sklearn.pipeline import make_pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+# TableVectorizer remplace ColumnTransformer + OneHotEncoder + StandardScaler
+# Il détecte les types et applique la meilleure transformation :
+# - Dates -> Année, Mois, Jour...
+# - Catégories -> OneHot ou GapEncoder (si beaucoup de catégories)
+# - Nombres -> Pas de changement (ou scaling)
+
+pipeline = make_pipeline(
+    TableVectorizer(),
+    RandomForestClassifier()
+)
+
+pipeline.fit(X_train, y_train)`
+                        }
+                    ]
+                },
+                {
+                    id: 'skrub_encoders',
+                    title: '4. Encoders Avancés',
+                    description: 'Gérer les catégories "sales" (Dirty Categories).',
+                    snippets: [
+                        {
+                            id: 'minhash_encoder',
+                            title: 'MinHashEncoder',
+                            description: 'Pour les catégories avec beaucoup de valeurs uniques ou des fautes.',
+                            code: `from skrub import MinHashEncoder
+
+# Idéal pour : Noms, Adresses, Descriptions courtes
+# Transforme les chaînes en vecteurs basés sur les n-grams.
+# Résistant aux fautes de frappe ("Paris" vs "Pariis").
+
+encoder = MinHashEncoder(n_components=30)
+X_encoded = encoder.fit_transform(X[['ville']])`
+                        },
+                        {
+                            id: 'gap_encoder',
+                            title: 'GapEncoder',
+                            description: 'Topic Modeling pour colonnes textuelles.',
+                            code: `from skrub import GapEncoder
+
+# Trouve des "sujets" latents dans le texte.
+# Utile pour des descriptions de produits, commentaires...
+# Interprétable : on peut voir les mots-clés de chaque topic.
+
+encoder = GapEncoder(n_components=10)
+X_topics = encoder.fit_transform(X[['description']])`
+                        }
+                    ]
+                },
+                {
+                    id: 'skrub_joins',
+                    title: '5. Jointures Floues & Agrégations',
+                    description: 'Assembler des tables complexes.',
+                    snippets: [
+                        {
+                            id: 'joiner',
+                            title: 'Joiner (Fuzzy Join)',
+                            description: 'Joindre deux tables même si les clés ne correspondent pas exactement.',
+                            code: `from skrub import Joiner
+
+# Jointure floue (basée sur la similarité de texte)
+# Ex: Joindre "Coca-Cola" avec "Coca Cola Inc."
+joiner = Joiner(
+    aux_table=df_info_entreprises, 
+    main_key='nom_entreprise', 
+    aux_key='nom_societe',
+    match_score=0.8 # Seuil de similarité
+)
+
+df_enrichi = joiner.fit_transform(df_main)`
+                        },
+                        {
+                            id: 'aggregator',
+                            title: 'Aggregator',
+                            description: 'Agréger une table secondaire avant jointure.',
+                            code: `from skrub import Aggregator
+
+# Résume une table liée (ex: commandes) pour la joindre à la table principale (ex: clients)
+# Calcule automatiquement : min, max, sum, mean... pour les colonnes numériques
+agg = Aggregator(
+    main_key='client_id', 
+    cols_to_summarize=['montant', 'date']
+)
+
+df_resumed = agg.fit_transform(df_commandes)`
+                        }
+                    ]
+                },
+                {
+                    id: 'skrub_cheat',
+                    title: 'Récapitulatif',
+                    description: 'Les fonctions clés de Skrub.',
+                    snippets: [
+                        {
+                            id: 'skrub_cheat_sheet',
+                            title: 'Cheat Sheet',
+                            description: 'Tableau récapitulatif des fonctions.',
+                            markdown: `### 🛠️ Fonctions Clés de Skrub
+
+| Fonction | Usage Principal | Réel Avantage 🚀 | Scikit-Learn Equivalent |
+| :--- | :--- | :--- | :--- |
+| \`TableReport\` | Audit rapide (HTML) | **Vision immédiate** des problèmes (types, manques). | \`df.describe()\` |
+| \`TableVectorizer\` | Preprocessing Auto | **Gère tout** (dates, catégories, nombres) sans config. | \`ColumnTransformer\` |
+| \`MinHashEncoder\` | Catégories sales | **Tolère les fautes** de frappe et variantes. | \`OneHotEncoder\` |
+| \`GapEncoder\` | Topics (Texte court) | **Interprétable** (donne les mots-clés des sujets). | \`NMF\` |
+| \`Joiner\` | Jointure floue | **Joint sans clé exacte** (ex: "Apple" = "Apple Inc"). | - |
+| \`Aggregator\` | Agrégation relationnelle | **Crée des features** auto depuis une table liée. | \`groupby()\` |
+`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'numpy',
+            title: 'Numpy',
+            description: 'Calcul Numérique & Matriciel',
+            categories: [
+
+                {
+                    id: 'arrays',
+                    title: 'Tableaux (Arrays)',
+                    description: 'Création et manipulation.',
+                    snippets: [
+                        {
+                            id: 'create_array',
+                            title: 'Création',
+                            description: 'Différentes façons de créer des arrays.',
+                            code: `import numpy as np
+
+# À partir d'une liste
+arr = np.array([1, 2, 3])
+
+# Zéros et Uns
+zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
+ones = np.ones((2, 4))   # Matrice 2x4 de 1
+
+# Séquences
+range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
+linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`
+                        },
+                        {
+                            id: 'reshape',
+                            title: 'Dimensions & Reshape',
+                            description: 'Changer la forme des données.',
+                            code: `arr = np.arange(12) # [0..11]
+
+# Changer en matrice 3x4
+mat = arr.reshape(3, 4)
+
+# Aplatir (Flatten)
+flat = mat.flatten()`
+                        }
+                    ]
+                },
+                {
+                    id: 'math_ops',
+                    title: 'Opérations Mathématiques',
+                    description: 'Calculs vectorisés.',
+                    snippets: [
+                        {
+                            id: 'basic_math',
+                            title: 'Calculs de base',
+                            description: 'Opérations élément par élément.',
+                            code: `a = np.array([1, 2, 3])
+b = np.array([10, 20, 30])
+
+print(a + b) # [11, 22, 33]
+print(a * 2) # [2, 4, 6]
+print(a ** 2) # [1, 4, 9]`
+                        },
+                        {
+                            id: 'stats_np',
+                            title: 'Statistiques',
+                            description: 'Moyenne, écart-type, etc.',
+                            code: `arr = np.array([1, 2, 3, 4, 5])
+
+print(np.mean(arr))  # Moyenne
+print(np.std(arr))   # Écart-type
+print(np.median(arr)) # Médiane
+print(np.max(arr))    # Maximum`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'statsmodels',
+            title: 'Statsmodels',
+            description: 'Modélisation Statistique',
+            categories: [
+
+                {
+                    id: 'regression_sm',
+                    title: 'Régression (OLS)',
+                    description: 'Moindres Carrés Ordinaires.',
+                    snippets: [
+                        {
+                            id: 'ols_formula',
+                            title: 'OLS (Formule)',
+                            description: 'Syntaxe style R (plus simple).',
+                            code: `import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Fit du modèle (y ~ x1 + x2)
+model = smf.ols('ventes ~ pub_tv + pub_radio', data=df).fit()
+
+# Résumé complet (R-squared, p-values...)
+print(model.summary())`
+                        },
+                        {
+                            id: 'ols_arrays',
+                            title: 'OLS (Arrays)',
+                            description: 'Avec X et y (comme Scikit-Learn).',
+                            code: `# Il faut ajouter une constante (intercept) manuellement !
+X = sm.add_constant(X)
+
+model = sm.OLS(y, X).fit()
+print(model.summary())`
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'streamlit',
+            title: 'Streamlit',
+            description: 'Applications Web Data',
+            categories: [
+
+                {
+                    id: 'st_basics',
+                    title: 'Éléments de Base',
+                    description: 'Titres, textes et données.',
+                    snippets: [
+                        {
+                            id: 'st_text',
+                            title: 'Texte & Titres',
+                            description: 'Structurer la page.',
+                            code: `import streamlit as st
+
+st.title("Mon Application Data")
+st.header("Une section importante")
+st.subheader("Une sous-section")
+st.text("Du texte brut.")
+st.markdown("**Du markdown** avec du *style*.")`
+                        },
+                        {
+                            id: 'st_data',
+                            title: 'Afficher des Données',
+                            description: 'DataFrames et Métriques.',
+                            code: `# DataFrame interactif
+st.dataframe(df)
+
+# Table statique
+st.table(df.head())
+
+# Métrique (KPI)
+st.metric(label="Chiffre d'Affaires", value="50k€", delta="+5%")`
+                        }
+                    ]
+                },
+                {
+                    id: 'st_widgets',
+                    title: 'Widgets Interactifs',
+                    description: 'Boutons, Sliders, Inputs.',
+                    snippets: [
+                        {
+                            id: 'st_input',
+                            title: 'Entrées Utilisateur',
+                            description: 'Récupérer des valeurs.',
+                            code: `nom = st.text_input("Votre nom")
+age = st.number_input("Votre âge", min_value=0, max_value=120)
+
+if st.button("Valider"):
+    st.write(f"Bonjour {nom} !")`
+                        },
+                        {
+                            id: 'st_sidebar',
+                            title: 'Sidebar',
+                            description: 'Barre latérale pour les filtres.',
+                            code: `with st.sidebar:
+    st.header("Filtres")
+    ville = st.selectbox("Choisir une ville", ["Paris", "Lyon", "Marseille"])
+    
+st.write(f"Ville sélectionnée : {ville}")`
                         }
                     ]
                 }

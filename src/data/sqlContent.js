@@ -70,6 +70,24 @@ ORDER BY created_at DESC; -- Du plus récent au plus ancien (ASC pour croissant)
 -- Supprimer les doublons
 SELECT DISTINCT country 
 FROM users; -- Liste unique des pays`
+                        },
+                        {
+                            id: 'execution_order',
+                            title: 'Ordre d\'Exécution SQL',
+                            description: 'Comprendre comment le moteur lit votre requête.',
+                            code: `-- L'ordre dans lequel vous ÉCRIVEZ :
+-- SELECT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
+
+-- L'ordre dans lequel le moteur EXÉCUTE :
+-- 1. FROM (Je charge la table)
+-- 2. WHERE (Je filtre les lignes)
+-- 3. GROUP BY (Je crée des groupes)
+-- 4. HAVING (Je filtre les groupes)
+-- 5. SELECT (Je sélectionne/calcule les colonnes)
+-- 6. ORDER BY (Je trie)
+-- 7. LIMIT (Je coupe)
+
+-- C'est pourquoi on ne peut pas utiliser un alias du SELECT dans le WHERE !`
                         }
                     ]
                 },
@@ -270,6 +288,32 @@ WITH ranked_orders AS (
 SELECT * 
 FROM ranked_orders 
 WHERE rn = 1; -- On ne garde que la plus récente`
+                        },
+                        {
+                            id: 'lag_lead',
+                            title: 'LAG & LEAD',
+                            description: 'Comparer avec la ligne précédente/suivante.',
+                            code: `SELECT 
+    month,
+    revenue,
+    -- LAG(col, 1) : Valeur de la ligne précédente
+    LAG(revenue, 1) OVER(ORDER BY month) as prev_month_revenue,
+    
+    -- Calcul de la croissance (Growth Rate)
+    (revenue - LAG(revenue, 1) OVER(ORDER BY month)) / LAG(revenue, 1) OVER(ORDER BY month) as growth
+FROM monthly_sales;`
+                        },
+                        {
+                            id: 'regex',
+                            title: 'Expressions Régulières (REGEXP)',
+                            description: 'Filtrage de texte avancé.',
+                            code: `-- Trouver les emails gmail ou hotmail
+SELECT * 
+FROM users 
+WHERE email ~* '@(gmail|hotmail)\\.com'; -- ~* = Regex insensible à la casse (Postgres)
+
+-- Sur BigQuery / MySQL :
+-- WHERE REGEXP_CONTAINS(email, r'@(gmail|hotmail)\\.com')`
                         }
                     ]
                 }

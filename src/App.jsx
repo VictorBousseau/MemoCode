@@ -7,9 +7,11 @@ import { gitContent } from './data/gitContent';
 import { pysparkContent } from './data/pysparkContent';
 import { daxContent } from './data/daxContent';
 import { rContent } from './data/rContent';
+import { examplesContent } from './data/examplesContent';
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('Python');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getContent = () => {
     switch (selectedLanguage) {
@@ -25,14 +27,21 @@ export default function App() {
         return daxContent;
       case 'R':
         return rContent;
+      case 'Exemples':
+        return examplesContent;
       default:
         return pythonContent;
     }
   };
 
   return (
-    <Layout selectedLanguage={selectedLanguage} onSelectLanguage={setSelectedLanguage}>
-      <LanguageView content={getContent()} />
+    <Layout
+      selectedLanguage={selectedLanguage}
+      onSelectLanguage={setSelectedLanguage}
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+    >
+      <LanguageView content={getContent()} searchQuery={searchQuery} />
     </Layout>
   );
 }

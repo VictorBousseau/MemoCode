@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
-import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb } from 'lucide-react';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout } from 'lucide-react';
 
 const themeIcons = {
     pandas: Layers,
     visualization: BarChart,
     ml: BrainCircuit,
     python_basics: FileCode,
-    python_tips: Lightbulb
+    python_tips: Lightbulb,
+    python_production: Settings,
+    polars: Zap,
+    skrub: Table,
+    snippets_utiles: Code,
+    numpy: Binary,
+    statsmodels: TrendingUp,
+    streamlit: Layout,
+    dax_mastery: BarChart // Reusing BarChart or finding a better one
 };
 
-export default function LanguageView({ content }) {
+export default function LanguageView({ content, searchQuery }) {
     // Default to first theme and its first category
     const [activeThemeId, setActiveThemeId] = useState(content.themes[0].id);
     const [activeCategoryId, setActiveCategoryId] = useState(content.themes[0].categories[0]?.id);
@@ -26,8 +34,8 @@ export default function LanguageView({ content }) {
         language = 'sql';
     } else if (content.themes.some(t => t.id === 'git_basics')) {
         language = 'bash';
-    } else if (content.themes.some(t => t.id === 'dax_basics')) {
-        language = 'sql'; // SyntaxHighlighter might not have 'dax', 'sql' is close enough
+    } else if (content.themes.some(t => t.id === 'dax_basics' || t.id === 'dax_mastery')) {
+        language = 'dax'; // Prism supports 'dax'
     } else if (content.themes.some(t => t.id === 'r_basics')) {
         language = 'r';
     }
@@ -48,6 +56,63 @@ export default function LanguageView({ content }) {
             setActiveCategoryId(activeTheme.categories[0].id);
         }
     }, [activeThemeId]);
+
+    // --- Search Logic ---
+    const getFilteredSnippets = () => {
+        if (!searchQuery) return [];
+        const query = searchQuery.toLowerCase();
+
+        // Flatten all snippets from all themes and categories
+        return content.themes.flatMap(theme =>
+            theme.categories.flatMap(category =>
+                category.snippets.filter(snippet =>
+                    snippet.title.toLowerCase().includes(query) ||
+                    snippet.description.toLowerCase().includes(query) ||
+                    (snippet.code && snippet.code.toLowerCase().includes(query)) ||
+                    (snippet.markdown && snippet.markdown.toLowerCase().includes(query))
+                ).map(snippet => ({
+                    ...snippet,
+                    themeTitle: theme.title,
+                    categoryTitle: category.title
+                }))
+            )
+        );
+    };
+
+    const searchResults = getFilteredSnippets();
+
+    if (searchQuery) {
+        return (
+            <div className="space-y-8">
+                <div className="mb-4">
+                    <h2 className="text-xl font-semibold text-zinc-400">
+                        Résultats pour "{searchQuery}"
+                        <span className="ml-2 text-sm font-normal text-zinc-500">
+                            ({searchResults.length} trouvé{searchResults.length > 1 ? 's' : ''})
+                        </span>
+                    </h2>
+                </div>
+
+                {searchResults.length > 0 ? (
+                    <div className="grid gap-8">
+                        {searchResults.map((snippet) => (
+                            <div key={snippet.id} className="relative">
+                                <div className="absolute -top-3 left-0 bg-blue-500/10 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/20">
+                                    {snippet.themeTitle} &gt; {snippet.categoryTitle}
+                                </div>
+                                <CodeCard snippet={snippet} language={language} />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 text-zinc-500">
+                        <p className="text-lg">Aucun résultat trouvé.</p>
+                        <p className="text-sm mt-2">Essayez d'autres mots-clés.</p>
+                    </div>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
