@@ -3249,7 +3249,28 @@ Trouver les 10 rues avec les meilleurs scores (basé sur la note la plus récent
     
     // 7. Top 10
     { $limit: 10 }
-]);`}]}]},{id:"neo4j",title:"Neo4j (Graphe)",description:"Penser en Noeuds et Relations.",categories:[{id:"cypher_basics",title:"1. Le Langage Cypher",description:"L'ASCII Art pour requêter.",snippets:[{id:"cypher_concept",title:"Noeuds & Relations",description:"La syntaxe intuitive (Node)-[RELATION]->(Node).",markdown:"### 🎨 Dessine ta requête\nCypher est conçu pour ressembler au graphe qu'il décrit.\n*   `(p:Person)` : Un Noeud (avec parenthèses comme un rond).\n*   `[r:FRIEND]` : Une Relation (avec crochets).\n*   `->` : Une flèche pour la direction.\n\n**Exemple :**\n`(Alice)-[:KNOWS]->(Bob)`"},{id:"cypher_create",title:"Créer (CREATE)",description:"Insérer des données.",code:`// Créer un noeud
+]);`}]}]},{id:"neo4j",title:"Neo4j (Graphe)",description:"Penser en Noeuds et Relations.",categories:[{id:"cypher_basics",title:"1. Le Langage Cypher",description:"L'ASCII Art pour requêter.",snippets:[{id:"cypher_concept",title:"Noeuds & Relations",description:"La syntaxe intuitive (Node)-[RELATION]->(Node).",markdown:`### 🎨 Le Graphe en Image
+Voici à quoi ressemble un graphe Neo4j typique :
+
+\`\`\`mermaid
+graph LR
+    V((Victor)) -- FRIEND --> A((Alice))
+    V -- LIKES --> N[Neo4j]
+    A -- KNOWS --> N
+    
+    style V fill:#0077ff,stroke:#fff,stroke-width:2px,color:#fff
+    style A fill:#0077ff,stroke:#fff,stroke-width:2px,color:#fff
+    style N fill:#00cc44,stroke:#fff,stroke-width:2px,color:#fff
+\`\`\`
+
+### ✍️ La Syntaxe Cypher
+Cypher est conçu pour **ressembler** à ce dessin (ASCII Art).
+*   \`(p:Person)\` : Un Noeud (avec parenthèses comme un rond).
+*   \`[r:FRIEND]\` : Une Relation (avec crochets).
+*   \`->\` : Une flèche pour la direction.
+
+**Exemple :**
+\`(Victor)-[:FRIEND]->(Alice)\``},{id:"cypher_create",title:"Créer (CREATE)",description:"Insérer des données.",code:`// Créer un noeud
 CREATE (v:Person {name: "Victor", age: 28})
 
 // Créer une relation (Victor AIME le Graph)
