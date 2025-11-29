@@ -820,7 +820,7 @@ for nom, age in zip(noms, ages):
 %autoreload 2
 
 import mon_module_perso
-# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]}]},{id:"python_production",title:"Production & Engineering",description:"Qualité, Tests et Performance",categories:[{id:"environment",title:"1. Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]},{id:"environment",title:"5. Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
 
 # 1. Créer l'environnement (dans le dossier du projet)
 python -m venv .venv
@@ -835,7 +835,7 @@ source .venv/bin/activate
 pip install pandas
 
 # 4. Sauvegarder les dépendances
-pip freeze > requirements.txt`}]},{id:"testing",title:"2. Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
+pip freeze > requirements.txt`}]},{id:"testing",title:"6. Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
 
 def addition(a, b):
     return a + b
@@ -845,7 +845,7 @@ def test_addition():
     assert addition(-1, 1) == 0
 
 # Lancer les tests dans le terminal :
-# pytest`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+# pytest`}]},{id:"optimization",title:"7. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
