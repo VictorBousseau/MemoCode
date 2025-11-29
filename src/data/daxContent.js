@@ -233,9 +233,112 @@ RANKX(
                         }
                     ]
                 },
+
+                {
+                    id: 'context_transition',
+                    title: '3. Context Transition',
+                    description: 'Le concept le plus complexe et puissant.',
+                    snippets: [
+                        {
+                            id: 'context_transition_concept',
+                            title: 'Row Context -> Filter Context',
+                            description: 'Comment une ligne devient un filtre.',
+                            markdown: `🧠 **Le Concept Clé**
+Le **Context Transition** est le mécanisme par lequel un **Row Context** (itération ligne par ligne) est transformé en un **Filter Context** équivalent.
+
+Il est déclenché automatiquement par \`CALCULATE\`.
+
+**Exemple :**
+Dans une colonne calculée \`[Ventes Max]\` :
+\`\`\`dax
+= CALCULATE( MAX(Ventes[Montant]) )
+\`\`\`
+1. On est dans une colonne calculée -> Row Context (on voit la ligne actuelle).
+2. \`CALCULATE\` invoque le Context Transition.
+3. Le Row Context (ex: Produit="A", Date="2023-01-01") devient un Filter Context.
+4. Le calcul \`MAX\` se fait uniquement sur les lignes filtrées par ce nouveau contexte.`
+                        },
+                        {
+                            id: 'context_transition_measure',
+                            title: 'Appeler une Mesure',
+                            description: 'Une mesure a un CALCULATE implicite.',
+                            markdown: `⚠️ **Piège Classique**
+Appeler une mesure dans un itérateur (comme \`SUMX\`) déclenche le Context Transition, car une mesure est toujours entourée d'un \`CALCULATE\` implicite.
+
+\`\`\`dax
+-- Ce code déclenche le Context Transition pour chaque ligne de 'Produit'
+SUMX(
+    'Produit',
+    [Total Ventes] -- = CALCULATE(SUM(Ventes[Montant]))
+)
+\`\`\``
+                        }
+                    ]
+                },
+                {
+                    id: 'semi_additive',
+                    title: '4. Semi-Additive Measures',
+                    description: 'Stocks et Soldes (Opening/Closing).',
+                    snippets: [
+                        {
+                            id: 'semi_additive_concept',
+                            title: 'Le Problème des Stocks',
+                            description: 'On ne somme pas des stocks dans le temps.',
+                            markdown: `📉 **Pourquoi Semi-Additif ?**
+*   **Additif** : Les ventes (On peut sommer sur les régions ET sur le temps).
+*   **Semi-Additif** : Les stocks (On peut sommer sur les régions, mais **PAS sur le temps**).
+    *   Stock Janvier : 100
+    *   Stock Février : 120
+    *   Stock Total : 220 ? ❌ NON ! C'est 120 (le dernier stock).`
+                        },
+                        {
+                            id: 'closing_balance',
+                            title: 'Closing Balance (Stock Fin)',
+                            description: 'Prendre la valeur de la dernière date.',
+                            code: `Stock Fin de Période = 
+CALCULATE(
+    SUM('Stock'[Quantité]),
+    LASTDATE('Temps'[Date])
+)`
+                        },
+                        {
+                            id: 'opening_balance',
+                            title: 'Opening Balance (Stock Début)',
+                            description: 'Prendre la valeur de la veille du début.',
+                            code: `Stock Début de Période = 
+CALCULATE(
+    SUM('Stock'[Quantité]),
+    PREVIOUSDAY(FIRSTDATE('Temps'[Date]))
+)`
+                        }
+                    ]
+                },
+                {
+                    id: 'hierarchies',
+                    title: '5. Hiérarchies Parent-Enfant',
+                    description: 'Gérer les organigrammes (PATH).',
+                    snippets: [
+                        {
+                            id: 'path_function',
+                            title: 'Aplatir la Hiérarchie (PATH)',
+                            description: 'Créer une chaîne de tous les parents.',
+                            markdown: `Pour une table avec \`EmployeeID\` et \`ManagerID\`.`,
+                            code: `Chemin Complet = PATH('Employés'[EmployeeID], 'Employés'[ManagerID])
+-- Résultat : "1|5|12" (Le chef du chef du chef)`
+                        },
+                        {
+                            id: 'path_item',
+                            title: 'Extraire un Niveau (PATHITEM)',
+                            description: 'Récupérer le N-ième manager.',
+                            code: `Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
+Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
+Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`
+                        }
+                    ]
+                },
                 {
                     id: 'relationships',
-                    title: '3. Relations Multiples',
+                    title: '6. Relations Multiples',
                     description: 'USERELATIONSHIP pour les dates multiples.',
                     snippets: [
                         {

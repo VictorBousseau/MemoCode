@@ -317,6 +317,103 @@ WHERE email ~* '@(gmail|hotmail)\\.com'; -- ~* = Regex insensible à la casse (P
                         }
                     ]
                 }
+
+            ]
+        },
+        {
+            id: 'sql_expert',
+            title: 'SQL Expert & Performance',
+            description: 'Manipulation avancée et Optimisation.',
+            categories: [
+                {
+                    id: 'text_manipulation',
+                    title: '1. Manipulation de Texte',
+                    description: 'Nettoyer et transformer les chaînes.',
+                    snippets: [
+                        {
+                            id: 'concat_substring',
+                            title: 'Concaténer et Extraire',
+                            description: 'CONCAT, ||, SUBSTRING.',
+                            code: `-- Concaténation (Standard SQL: ||)
+SELECT first_name || ' ' || last_name as full_name
+FROM users;
+
+-- Sur MySQL/SQL Server : CONCAT(first_name, ' ', last_name)
+
+-- Extraire une partie (SUBSTRING)
+-- Ex: Extraire l'année "2023" de "2023-01-01" (si c'est du texte)
+SELECT SUBSTRING('2023-01-01', 1, 4); -- Commence à 1, longueur 4`
+                        },
+                        {
+                            id: 'trim_coalesce',
+                            title: 'Nettoyer et Gérer les NULL',
+                            description: 'TRIM et COALESCE.',
+                            code: `-- TRIM : Enlever les espaces inutiles
+SELECT TRIM(email) FROM users;
+
+-- COALESCE : Remplacer NULL par une valeur par défaut
+-- Très utile pour l'affichage ou les calculs
+SELECT 
+    product_name,
+    COALESCE(description, 'Pas de description') as desc_safe,
+    COALESCE(discount_rate, 0) as discount_safe -- Évite les erreurs de calcul
+FROM products;`
+                        }
+                    ]
+                },
+                {
+                    id: 'json_handling',
+                    title: '2. Gestion du JSON',
+                    description: 'Requêter des données semi-structurées.',
+                    snippets: [
+                        {
+                            id: 'json_extract',
+                            title: 'Lire du JSON (PostgreSQL/BigQuery)',
+                            description: 'Accéder aux clés d\'un objet JSON stocké en texte.',
+                            code: `-- Supposons une colonne 'metadata' : {"browser": "Chrome", "clicks": 12}
+
+-- PostgreSQL
+SELECT 
+    metadata->>'browser' as browser_name, -- ->> renvoie du texte
+    (metadata->>'clicks')::int as clicks -- Cast en entier
+FROM events;
+
+-- BigQuery
+SELECT 
+    JSON_EXTRACT_SCALAR(metadata, '$.browser') as browser_name
+FROM events;`
+                        }
+                    ]
+                },
+                {
+                    id: 'performance',
+                    title: '3. Performance & Index',
+                    description: 'Pourquoi ma requête est lente ?',
+                    snippets: [
+                        {
+                            id: 'explain_analyze',
+                            title: 'Comprendre le Plan (EXPLAIN)',
+                            description: 'Voir comment le moteur exécute la requête.',
+                            code: `-- Ajoutez EXPLAIN devant votre requête pour voir le plan
+EXPLAIN SELECT * FROM orders WHERE user_id = 123;
+
+-- Recherchez :
+-- "Seq Scan" (Scan complet de la table) -> ❌ LENT sur grosse table
+-- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`
+                        },
+                        {
+                            id: 'indexes',
+                            title: 'Les Index',
+                            description: 'Le sommaire du livre.',
+                            markdown: `🚀 **Le concept**
+Sans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".
+Avec un index, elle va à la fin, trouve "H", et va directement à la page.
+
+**Quand créer un index ?**
+Sur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: \`user_id\`, \`email\`, \`created_at\`).`
+                        }
+                    ]
+                }
             ]
         }
     ]
