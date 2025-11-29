@@ -1044,51 +1044,69 @@ def runge_kutta_4(f, y0, t0, tf, h):
     """
     Résout l'équation différentielle y' = f(t, y) avec la méthode RK4.
     
-    Args:
-        f: Fonction dérivée f(t, y)
-        y0: Condition initiale y(t0)
-        t0: Temps initial
-        tf: Temps final
-        h: Pas de temps
-        
-    Returns:
-        t_values: Tableau des temps
-        y_values: Tableau des solutions approximées
+    --- 🧠 INTUITION (Comment ça marche ?) ---
+    Contrairement à la méthode d'Euler qui suit bêtement la pente du début,
+    RK4 est "intelligente" : elle tâte le terrain à 4 endroits pour décider où aller.
+    
+    --- 🔍 LES 4 PENTES (k1 à k4) ---
+    k1 : Pente au DÉBUT de l'intervalle.
+         -> C'est la prédiction basique (comme Euler).
+         
+    k2 : Pente au MILIEU (estimation 1).
+         -> On avance de h/2 avec la pente k1, et on regarde la pente là-bas.
+         
+    k3 : Pente au MILIEU (estimation 2).
+         -> On refait une estimation au milieu, mais en utilisant k2 (correction).
+         
+    k4 : Pente à la FIN.
+         -> On utilise k3 pour estimer la pente tout à la fin du pas h.
+         
+    --- ⚗️ LA FORMULE MAGIQUE ---
+    On fait une MOYENNE PONDÉRÉE de ces 4 pentes :
+    y_next = y + (h / 6) * (k1 + 2*k2 + 2*k3 + k4)
+    
+    Notez que les pentes du milieu (k2 et k3) comptent DOUBLE car elles sont
+    généralement plus représentatives de la dynamique sur l'intervalle.
+    
+    --- 📝 ARGUMENTS ---
+    f  : La fonction dérivée (la physique du système). y' = f(t, y)
+    y0 : État initial (ex: position de départ).
+    t0 : Temps de début.
+    tf : Temps de fin.
+    h  : Pas de temps (plus il est petit, plus c'est précis).
     """
     t_values = np.arange(t0, tf + h, h)
     y_values = [y0]
     y = y0
     
     for t in t_values[:-1]:
+        # 1. Pente au début
         k1 = h * f(t, y)
+        
+        # 2. Pente au milieu (avec k1)
         k2 = h * f(t + 0.5 * h, y + 0.5 * k1)
+        
+        # 3. Pente au milieu (avec k2)
         k3 = h * f(t + 0.5 * h, y + 0.5 * k2)
+        
+        # 4. Pente à la fin (avec k3)
         k4 = h * f(t + h, y + k3)
         
-        # Moyenne pondérée des pentes
+        # Moyenne pondérée
         y = y + (k1 + 2 * k2 + 2 * k3 + k4) / 6
         y_values.append(y)
         
     return t_values, np.array(y_values)
 
-# --- Exemple d'utilisation : Croissance Exponentielle ---
-# dy/dt = r * y  (Solution exacte : y(t) = y0 * exp(r*t))
-
+# --- Exemple : Croissance Exponentielle ---
+# dy/dt = r * y
 def modele_croissance(t, y):
-    r = 0.1 # Taux de croissance
-    return r * y
+    return 0.1 * y
 
-# Paramètres
-y0 = 100  # Population initiale
-t0, tf = 0, 50
-h = 0.1
+# Simulation
+t, y = runge_kutta_4(modele_croissance, y0=100, t0=0, tf=50, h=0.1)
 
-# Résolution
-t_rk4, y_rk4 = runge_kutta_4(modele_croissance, y0, t0, tf, h)
-
-# Visualisation
-plt.plot(t_rk4, y_rk4, label='RK4 Approximation')
-plt.plot(t_rk4, y0 * np.exp(0.1 * t_rk4), '--', label='Solution Exacte')
-plt.legend()
-plt.title("Simulation RK4 : Croissance Exponentielle")
-plt.show()`}]}]}]};function tA(){const[n,i]=ht.useState("Python"),[s,u]=ht.useState(""),c=()=>{switch(n){case"Python":return VE;case"SQL":return Z_;case"Git":return W_;case"PySpark":return K_;case"DAX":return Q_;case"R":return J_;case"Exemples":return eA;default:return VE}};return P.jsx(zT,{selectedLanguage:n,onSelectLanguage:i,searchQuery:s,setSearchQuery:u,children:P.jsx(X_,{content:c(),searchQuery:s})})}Zv.createRoot(document.getElementById("root")).render(P.jsx(ht.StrictMode,{children:P.jsx(tA,{})}));
+# Plot
+plt.plot(t, y, label='RK4')
+plt.plot(t, 100 * np.exp(0.1 * t), '--', label='Exact')
+plt.legend(); plt.show()`}]}]}]};function tA(){const[n,i]=ht.useState("Python"),[s,u]=ht.useState(""),c=()=>{switch(n){case"Python":return VE;case"SQL":return Z_;case"Git":return W_;case"PySpark":return K_;case"DAX":return Q_;case"R":return J_;case"Exemples":return eA;default:return VE}};return P.jsx(zT,{selectedLanguage:n,onSelectLanguage:i,searchQuery:s,setSearchQuery:u,children:P.jsx(X_,{content:c(),searchQuery:s})})}Zv.createRoot(document.getElementById("root")).render(P.jsx(ht.StrictMode,{children:P.jsx(tA,{})}));
