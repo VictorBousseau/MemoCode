@@ -1376,7 +1376,7 @@ df.filter(df.age > 21).show()`},{id:"groupby_agg",title:"GroupBy & Aggregation",
 df.groupBy("ville").agg(
     avg("age").alias("age_moyen"),
     count("*").alias("nb_personnes")
-).show()`}]}]}]},xL={themes:[{id:"dax_mastery",title:"DAX pour Data Scientists",description:"De Pandas à Power BI : Guide Expert (Assurance)",categories:[{id:"aggregations",title:"1. Agrégations Sécurisées",description:"Compter et Diviser sans erreur.",snippets:[{id:"count_rows",title:"Compter le volume (COUNTROWS)",description:"Le standard pour compter les lignes.",markdown:"💡 **Pourquoi COUNTROWS ?**\nContrairement à `COUNT(colonne)` qui ignore les BLANKs (comme `df['col'].count()`), `COUNTROWS('Table')` compte simplement les lignes de la table (comme `len(df)`). C'est plus rapide et plus sûr pour compter un volume de sinistres.",code:"Nombre de Sinistres = COUNTROWS('Sinistres')"},{id:"distinct_count",title:"Compter les uniques (DISTINCTCOUNT)",description:"Équivalent de df['col'].nunique().",code:"Nombre Assurés Uniques = DISTINCTCOUNT('Portefeuille'[ID_Assuré])"},{id:"divide",title:"Division Sécurisée (DIVIDE)",description:"Gérer la division par zéro automatiquement.",markdown:"💡 **Pourquoi DIVIDE ?**\nL'opérateur `/` plante ou renvoie Infinity si le dénominateur est 0.\n`DIVIDE(N, D, 0)` est l'équivalent d'un `np.where(D == 0, 0, N / D)`. Indispensable pour les ratios S/P.",code:"Ratio S/P = DIVIDE([Montant Sinistres], [Primes Acquises], 0)"}]},{id:"calculate_context",title:"2. Le Moteur : CALCULATE",description:'Le "WHERE" dynamique de Power BI.',snippets:[{id:"calculate_concept",title:"Concept : CALCULATE",description:"Comprendre la modification de contexte.",markdown:`🧠 **Le Cerveau du DAX**
+).show()`}]}]}]},xL={themes:[{id:"dax_essentials",title:"DAX Essentiels",description:"Les fondations solides (Agrégations, Calculate, Itérateurs).",categories:[{id:"aggregations",title:"1. Agrégations Sécurisées",description:"Compter et Diviser sans erreur.",snippets:[{id:"count_rows",title:"Compter le volume (COUNTROWS)",description:"Le standard pour compter les lignes.",markdown:"💡 **Pourquoi COUNTROWS ?**\nContrairement à `COUNT(colonne)` qui ignore les BLANKs (comme `df['col'].count()`), `COUNTROWS('Table')` compte simplement les lignes de la table (comme `len(df)`). C'est plus rapide et plus sûr pour compter un volume de sinistres.",code:"Nombre de Sinistres = COUNTROWS('Sinistres')"},{id:"distinct_count",title:"Compter les uniques (DISTINCTCOUNT)",description:"Équivalent de df['col'].nunique().",code:"Nombre Assurés Uniques = DISTINCTCOUNT('Portefeuille'[ID_Assuré])"},{id:"divide",title:"Division Sécurisée (DIVIDE)",description:"Gérer la division par zéro automatiquement.",markdown:"💡 **Pourquoi DIVIDE ?**\nL'opérateur `/` plante ou renvoie Infinity si le dénominateur est 0.\n`DIVIDE(N, D, 0)` est l'équivalent d'un `np.where(D == 0, 0, N / D)`. Indispensable pour les ratios S/P.",code:"Ratio S/P = DIVIDE([Montant Sinistres], [Primes Acquises], 0)"}]},{id:"calculate_context",title:"2. Le Moteur : CALCULATE",description:'Le "WHERE" dynamique de Power BI.',snippets:[{id:"calculate_concept",title:"Concept : CALCULATE",description:"Comprendre la modification de contexte.",markdown:`🧠 **Le Cerveau du DAX**
 \`CALCULATE\` est la seule fonction qui peut **modifier le contexte de filtre** d'une mesure.
 C'est l'équivalent d'un filtre dynamique que vous appliquez par-dessus les filtres choisis par l'utilisateur (Slicers).
 
@@ -1395,7 +1395,11 @@ CALCULATE(
 VAR SinistresAgence = [Montant Sinistres]
 VAR SinistresGlobal = CALCULATE([Montant Sinistres], ALL('Agence'))
 RETURN
-    DIVIDE(SinistresAgence, SinistresGlobal)`}]},{id:"time_intelligence",title:"3. Intelligence Temporelle",description:"Comparer N vs N-1, YTD, etc.",snippets:[{id:"time_prereq",title:"Pré-requis : Table Date",description:"Indispensable pour ces fonctions.",markdown:"⚠️ **Attention** : Toutes les fonctions de Time Intelligence (`TOTALYTD`, `SAMEPERIODLASTYEAR`...) nécessitent une **Table Date** dédiée, marquée comme telle dans le modèle, et reliée à votre table de faits."},{id:"totalytd",title:"Cumul Annuel (YTD)",description:"Primes encaissées depuis le 1er janvier.",code:`Primes YTD = 
+    DIVIDE(SinistresAgence, SinistresGlobal)`}]},{id:"iterators",title:'3. Les Itérateurs (Fonctions "X")',description:'SUMX, AVERAGEX... Le "Row Context".',snippets:[{id:"iterators_concept",title:"Concept : Agrégation vs Itération",description:"Pourquoi SUM ne suffit pas toujours.",markdown:"🔄 **SUM vs SUMX**\n*   `SUM` : Fait la somme d'une colonne. (Rapide, mais basique).\n*   `SUMX` : Itère ligne par ligne, effectue un calcul, PUIS fait la somme.\n\n**Analogie Pandas :**\n*   `SUM` -> `df['col'].sum()`\n*   `SUMX` -> `df.apply(lambda row: row['a'] * row['b'], axis=1).sum()`"},{id:"sumx_example",title:"Exemple SUMX",description:"Calcul ligne par ligne avant agrégation.",code:`Prime Totale Ajustée = 
+SUMX(
+    'Portefeuille',
+    'Portefeuille'[Prime de Base] * 'Portefeuille'[Coeff Bonus-Malus]
+)`}]}]},{id:"dax_time",title:"Time Intelligence",description:"Comparer N vs N-1, YTD, MTD.",categories:[{id:"time_intelligence",title:"1. Fonctions Temporelles",description:"Comparer N vs N-1, YTD, etc.",snippets:[{id:"time_prereq",title:"Pré-requis : Table Date",description:"Indispensable pour ces fonctions.",markdown:"⚠️ **Attention** : Toutes les fonctions de Time Intelligence (`TOTALYTD`, `SAMEPERIODLASTYEAR`...) nécessitent une **Table Date** dédiée, marquée comme telle dans le modèle, et reliée à votre table de faits."},{id:"totalytd",title:"Cumul Annuel (YTD)",description:"Primes encaissées depuis le 1er janvier.",code:`Primes YTD = 
 TOTALYTD(
     [Primes Acquises],
     'Temps'[Date]
@@ -1409,20 +1413,7 @@ Evolution Primes = DIVIDE([Primes Acquises] - [Primes N-1], [Primes N-1])`},{id:
 CALCULATE(
     [Primes Acquises],
     DATEADD('Temps'[Date], -1, QUARTER)
-)`}]},{id:"iterators",title:'4. Les Itérateurs (Fonctions "X")',description:'SUMX, AVERAGEX... Le "Row Context".',snippets:[{id:"iterators_concept",title:"Concept : Agrégation vs Itération",description:"Pourquoi SUM ne suffit pas toujours.",markdown:"🔄 **SUM vs SUMX**\n*   `SUM` : Fait la somme d'une colonne. (Rapide, mais basique).\n*   `SUMX` : Itère ligne par ligne, effectue un calcul, PUIS fait la somme.\n\n**Analogie Pandas :**\n*   `SUM` -> `df['col'].sum()`\n*   `SUMX` -> `df.apply(lambda row: row['a'] * row['b'], axis=1).sum()`"},{id:"sumx_example",title:"Exemple SUMX",description:"Calcul ligne par ligne avant agrégation.",code:`Prime Totale Ajustée = 
-SUMX(
-    'Portefeuille',
-    'Portefeuille'[Prime de Base] * 'Portefeuille'[Coeff Bonus-Malus]
-)`}]},{id:"variables",title:"5. Best Practice : Variables",description:"VAR / RETURN : Lisibilité et Performance.",snippets:[{id:"var_benefits",title:"Pourquoi utiliser des variables ?",description:"Indispensable en entreprise.",markdown:`✅ **Avantages :**
-1.  **Lisibilité** : On nomme les étapes intermédiaires.
-2.  **Performance** : Une variable n'est calculée qu'une seule fois, même si elle est utilisée plusieurs fois dans le RETURN.
-3.  **Débogage** : On peut facilement changer le \`RETURN\` pour afficher une variable intermédiaire.`},{id:"var_syntax",title:"Syntaxe Propre",description:"Exemple de calcul de Fréquence.",code:`Fréquence Sinistres = 
-VAR NbSinistres = COUNTROWS('Sinistres')
-VAR NbContrats = SUM('Portefeuille'[NombreContrats])
-VAR Resultat = DIVIDE(NbSinistres, NbContrats)
-
-RETURN
-    Resultat`}]},{id:"virtual_tables",title:"6. Tables Virtuelles & GroupBy",description:"SUMMARIZE et ADDCOLUMNS.",snippets:[{id:"groupby_problem",title:"Le Problème : Moyenne des Sommes",description:"Comment faire un panier moyen par agence ?",markdown:`🤔 **Le défi**
+)`}]}]},{id:"dax_expert",title:"Expert & Best Practices",description:"Patterns avancés, Optimisation et UX.",categories:[{id:"virtual_tables",title:"1. Tables Virtuelles & GroupBy",description:"SUMMARIZE et ADDCOLUMNS.",snippets:[{id:"groupby_problem",title:"Le Problème : Moyenne des Sommes",description:"Comment faire un panier moyen par agence ?",markdown:`🤔 **Le défi**
 Si vous faites \`AVERAGE(Ventes)\`, vous faites la moyenne de toutes les lignes.
 Mais si vous voulez la **moyenne des chiffres d'affaires par Agence**, il faut d'abord grouper par Agence, sommer les ventes, PUIS faire la moyenne.
 
@@ -1435,7 +1426,7 @@ VAR TableVirtuelle =
     )
 
 RETURN
-    AVERAGEX(TableVirtuelle, [@CA_Agence])`}]},{id:"advanced_patterns",title:"7. Patterns Data Science",description:"Moyenne Mobile et Classement.",snippets:[{id:"moving_average",title:"Moyenne Mobile (Lissage)",description:"Lisser la volatilité sur 3 mois.",code:`Sinistres Lissés (3 mois) = 
+    AVERAGEX(TableVirtuelle, [@CA_Agence])`}]},{id:"advanced_patterns",title:"2. Patterns Data Science",description:"Moyenne Mobile et Classement.",snippets:[{id:"moving_average",title:"Moyenne Mobile (Lissage)",description:"Lisser la volatilité sur 3 mois.",code:`Sinistres Lissés (3 mois) = 
 CALCULATE(
     [Montant Sinistres],
     DATESINPERIOD(
@@ -1450,14 +1441,14 @@ RANKX(
     [Primes Acquises],
     ,
     DESC
-)`}]},{id:"relationships",title:"8. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
+)`}]},{id:"relationships",title:"3. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
 Mais on ne peut avoir qu'une seule relation active vers la table **Temps**.
 La relation active est souvent sur la **Survenance**.
 Comment analyser par **Date de Déclaration** sans dupliquer la table Temps ?`},{id:"userelationship_code",title:"Solution : USERELATIONSHIP",description:"Activer une relation inactive à la demande.",code:`Sinistres (Vue Déclaration) = 
 CALCULATE(
     [Montant Sinistres],
     USERELATIONSHIP('Sinistres'[DateDeclaration], 'Temps'[Date])
-)`}]},{id:"tips_practices",title:"9. Tips & Bonnes Pratiques",description:"Le best-of pour briller en DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
+)`}]},{id:"tips_practices",title:"4. Tips & Bonnes Pratiques",description:"Le best-of pour briller en DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
 
 Il ne faut jamais écrire l'agrégation directement dans un \`CALCULATE\`.
 Créez d'abord une mesure de base, puis réutilisez-la.
