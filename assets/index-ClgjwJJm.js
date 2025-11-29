@@ -1282,4 +1282,66 @@ with gp.Env() as env, gp.Model(name, env=env) as model:
     if model.SolCount:
         print(f"Total cost = {model.ObjVal:.2f}")
         for t in range(H):
-            print(f"t={t:2d}: y={int(y[t].X)} x={x[t].X:.1f} I={I[t].X:.1f}")`}]}]}]};function tA(){const[n,r]=ht.useState("Python"),[s,u]=ht.useState(""),c=()=>{switch(n){case"Python":return VE;case"SQL":return ZT;case"Git":return KT;case"PySpark":return WT;case"DAX":return QT;case"R":return JT;case"Exemples":return eA;default:return VE}};return P.jsx(z_,{selectedLanguage:n,onSelectLanguage:r,searchQuery:s,setSearchQuery:u,children:P.jsx(XT,{content:c(),searchQuery:s})})}Zv.createRoot(document.getElementById("root")).render(P.jsx(ht.StrictMode,{children:P.jsx(tA,{})}));
+            print(f"t={t:2d}: y={int(y[t].X)} x={x[t].X:.1f} I={I[t].X:.1f}")`}]}]},{id:"data_science",title:"Data Science",description:"Projets complets de Machine Learning",categories:[{id:"shoppers_intention",title:"Projet Complet (Shoppers Intention)",description:"Prédiction de l'intention d'achat (Classification)",snippets:[{id:"eda",title:"1. Exploration des Données (EDA)",description:"Chargement, analyse de la target et corrélations.",code:`import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Chargement des données
+df = pd.read_csv('public/data/online_shoppers_intention.csv')
+
+print("Dimensions du dataset :", df.shape)
+print(df.head())
+
+# Distribution de la target 'Revenue'
+plt.figure(figsize=(6, 4))
+sns.countplot(x='Revenue', data=df)
+plt.title('Distribution de la Target (Revenue)')
+plt.show()
+
+# Matrice de corrélation
+plt.figure(figsize=(12, 10))
+sns.heatmap(df.corr(numeric_only=True), annot=False, cmap='coolwarm')
+plt.title('Matrice de Corrélation')
+plt.show()`},{id:"preprocessing",title:"2. Preprocessing & Feature Engineering",description:"Encodage des variables et mise à l'échelle.",code:`from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+# Encodage des variables catégorielles (Month, VisitorType, etc.)
+# Pour simplifier, on utilise LabelEncoder ici (OneHotEncoder serait mieux pour certaines)
+le = LabelEncoder()
+categorical_cols = df.select_dtypes(include=['object', 'bool']).columns
+
+for col in categorical_cols:
+    df[col] = le.fit_transform(df[col])
+
+print("Aperçu après encodage :")
+print(df.head())
+
+# Séparation Features (X) / Target (y)
+X = df.drop('Revenue', axis=1)
+y = df['Revenue']
+
+# Scaling (Standardisation)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)`},{id:"modeling",title:"3. Modélisation & Évaluation",description:"Entraînement d'un modèle et analyse des performances.",code:`from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Split Train / Test
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Entraînement (Random Forest)
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Prédictions
+y_pred = model.fit(X_train, y_train).predict(X_test)
+
+# Évaluation
+print("Rapport de Classification :")
+print(classification_report(y_test, y_pred))
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
+plt.title('Matrice de Confusion')
+plt.ylabel('Vrai label')
+plt.xlabel('Label prédit')
+plt.show()`}]}]}]};function tA(){const[n,r]=ht.useState("Python"),[s,u]=ht.useState(""),c=()=>{switch(n){case"Python":return VE;case"SQL":return ZT;case"Git":return KT;case"PySpark":return WT;case"DAX":return QT;case"R":return JT;case"Exemples":return eA;default:return VE}};return P.jsx(z_,{selectedLanguage:n,onSelectLanguage:r,searchQuery:s,setSearchQuery:u,children:P.jsx(XT,{content:c(),searchQuery:s})})}Zv.createRoot(document.getElementById("root")).render(P.jsx(ht.StrictMode,{children:P.jsx(tA,{})}));
