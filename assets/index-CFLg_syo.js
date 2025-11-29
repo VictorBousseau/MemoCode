@@ -1700,7 +1700,65 @@ df_sql = spark.sql("""
     GROUP BY ville
 """)
 
-df_sql.show()`}]}]}]},xL={themes:[{id:"dax_essentials",title:"DAX Essentiels",description:"Les fondations solides (Agrégations, Calculate, Itérateurs).",categories:[{id:"aggregations",title:"1. Agrégations Sécurisées",description:"Compter et Diviser sans erreur.",snippets:[{id:"count_rows",title:"Compter le volume (COUNTROWS)",description:"Le standard pour compter les lignes.",markdown:"💡 **Pourquoi COUNTROWS ?**\nContrairement à `COUNT(colonne)` qui ignore les BLANKs (comme `df['col'].count()`), `COUNTROWS('Table')` compte simplement les lignes de la table (comme `len(df)`). C'est plus rapide et plus sûr pour compter un volume de sinistres.",code:"Nombre de Sinistres = COUNTROWS('Sinistres')"},{id:"distinct_count",title:"Compter les uniques (DISTINCTCOUNT)",description:"Équivalent de df['col'].nunique().",code:"Nombre Assurés Uniques = DISTINCTCOUNT('Portefeuille'[ID_Assuré])"},{id:"divide",title:"Division Sécurisée (DIVIDE)",description:"Gérer la division par zéro automatiquement.",markdown:"💡 **Pourquoi DIVIDE ?**\nL'opérateur `/` plante ou renvoie Infinity si le dénominateur est 0.\n`DIVIDE(N, D, 0)` est l'équivalent d'un `np.where(D == 0, 0, N / D)`. Indispensable pour les ratios S/P.",code:"Ratio S/P = DIVIDE([Montant Sinistres], [Primes Acquises], 0)"}]},{id:"calculate_context",title:"2. Le Moteur : CALCULATE",description:'Le "WHERE" dynamique de Power BI.',snippets:[{id:"calculate_concept",title:"Concept : CALCULATE",description:"Comprendre la modification de contexte.",markdown:`🧠 **Le Cerveau du DAX**
+df_sql.show()`}]}]},{id:"pyspark_advanced",title:"PySpark Avancé",description:"Fonctions de Fenêtrage et Optimisation",categories:[{id:"window_functions",title:"1. Window Functions",description:"Calculs sur des fenêtres glissantes (Ranking, Lead/Lag).",snippets:[{id:"window_spec",title:"Définir une Fenêtre",description:"La base : PartitionBy et OrderBy.",code:`from pyspark.sql.window import Window
+from pyspark.sql.functions import col
+
+# 1. Partitionner par département
+window_dept = Window.partitionBy("departement")
+
+# 2. Partitionner par département et trier par salaire (décroissant)
+window_dept_salary = Window \\
+    .partitionBy("departement") \\
+    .orderBy(col("salaire").desc())
+
+# 3. Fenêtre glissante (Rows between)
+# Ex: 1 ligne avant, la ligne courante, 1 ligne après
+window_sliding = Window \\
+    .partitionBy("departement") \\
+    .orderBy("date") \\
+    .rowsBetween(-1, 1)`},{id:"ranking",title:"Classement (Rank, RowNumber)",description:"Attribuer un rang à chaque ligne.",code:`from pyspark.sql.functions import rank, dense_rank, row_number
+
+# row_number() : 1, 2, 3, 4 (Unique, même si égalité)
+# rank()       : 1, 2, 2, 4 (Saut de rang si égalité)
+# dense_rank() : 1, 2, 2, 3 (Pas de saut de rang)
+
+df = df.withColumn(
+    "rang_salaire", 
+    rank().over(window_dept_salary)
+)
+
+# Garder uniquement le mieux payé de chaque département
+df_best = df.filter(col("rang_salaire") == 1)`},{id:"analytic",title:"Analytique (Lead, Lag)",description:"Accéder aux lignes précédentes ou suivantes.",code:`from pyspark.sql.functions import lag, lead
+
+# lag(col, n) : Valeur de la ligne n précédente
+# lead(col, n) : Valeur de la ligne n suivante
+
+# Calculer l'évolution du salaire par rapport au précédent
+df = df.withColumn(
+    "salaire_precedent", 
+    lag("salaire", 1).over(window_dept_salary)
+)
+
+df = df.withColumn(
+    "diff_salaire", 
+    col("salaire") - col("salaire_precedent")
+)`},{id:"running_total",title:"Cumul (Running Total)",description:"Somme cumulée ou moyenne mobile.",code:`from pyspark.sql.functions import sum, avg
+
+# Somme cumulée des ventes par date
+window_cumsum = Window.orderBy("date").rowsBetween(Window.unboundedPreceding, Window.currentRow)
+
+df = df.withColumn(
+    "ventes_cumulees", 
+    sum("ventes").over(window_cumsum)
+)
+
+# Moyenne mobile sur 3 jours (hier, aujourd'hui, demain)
+window_moving = Window.orderBy("date").rowsBetween(-1, 1)
+
+df = df.withColumn(
+    "moyenne_mobile", 
+    avg("ventes").over(window_moving)
+)`}]}]}]},xL={themes:[{id:"dax_essentials",title:"DAX Essentiels",description:"Les fondations solides (Agrégations, Calculate, Itérateurs).",categories:[{id:"aggregations",title:"1. Agrégations Sécurisées",description:"Compter et Diviser sans erreur.",snippets:[{id:"count_rows",title:"Compter le volume (COUNTROWS)",description:"Le standard pour compter les lignes.",markdown:"💡 **Pourquoi COUNTROWS ?**\nContrairement à `COUNT(colonne)` qui ignore les BLANKs (comme `df['col'].count()`), `COUNTROWS('Table')` compte simplement les lignes de la table (comme `len(df)`). C'est plus rapide et plus sûr pour compter un volume de sinistres.",code:"Nombre de Sinistres = COUNTROWS('Sinistres')"},{id:"distinct_count",title:"Compter les uniques (DISTINCTCOUNT)",description:"Équivalent de df['col'].nunique().",code:"Nombre Assurés Uniques = DISTINCTCOUNT('Portefeuille'[ID_Assuré])"},{id:"divide",title:"Division Sécurisée (DIVIDE)",description:"Gérer la division par zéro automatiquement.",markdown:"💡 **Pourquoi DIVIDE ?**\nL'opérateur `/` plante ou renvoie Infinity si le dénominateur est 0.\n`DIVIDE(N, D, 0)` est l'équivalent d'un `np.where(D == 0, 0, N / D)`. Indispensable pour les ratios S/P.",code:"Ratio S/P = DIVIDE([Montant Sinistres], [Primes Acquises], 0)"}]},{id:"calculate_context",title:"2. Le Moteur : CALCULATE",description:'Le "WHERE" dynamique de Power BI.',snippets:[{id:"calculate_concept",title:"Concept : CALCULATE",description:"Comprendre la modification de contexte.",markdown:`🧠 **Le Cerveau du DAX**
 \`CALCULATE\` est la seule fonction qui peut **modifier le contexte de filtre** d'une mesure.
 C'est l'équivalent d'un filtre dynamique que vous appliquez par-dessus les filtres choisis par l'utilisateur (Slicers).
 
