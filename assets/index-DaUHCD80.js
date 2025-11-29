@@ -582,7 +582,7 @@ df_imp = df_imp.sort_values('importance', ascending=False)
 plt.figure(figsize=(10, 6))
 sns.barplot(data=df_imp, x='importance', y='feature')
 plt.title("Importance des Variables (Feature Importance)")
-plt.show()`}]}]},{id:"python_basics",title:"4. Python Basics",description:"Les fondamentaux du langage",categories:[{id:"std_libs",title:"Modules Standards",description:"Math, Random, Datetime, OS...",snippets:[{id:"math_lib",title:"Mathématiques (math)",description:"Fonctions mathématiques de base.",code:`import math
+plt.show()`}]}]},{id:"python_basics",title:"Python Basics",description:"Les fondamentaux du langage",categories:[{id:"std_libs",title:"1. Modules Standards",description:"Math, Random, Datetime, OS...",snippets:[{id:"math_lib",title:"Mathématiques (math)",description:"Fonctions mathématiques de base.",code:`import math
 
 # Constantes
 print(math.pi)  # 3.14159...
@@ -666,7 +666,7 @@ print(compteur.most_common(1)) # [('a', 3)]
 d = defaultdict(int) # Valeur par défaut : 0
 d['a'] += 1
 print(d['a']) # 1
-print(d['z']) # 0 (créé automatiquement)`}]},{id:"control_flow",title:"Contrôle de Flux",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
+print(d['z']) # 0 (créé automatiquement)`}]},{id:"control_flow",title:"2. Contrôle de Flux",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
 import random
 import datetime
 import os
@@ -700,7 +700,7 @@ statut = "Majeur" if age >= 18 else "Mineur"`},{id:"break_continue",title:"Break
         continue # Passe à l'itération suivante (saute 3)
     if i == 8:
         break # Arrête complètement la boucle
-    print(i)`}]},{id:"functions",title:"Fonctions",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message="Bonjour"):
+    print(i)`}]},{id:"functions",title:"3. Fonctions",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message="Bonjour"):
     """
     Affiche un message de salutation.
     message est un paramètre optionnel (valeur par défaut).
@@ -726,7 +726,7 @@ print(carre(5)) # 25
 
 # Souvent utilisé avec map() ou filter()
 nombres = [1, 2, 3, 4]
-pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`}]},{id:"data_structures",title:"Structures de Données",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
+pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`}]},{id:"data_structures",title:"4. Structures de Données",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
 
 # Ajout
 ma_liste.append(4) # [1, 2, 3, 4]
@@ -750,7 +750,7 @@ a = {1, 2, 3}
 b = {3, 4, 5}
 
 print(a.intersection(b)) # {3}
-print(a.union(b)) # {1, 2, 3, 4, 5}`}]},{id:"error_handling",title:"Gestion d'Erreurs",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
+print(a.union(b)) # {1, 2, 3, 4, 5}`}]},{id:"error_handling",title:"5. Gestion d'Erreurs",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
     resultat = 10 / 0
 except ZeroDivisionError:
     print("Erreur : Division par zéro impossible !")
@@ -759,7 +759,7 @@ except Exception as e:
 else:
     print("Tout s'est bien passé (si pas d'erreur)")
 finally:
-    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]}]},{id:"python_tips",title:"5. Python Tips",description:"Astuces et Bonnes Pratiques",categories:[{id:"string_formatting",title:"Formatage de Chaînes (f-strings)",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
+    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]}]},{id:"python_tips",title:"Python Tips",description:"Astuces et Bonnes Pratiques",categories:[{id:"string_formatting",title:"1. Formatage de Chaînes (f-strings)",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
 
 nom = "Alice"
 age = 30
@@ -779,7 +779,7 @@ print(f"Taux : {pourcentage:.1%}") # 12.3%
 
 # Debug facile (affiche nom_variable = valeur)
 x = 10
-print(f"{x=}") # x=10`}]},{id:"documentation",title:"Documentation",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
+print(f"{x=}") # x=10`}]},{id:"documentation",title:"2. Documentation",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
     """
     Effectue un calcul complexe entre x et y.
 
@@ -793,7 +793,7 @@ print(f"{x=}") # x=10`}]},{id:"documentation",title:"Documentation",description:
     return x * y + 10
 
 # Accéder à la doc
-help(calcul_complexe)`}]},{id:"pythonic_idioms",title:'Astuces "Pythoniques"',description:"Écrire du code plus élégant et concis.",snippets:[{id:"unpacking",title:"Unpacking (Déballage)",description:"Assigner plusieurs variables en une ligne.",code:`coords = (10, 20)
+help(calcul_complexe)`}]},{id:"pythonic_idioms",title:'3. Astuces "Pythoniques"',description:"Écrire du code plus élégant et concis.",snippets:[{id:"unpacking",title:"Unpacking (Déballage)",description:"Assigner plusieurs variables en une ligne.",code:`coords = (10, 20)
 x, y = coords # x=10, y=20
 
 # Échanger deux variables sans variable temporaire
@@ -811,7 +811,7 @@ for i, fruit in enumerate(fruits):
 ages = [25, 30]
 
 for nom, age in zip(noms, ages):
-    print(f"{nom} a {age} ans")`}]},{id:"jupyter_magic",title:"Jupyter & Notebooks",description:"Magics commands pour gagner du temps.",snippets:[{id:"timeit",title:"Mesurer le temps (%timeit)",description:"Chronometrer une ligne de code.",code:`# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
+    print(f"{nom} a {age} ans")`}]},{id:"jupyter_magic",title:"4. Jupyter & Notebooks",description:"Magics commands pour gagner du temps.",snippets:[{id:"timeit",title:"Mesurer le temps (%timeit)",description:"Chronometrer une ligne de code.",code:`# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
 %timeit [x**2 for x in range(1000)]
 
 # Pour une cellule entière :
@@ -820,7 +820,7 @@ for nom, age in zip(noms, ages):
 %autoreload 2
 
 import mon_module_perso
-# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]}]},{id:"python_production",title:"6. Production & Engineering",description:"Qualité, Tests et Performance",categories:[{id:"environment",title:"Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]}]},{id:"python_production",title:"Production & Engineering",description:"Qualité, Tests et Performance",categories:[{id:"environment",title:"1. Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
 
 # 1. Créer l'environnement (dans le dossier du projet)
 python -m venv .venv
@@ -835,7 +835,7 @@ source .venv/bin/activate
 pip install pandas
 
 # 4. Sauvegarder les dépendances
-pip freeze > requirements.txt`}]},{id:"testing",title:"Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
+pip freeze > requirements.txt`}]},{id:"testing",title:"2. Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
 
 def addition(a, b):
     return a + b
@@ -845,7 +845,7 @@ def test_addition():
     assert addition(-1, 1) == 0
 
 # Lancer les tests dans le terminal :
-# pytest`}]},{id:"optimization",title:"Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+# pytest`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
@@ -1341,14 +1341,14 @@ git push -u origin main
 git push`},{id:"git_pull",title:"Récupérer les changements (Pull)",description:"Mettre à jour votre local depuis GitHub.",subCategory:"Synchronisation",code:`# Récupérer et fusionner les changements
 git pull origin main
 
-# Si vous avez des conflits, Git vous préviendra.`}]}]},{id:"git_panic",title:"5. Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
+# Si vous avez des conflits, Git vous préviendra.`}]}]},{id:"git_panic",title:"Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"1. Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
 git stash
 
 # Récupérer ce qu'on a mis de côté
 git stash pop
 
 # Voir la liste des stashs
-git stash list`}]},{id:"undo",title:"Annuler des choses",description:"Reset et Revert.",snippets:[{id:"git_reset",title:"Git Reset (Attention !)",description:"Revenir en arrière dans l'historique.",code:`# Soft Reset : Annule le commit mais GARDE les fichiers modifiés (Staging)
+git stash list`}]},{id:"undo",title:"2. Annuler des choses",description:"Reset et Revert.",snippets:[{id:"git_reset",title:"Git Reset (Attention !)",description:"Revenir en arrière dans l'historique.",code:`# Soft Reset : Annule le commit mais GARDE les fichiers modifiés (Staging)
 git reset --soft HEAD~1
 
 # Hard Reset : Annule TOUT (Commit + Fichiers). Destructeur !
