@@ -1133,7 +1133,49 @@ def test_addition():
     assert addition(-1, 1) == 0
 
 # Lancer les tests dans le terminal :
-# pytest`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+# pytest`},{id:"pytest_fixtures",title:"Fixtures (Setup/Teardown)",description:"Préparer des données avant chaque test.",code:`import pytest
+
+@pytest.fixture
+def sample_data():
+    # Setup : Ce code s'exécute avant le test
+    data = {"id": 1, "name": "Test"}
+    return data
+
+def test_data_name(sample_data):
+    # Le test reçoit le résultat de la fixture
+    assert sample_data["name"] == "Test"`},{id:"pytest_parametrize",title:"Parametrize",description:"Tester plusieurs cas en une seule fonction.",code:`import pytest
+
+# On définit les entrées et le résultat attendu
+@pytest.mark.parametrize("input_a, input_b, expected", [
+    (1, 2, 3),
+    (0, 0, 0),
+    (-1, 1, 0),
+    (100, 200, 300),
+])
+def test_addition_multi(input_a, input_b, expected):
+    assert input_a + input_b == expected`}]},{id:"logging",title:"3. Logging (vs Print)",description:"Arrêtez d'utiliser print() en production !",snippets:[{id:"logging_basics",title:"Les Niveaux de Log",description:"Debug, Info, Warning, Error, Critical.",code:`import logging
+
+# Configuration de base (à faire au début du script)
+logging.basicConfig(level=logging.INFO)
+
+logging.debug("Détail technique pour le dév") # Ne s'affichera pas (niveau INFO > DEBUG)
+logging.info("Le script a démarré")
+logging.warning("Attention, espace disque faible")
+logging.error("Échec de la connexion BDD")
+logging.critical("Le système va s'arrêter !")`},{id:"logging_config",title:"Configuration Avancée",description:"Écrire dans un fichier et formater.",code:`import logging
+
+# On crée un logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Handler pour écrire dans un fichier
+file_handler = logging.FileHandler('app.log')
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+logger.info("Ce message ira dans le fichier app.log avec la date")`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
@@ -1146,7 +1188,19 @@ df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 df['c'] = df['a'] + df['b']
 
 # ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Optimisation)",description:"Garder la connexion ouverte (Cookies, Auth).",code:`import requests
+
+# Sans Session : Ouvre et ferme une connexion TCP à chaque appel (Lent)
+# requests.get('https://api.github.com/user')
+# requests.get('https://api.github.com/user/repos')
+
+# Avec Session : Réutilise la connexion (Rapide)
+with requests.Session() as s:
+    s.headers.update({'Authorization': 'Bearer MON_TOKEN'})
+    
+    # Les headers sont envoyés automatiquement
+    r1 = s.get('https://api.github.com/user')
+    r2 = s.get('https://api.github.com/user/repos')`},{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
 
 url = "https://api.github.com/search/repositories"
 
@@ -1476,7 +1530,16 @@ EXPLAIN SELECT * FROM orders WHERE user_id = 123;
 
 -- Recherchez :
 -- "Seq Scan" (Scan complet de la table) -> ❌ LENT sur grosse table
--- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`},{id:"indexes",title:"Les Index",description:"Le sommaire du livre.",markdown:'🚀 **Le concept**\nSans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".\nAvec un index, elle va à la fin, trouve "H", et va directement à la page.\n\n**Quand créer un index ?**\nSur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: `user_id`, `email`, `created_at`).'}]}]}]},DL={themes:[{id:"git_basics",title:"Git & GitHub",description:"Version Control & Collaboration",categories:[{id:"config_init",title:"1. Configuration & Initialisation",description:"À faire une seule fois (ou presque).",snippets:[{id:"git_config",title:"Configuration de l'identité",description:"Indispensable pour que vos commits vous soient attribués.",code:`# Définir votre nom (apparaîtra dans l'historique)
+-- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`},{id:"indexes",title:"Les Index",description:"Le sommaire du livre.",markdown:'🚀 **Le concept**\nSans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".\nAvec un index, elle va à la fin, trouve "H", et va directement à la page.\n\n**Quand créer un index ?**\nSur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: `user_id`, `email`, `created_at`).'}]},{id:"pivot_unpivot",title:"4. Pivot & Unpivot",description:"Changer la forme des données.",snippets:[{id:"sql_pivot",title:"Pivot (Lignes -> Colonnes)",description:"Créer un tableau croisé avec CASE WHEN.",code:`-- Objectif : Une colonne par année
+SELECT 
+    product_id,
+    SUM(CASE WHEN year = 2022 THEN amount ELSE 0 END) as sales_2022,
+    SUM(CASE WHEN year = 2023 THEN amount ELSE 0 END) as sales_2023
+FROM sales
+GROUP BY product_id;`},{id:"sql_unpivot",title:"Unpivot (Colonnes -> Lignes)",description:"Aplatir un tableau avec UNION ALL.",code:`-- Objectif : Transformer sales_2022 et sales_2023 en une colonne 'year'
+SELECT product_id, 2022 as year, sales_2022 as amount FROM sales
+UNION ALL
+SELECT product_id, 2023 as year, sales_2023 as amount FROM sales;`}]}]}]},DL={themes:[{id:"git_basics",title:"Git & GitHub",description:"Version Control & Collaboration",categories:[{id:"config_init",title:"1. Configuration & Initialisation",description:"À faire une seule fois (ou presque).",snippets:[{id:"git_config",title:"Configuration de l'identité",description:"Indispensable pour que vos commits vous soient attribués.",code:`# Définir votre nom (apparaîtra dans l'historique)
 git config --global user.name "Votre Prénom Nom"
 
 # Définir votre email (doit correspondre à celui de GitHub)
@@ -1541,7 +1604,37 @@ git push -u origin main
 git push`},{id:"git_pull",title:"Récupérer les changements (Pull)",description:"Mettre à jour votre local depuis GitHub.",subCategory:"Synchronisation",code:`# Récupérer et fusionner les changements
 git pull origin main
 
-# Si vous avez des conflits, Git vous préviendra.`}]}]},{id:"git_panic",title:"Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"1. Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
+# Si vous avez des conflits, Git vous préviendra.`}]}]},{id:"git_advanced",title:"Git Avancé",description:"Pour un historique propre et maîtrisé.",categories:[{id:"clean_history",title:"1. Historique Propre",description:"Rebase et Cherry-pick.",snippets:[{id:"rebase_vs_merge",title:"Rebase vs Merge",description:"Garder un historique linéaire.",markdown:`### 🌿 Merge vs Rebase
+**Merge** : Crée un commit de fusion ("Merge branch..."). Préserve la réalité historique mais peut polluer le graphe.
+**Rebase** : Réécrit l'histoire. Place vos commits **à la suite** de la branche cible.
+
+\`\`\`bash
+# Se placer sur sa branche
+git checkout ma-feature
+
+# Rebaser sur main (Mettre mes changements APRES ceux de main)
+git rebase main
+\`\`\`
+⚠️ **Règle d'or** : Ne jamais rebaser une branche partagée (déjà pushée) !`},{id:"cherry_pick",title:"Cherry-Pick",description:"Picorer un commit spécifique.",code:`# Vous voulez juste le commit "Fix bug" de la branche "dev" sur votre branche "main"
+# sans tout fusionner.
+
+git cherry-pick <hash_du_commit>`}]},{id:"ignoring",title:"2. Ignorer des fichiers",description:"Le fichier .gitignore.",snippets:[{id:"gitignore_rules",title:"Règles .gitignore",description:"Ce qu'il ne faut JAMAIS commiter.",code:`# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Environnements virtuels Python
+.venv/
+env/
+__pycache__/
+
+# Fichiers de configuration locaux / Secrets
+.env
+config_local.json
+
+# Dossiers de build
+dist/
+build/
+node_modules/`}]}]},{id:"git_panic",title:"Sauvetage (Panic Mode)",description:"Quand ça tourne mal...",categories:[{id:"stash",title:"1. Mettre de côté (Stash)",description:"Sauvegarder temporairement sans commiter.",snippets:[{id:"git_stash",title:"Git Stash",description:"Très utile quand on doit changer de branche en urgence.",code:`# Mettre de côté les modifications en cours
 git stash
 
 # Récupérer ce qu'on a mis de côté
@@ -2020,7 +2113,16 @@ IF(
 )`},{id:"dynamic_title",title:"Titre de Visuel Dynamique",description:"Afficher la sélection en cours.",markdown:`🏷️ **Titre Intelligent**
 Créez une mesure pour le titre, puis dans le visuel > Général > Titre > (fx) > Sélectionnez la mesure.`,code:`Titre Dynamique = 
 "Analyse des Ventes : " & 
-SELECTEDVALUE('Geo'[Pays], "Monde Entier")`}]}]}]},FL={themes:[{id:"r_basics",title:"R (Tidyverse)",description:"Manipulation de données moderne",categories:[{id:"dplyr_basics",title:"Dplyr Basics",description:"Les verbes essentiels",snippets:[{id:"select_filter",title:"Select & Filter",description:"Choisir colonnes et lignes.",code:`library(dplyr)
+SELECTEDVALUE('Geo'[Pays], "Monde Entier")`}]},{id:"dynamic_features",title:"5. Fonctionnalités Dynamiques (Expert)",description:"Calculation Groups & Field Parameters.",snippets:[{id:"calculation_groups",title:"Calculation Groups",description:"Changer la logique de calcul dynamiquement (YTD, MTD...).",markdown:"🚀 **La Révolution des Calculation Groups**\nAu lieu de créer 3 mesures pour chaque KPI (`Ventes`, `Ventes YTD`, `Ventes YoY`), vous créez un **Groupe de Calcul**.\n\n**Exemple d'Item de Calcul (YTD) :**\n```dax\nCALCULATE(\n    SELECTEDMEASURE(), -- Remplace la mesure utilisée dans le visuel\n    DATESYTD('Temps'[Date])\n)\n```\nEnsuite, l'utilisateur choisit \"YTD\" dans un segment, et **toutes** les mesures du graphique passent en YTD."},{id:"field_parameters",title:"Field Parameters",description:"Laisser l'utilisateur choisir l'axe ou la mesure.",markdown:`🎛️ **Paramètres de Champs**
+Permet de changer dynamiquement les axes ou les légendes d'un graphique.
+
+**Comment faire :**
+1. Onglet **Modélisation** > **Nouveau paramètre** > **Champs**.
+2. Sélectionnez les champs (ex: Pays, Produit, Segment).
+3. Cela crée une table spéciale.
+4. Mettez cette colonne dans l'axe X de votre graphique.
+
+L'utilisateur peut maintenant cliquer sur "Pays" ou "Produit" pour changer l'analyse instantanément.`}]}]}]},FL={themes:[{id:"r_basics",title:"R (Tidyverse)",description:"Manipulation de données moderne",categories:[{id:"dplyr_basics",title:"Dplyr Basics",description:"Les verbes essentiels",snippets:[{id:"select_filter",title:"Select & Filter",description:"Choisir colonnes et lignes.",code:`library(dplyr)
 
 # Sélectionner des colonnes
 df %>% select(nom, age)
