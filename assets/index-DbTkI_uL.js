@@ -1667,7 +1667,21 @@ Le chemin (\`PATH\`) calculé pour le Manager (12) est donc : \`"1|5|12"\`.
 | :--- | :--- | :--- | :--- |
 | **1** | \`PATHITEM(Path, 1)\` | **1** | CEO |
 | **2** | \`PATHITEM(Path, 2)\` | **5** | Directeur |
-| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |`,code:`Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
+| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |
+ 
+### 🎯 À quoi ça sert ?
+Une fois ces colonnes calculées (\`Niveau 1\`, \`Niveau 2\`...), vous pouvez :
+1.  **Créer une Matrice** : Mettez *Niveau 1*, *Niveau 2*, *Niveau 3* en lignes pour permettre le "Drill Down".
+2.  **Filtrer toute une branche** :
+    \`\`\`dax
+    -- Calculer les ventes de toute l'équipe du Directeur 5
+    Ventes Equipe Directeur = 
+    CALCULATE(
+        [Total Ventes],
+        'Employés'[Niveau 2] = "5" 
+        -- Filtre automatiquement le Directeur 5 ET ses Managers (12...)
+    )
+    \`\`\``,code:`Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
 Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
 Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`}]},{id:"relationships",title:"6. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
 Mais on ne peut avoir qu'une seule relation active vers la table **Temps**.
