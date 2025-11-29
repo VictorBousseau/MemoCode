@@ -330,6 +330,15 @@ CALCULATE(
                             id: 'path_item',
                             title: 'Extraire un Niveau (PATHITEM)',
                             description: 'Récupérer le N-ième manager.',
+                            markdown: `### 📊 Exemple Concret
+Imaginons la hiérarchie suivante : **CEO (1) > Directeur (5) > Manager (12)**.
+Le chemin (\`PATH\`) est : \`"1|5|12"\`.
+
+| Niveau | Fonction | Résultat | Rôle |
+| :--- | :--- | :--- | :--- |
+| **1** | \`PATHITEM(Path, 1)\` | **1** | CEO |
+| **2** | \`PATHITEM(Path, 2)\` | **5** | Directeur |
+| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |`,
                             code: `Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
 Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
 Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`
