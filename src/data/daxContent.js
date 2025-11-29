@@ -331,8 +331,12 @@ CALCULATE(
                             title: 'Extraire un Niveau (PATHITEM)',
                             description: 'Récupérer le N-ième manager.',
                             markdown: `### 📊 Exemple Concret
-Imaginons la hiérarchie suivante : **CEO (1) > Directeur (5) > Manager (12)**.
-Le chemin (\`PATH\`) est : \`"1|5|12"\`.
+Imaginons une chaîne hiérarchique avec des **Identifiants Employés (ID)** :
+*   **CEO** (ID = 1)
+*   **Directeur** (ID = 5) -> Son chef est le 1
+*   **Manager** (ID = 12) -> Son chef est le 5
+
+Le chemin (\`PATH\`) calculé pour le Manager (12) est donc : \`"1|5|12"\`.
 
 | Niveau | Fonction | Résultat | Rôle |
 | :--- | :--- | :--- | :--- |
