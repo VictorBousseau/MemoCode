@@ -3189,7 +3189,67 @@ db.users.find({ skills: "Python" })`},{id:"mongo_aggregation",title:"Aggregation
 
     // Étape 3 : Trier (ORDER BY)
     { $sort: { totalSpent: -1 } } // Descending
-])`}]}]},{id:"neo4j",title:"Neo4j (Graphe)",description:"Penser en Noeuds et Relations.",categories:[{id:"cypher_basics",title:"1. Le Langage Cypher",description:"L'ASCII Art pour requêter.",snippets:[{id:"cypher_concept",title:"Noeuds & Relations",description:"La syntaxe intuitive (Node)-[RELATION]->(Node).",markdown:"### 🎨 Dessine ta requête\nCypher est conçu pour ressembler au graphe qu'il décrit.\n*   `(p:Person)` : Un Noeud (avec parenthèses comme un rond).\n*   `[r:FRIEND]` : Une Relation (avec crochets).\n*   `->` : Une flèche pour la direction.\n\n**Exemple :**\n`(Alice)-[:KNOWS]->(Bob)`"},{id:"cypher_create",title:"Créer (CREATE)",description:"Insérer des données.",code:`// Créer un noeud
+])`}]},{id:"mongo_practice",title:"3. Cas Pratiques (Restaurants)",description:"Exercices sur le dataset NYC Restaurants.",snippets:[{id:"mongo_ex_sort_array",title:"1. Trier par taille de tableau",description:"Top 10 des restaurants les plus visités.",code:`db.Restaurants.aggregate([
+    // 1. Créer un champ calculé (Nombre de visites = taille du tableau grades)
+    { $addFields: { "Nombre visite": { $size: "$grades" } } },
+    
+    // 2. Sélectionner les colonnes à garder (Projection)
+    // borough: 1 (Garder), _id: 0 (Cacher), Nombre visite: 1 (Garder)
+    { $project: { borough: 1, _id: 0, "Nombre visite": 1 } },
+    
+    // 3. Trier par nombre de visites décroissant (-1)
+    { $sort: { "Nombre visite": -1 } },
+    
+    // 4. Garder les 10 premiers
+    { $limit: 10 }
+])`},{id:"mongo_ex_group_count",title:"2. Compter par Quartier",description:"Nombre de restaurants par Borough.",code:`db.Restaurants.aggregate([
+    // Grouper par quartier (borough)
+    { $group: { 
+        _id: { borough: "$borough" }, // Clé de groupement
+        nombreResto: { $sum: 1 }      // Compteur (+1 pour chaque ligne)
+    }}
+])`},{id:"mongo_ex_unwind_avg",title:"3. Moyenne des notes (Unwind)",description:"Aplatir un tableau pour calculer la moyenne.",markdown:`### 🌪️ $unwind
+Cette étape "explose" le tableau \`grades\`.
+Si un restaurant a 3 notes, il deviendra **3 documents** distincts dans le pipeline.
+C'est indispensable pour faire des calculs sur les éléments d'un tableau.`,code:`db.Restaurants.aggregate([
+    // 1. Aplatir le tableau grades (1 ligne par note)
+    { $unwind: "$grades" }, 
+    
+    // 2. Grouper par quartier et faire la moyenne des scores
+    { $group: { 
+        _id: { borough: "$borough" }, 
+        moyenne: { $avg: "$grades.score" } 
+    }}
+])`},{id:"mongo_ex_complex",title:"4. Pipeline Complexe",description:"Les rues où on mange le plus sainement.",markdown:`### 🎯 Objectif
+Trouver les 10 rues avec les meilleurs scores (basé sur la note la plus récente).
+*Note : Dans ce dataset, un score bas est meilleur (moins de violations sanitaires).*`,code:`db.Restaurants.aggregate([
+    // 1. Exclure les restaurants sans notes (tableau vide)
+    { $match: { grades: { $ne: [] } } },
+    
+    // 2. Aplatir le tableau grades
+    { $unwind: "$grades" },
+    
+    // 3. Trier par date décroissante (pour avoir la plus récente en premier)
+    { $sort: { "grades.date": -1 } },
+    
+    // 4. Grouper par Restaurant (Quartier + Rue) pour choper la 1ère note (la plus récente)
+    { $group: { 
+        _id: { borough: "$borough", street: "$address.street" },
+        firstGrade: { $first: "$grades.score" } 
+    }},
+    
+    // 5. Regrouper par Rue pour faire la moyenne de ces "dernières notes"
+    { $group: { 
+        _id: "$_id.street", 
+        moyenneScore: { $avg: "$firstGrade" } 
+    }},
+    
+    // 6. Trier par score décroissant (ou croissant selon la logique métier)
+    { $sort: { moyenneScore: -1 } },
+    
+    // 7. Top 10
+    { $limit: 10 }
+]);`}]}]},{id:"neo4j",title:"Neo4j (Graphe)",description:"Penser en Noeuds et Relations.",categories:[{id:"cypher_basics",title:"1. Le Langage Cypher",description:"L'ASCII Art pour requêter.",snippets:[{id:"cypher_concept",title:"Noeuds & Relations",description:"La syntaxe intuitive (Node)-[RELATION]->(Node).",markdown:"### 🎨 Dessine ta requête\nCypher est conçu pour ressembler au graphe qu'il décrit.\n*   `(p:Person)` : Un Noeud (avec parenthèses comme un rond).\n*   `[r:FRIEND]` : Une Relation (avec crochets).\n*   `->` : Une flèche pour la direction.\n\n**Exemple :**\n`(Alice)-[:KNOWS]->(Bob)`"},{id:"cypher_create",title:"Créer (CREATE)",description:"Insérer des données.",code:`// Créer un noeud
 CREATE (v:Person {name: "Victor", age: 28})
 
 // Créer une relation (Victor AIME le Graph)
