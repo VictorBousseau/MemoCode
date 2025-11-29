@@ -185,12 +185,12 @@ git pull origin main
         },
         {
             id: 'git_panic',
-            title: '5. Sauvetage (Panic Mode)',
+            title: 'Sauvetage (Panic Mode)',
             description: 'Quand ça tourne mal...',
             categories: [
                 {
                     id: 'stash',
-                    title: 'Mettre de côté (Stash)',
+                    title: '1. Mettre de côté (Stash)',
                     description: 'Sauvegarder temporairement sans commiter.',
                     snippets: [
                         {
@@ -210,7 +210,7 @@ git stash list`
                 },
                 {
                     id: 'undo',
-                    title: 'Annuler des choses',
+                    title: '2. Annuler des choses',
                     description: 'Reset et Revert.',
                     snippets: [
                         {

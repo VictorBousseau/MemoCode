@@ -590,12 +590,13 @@ plt.show()`
         },
         {
             id: 'ml',
-            title: 'Machine Learning',
-            description: 'Modélisation avec Scikit-Learn',
+            title: 'Modélisation & AI',
+            description: 'Machine Learning, Stats et Deep Learning.',
             categories: [
                 {
                     id: 'pipelines',
                     title: '0. Pipelines & Workflow',
+                    subCategory: 'Machine Learning',
                     description: 'Automatiser et sécuriser le ML.',
                     snippets: [
                         {
@@ -670,6 +671,7 @@ y_pred = pipe.predict(X_test)`
                 {
                     id: 'preprocessing',
                     title: '1. Préparation (Preprocessing)',
+                    subCategory: 'Machine Learning',
                     description: 'Split, Encodage et Scaling',
                     snippets: [
                         {
@@ -742,6 +744,7 @@ X_test_scaled = scaler.transform(X_test)`
                 {
                     id: 'regression_models',
                     title: '2.1 Modèles de Régression',
+                    subCategory: 'Machine Learning',
                     description: 'Prédire une valeur continue',
                     snippets: [
                         {
@@ -818,6 +821,7 @@ predictions = model.predict(X_test_scaled)`
                 {
                     id: 'classification_models',
                     title: '2.2 Modèles de Classification',
+                    subCategory: 'Machine Learning',
                     description: 'Prédire une classe / catégorie',
                     snippets: [
                         {
@@ -942,6 +946,7 @@ predictions = model.predict(X_test_scaled)`
                 {
                     id: 'evaluation',
                     title: '3. Évaluation & Interprétabilité',
+                    subCategory: 'Machine Learning',
                     description: 'Métriques et Graphiques de performance',
                     snippets: [
                         {
@@ -1012,18 +1017,193 @@ plt.title("Importance des Variables (Feature Importance)")
 plt.show()`
                         }
                     ]
+                },
+                {
+                    id: 'regression_sm',
+                    title: '4. Régression (OLS)',
+                    subCategory: 'Statistiques',
+                    description: 'Moindres Carrés Ordinaires.',
+                    snippets: [
+                        {
+                            id: 'ols_formula',
+                            title: 'OLS (Formule)',
+                            description: 'Syntaxe style R (plus simple).',
+                            code: `import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Fit du modèle (y ~ x1 + x2)
+model = smf.ols('ventes ~ pub_tv + pub_radio', data=df).fit()
+
+# Résumé complet (R-squared, p-values...)
+print(model.summary())`
+                        },
+                        {
+                            id: 'ols_arrays',
+                            title: 'OLS (Arrays)',
+                            description: 'Avec X et y (comme Scikit-Learn).',
+                            code: `# Il faut ajouter une constante (intercept) manuellement !
+X = sm.add_constant(X)
+
+model = sm.OLS(y, X).fit()
+print(model.summary())`
+                        }
+                    ]
+                },
+                {
+                    id: 'tf_concepts',
+                    title: '5. Concepts & Tenseurs',
+                    subCategory: 'Deep Learning',
+                    description: 'Comprendre les bases avant de coder.',
+                    snippets: [
+                        {
+                            id: 'dl_intro',
+                            title: 'Deep Learning vs ML Classique',
+                            description: 'Quand utiliser le Deep Learning ?',
+                            markdown: `🧠 **Deep Learning (Réseaux de Neurones)**
+Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
+
+**Le concept clé :**
+Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`
+                        },
+                        {
+                            id: 'tensors',
+                            title: 'Les Tenseurs',
+                            description: 'La brique de base de TensorFlow.',
+                            markdown: `📦 **Qu'est-ce qu'un Tenseur ?**
+C'est une généralisation des matrices à N dimensions.
+*   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
+*   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
+*   **Matrice** (2D) : Un tableau (ex: une image noir & blanc)
+*   **Tenseur 3D** : Un cube (ex: une image couleur RGB)
+*   **Tenseur 4D** : Un lot d'images (Batch)
+
+En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`
+                        }
+                    ]
+                },
+                {
+                    id: 'keras_workflow',
+                    title: '6. Workflow Keras',
+                    subCategory: 'Deep Learning',
+                    description: 'Construire un modèle étape par étape.',
+                    snippets: [
+                        {
+                            id: 'sequential',
+                            title: 'L\'Architecture (Sequential)',
+                            description: 'Empiler des couches comme des Lego.',
+                            code: `import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# Création d'un modèle vide
+model = models.Sequential()
+
+# Ajout de couches (Layers)
+# Dense = Couche entièrement connectée (chaque neurone est relié à tous les précédents)
+model.add(layers.Dense(64, activation='relu', input_shape=(10,))) # 10 features en entrée
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`
+                        },
+                        {
+                            id: 'activation',
+                            title: 'Fonctions d\'Activation',
+                            description: 'Donner de la non-linéarité au modèle.',
+                            markdown: `⚡ **Pourquoi une fonction d'activation ?**
+Sans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.
+
+*   **ReLU** (\`relu\`) : La plus utilisée dans les couches cachées. Rapide et efficace.
+*   **Sigmoid** (\`sigmoid\`) : Pour la sortie d'une classification binaire (0 ou 1).
+*   **Softmax** (\`softmax\`) : Pour la sortie d'une classification multi-classes (probabilités).
+*   **Linear** (\`linear\`) : Pour la sortie d'une régression (valeur continue).`
+                        },
+                        {
+                            id: 'compile',
+                            title: 'Compilation',
+                            description: 'Définir comment le modèle apprend.',
+                            code: `model.compile(
+    optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
+    loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
+    metrics=['mae']        # Métriques à suivre (Mean Absolute Error)
+)`
+                        }
+                    ]
+                },
+                {
+                    id: 'training',
+                    title: '7. Entraînement',
+                    subCategory: 'Deep Learning',
+                    description: 'Lancer l\'apprentissage (Fit).',
+                    snippets: [
+                        {
+                            id: 'fit',
+                            title: 'Entraîner le modèle (Fit)',
+                            description: 'Epochs et Batch Size.',
+                            code: `history = model.fit(
+    X_train, y_train,
+    epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
+    batch_size=32,         # Nombre d'exemples traités avant de mettre à jour les poids
+    validation_split=0.2,  # 20% des données gardées pour valider pendant l'entraînement
+    verbose=1
+)`
+                        },
+                        {
+                            id: 'overfitting',
+                            title: 'Éviter le Sur-apprentissage',
+                            description: 'Early Stopping et Dropout.',
+                            code: `from tensorflow.keras.callbacks import EarlyStopping
+
+# Arrêter si la validation ne s'améliore plus après 5 epochs
+early_stop = EarlyStopping(monitor='val_loss', patience=5)
+
+model.fit(
+    X_train, y_train,
+    epochs=100,
+    callbacks=[early_stop]
+)`
+                        }
+                    ]
+                },
+                {
+                    id: 'tf_example',
+                    title: '8. Exemple Complet',
+                    subCategory: 'Deep Learning',
+                    description: 'Régression de bout en bout.',
+                    snippets: [
+                        {
+                            id: 'full_regression',
+                            title: 'Régression (Prix Immo)',
+                            description: 'Prédire une valeur continue.',
+                            code: `import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# 1. Architecture
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1) # Pas d'activation pour une régression (ou linear)
+])
+
+# 2. Compilation
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+# 3. Entraînement
+history = model.fit(X_train, y_train, epochs=50, validation_split=0.2)
+
+# 4. Prédiction
+predictions = model.predict(X_test)`
+                        }
+                    ]
                 }
             ]
         },
         {
             id: 'python_basics',
-            title: '4. Python Basics',
-            description: 'Les fondamentaux du langage',
+            title: 'Langage & Outils',
+            description: 'Les fondamentaux, astuces et calcul numérique.',
             categories: [
-
                 {
                     id: 'std_libs',
-                    title: 'Modules Standards',
+                    title: '1. Modules Standards',
+                    subCategory: 'Bases',
                     description: 'Math, Random, Datetime, OS...',
                     snippets: [
                         {
@@ -1144,7 +1324,8 @@ print(d['z']) # 0 (créé automatiquement)`
                 },
                 {
                     id: 'control_flow',
-                    title: 'Contrôle de Flux',
+                    title: '2. Contrôle de Flux',
+                    subCategory: 'Bases',
                     description: 'Boucles et Conditions',
                     snippets: [
                         {
@@ -1203,7 +1384,8 @@ statut = "Majeur" if age >= 18 else "Mineur"`
                 },
                 {
                     id: 'functions',
-                    title: 'Fonctions',
+                    title: '3. Fonctions',
+                    subCategory: 'Bases',
                     description: 'Définir et utiliser des blocs de code réutilisables',
                     snippets: [
                         {
@@ -1254,7 +1436,8 @@ pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`
                 },
                 {
                     id: 'data_structures',
-                    title: 'Structures de Données',
+                    title: '4. Structures de Données',
+                    subCategory: 'Bases',
                     description: 'Listes, Dictionnaires, Sets, Tuples',
                     snippets: [
                         {
@@ -1303,7 +1486,8 @@ print(a.union(b)) # {1, 2, 3, 4, 5}`
                 },
                 {
                     id: 'error_handling',
-                    title: 'Gestion d\'Erreurs',
+                    title: '5. Gestion d\'Erreurs',
+                    subCategory: 'Bases',
                     description: 'Try, Except, Finally',
                     snippets: [
                         {
@@ -1322,18 +1506,11 @@ finally:
     print("S'exécute toujours (utile pour fermer un fichier/connexion)")`
                         }
                     ]
-                }
-            ]
-        },
-        {
-            id: 'python_tips',
-            title: '5. Python Tips',
-            description: 'Astuces et Bonnes Pratiques',
-            categories: [
-
+                },
                 {
                     id: 'string_formatting',
-                    title: 'Formatage de Chaînes (f-strings)',
+                    title: '6. Formatage de Chaînes (f-strings)',
+                    subCategory: 'Astuces',
                     description: 'La méthode moderne pour formater du texte.',
                     snippets: [
                         {
@@ -1372,7 +1549,8 @@ print(f"{x=}") # x=10`
                 },
                 {
                     id: 'documentation',
-                    title: 'Documentation',
+                    title: '7. Documentation',
+                    subCategory: 'Astuces',
                     description: 'Docstrings et Commentaires',
                     snippets: [
                         {
@@ -1399,7 +1577,8 @@ help(calcul_complexe)`
                 },
                 {
                     id: 'pythonic_idioms',
-                    title: 'Astuces "Pythoniques"',
+                    title: '8. Astuces "Pythoniques"',
+                    subCategory: 'Astuces',
                     description: 'Écrire du code plus élégant et concis.',
                     snippets: [
                         {
@@ -1442,7 +1621,8 @@ for nom, age in zip(noms, ages):
                 },
                 {
                     id: 'jupyter_magic',
-                    title: 'Jupyter & Notebooks',
+                    title: '9. Jupyter & Notebooks',
+                    subCategory: 'Astuces',
                     description: 'Magics commands pour gagner du temps.',
                     snippets: [
                         {
@@ -1467,94 +1647,77 @@ import mon_module_perso
 # Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`
                         }
                     ]
-                }
-            ]
-        },
-        {
-            id: 'python_production',
-            title: '6. Production & Engineering',
-            description: 'Qualité, Tests et Performance',
-            categories: [
-
+                },
                 {
-                    id: 'environment',
-                    title: 'Environnement Virtuel',
-                    description: 'Isoler ses projets (Indispensable !)',
+                    id: 'arrays',
+                    title: '10. Tableaux (Arrays)',
+                    subCategory: 'Calcul Numérique',
+                    description: 'Création et manipulation.',
                     snippets: [
                         {
-                            id: 'venv',
-                            title: 'Venv (Standard)',
-                            description: 'Créer et activer un environnement virtuel.',
-                            code: `import pytest
+                            id: 'create_array',
+                            title: 'Création',
+                            description: 'Différentes façons de créer des arrays.',
+                            code: `import numpy as np
 
-# 1. Créer l'environnement (dans le dossier du projet)
-python -m venv .venv
+# À partir d'une liste
+arr = np.array([1, 2, 3])
 
-# 2. Activer l'environnement
-# Windows :
-.venv\\Scripts\\activate
-# Mac/Linux :
-source .venv/bin/activate
+# Zéros et Uns
+zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
+ones = np.ones((2, 4))   # Matrice 2x4 de 1
 
-# 3. Installer des paquets
-pip install pandas
+# Séquences
+range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
+linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`
+                        },
+                        {
+                            id: 'reshape',
+                            title: 'Dimensions & Reshape',
+                            description: 'Changer la forme des données.',
+                            code: `arr = np.arange(12) # [0..11]
 
-# 4. Sauvegarder les dépendances
-pip freeze > requirements.txt`
+# Changer en matrice 3x4
+mat = arr.reshape(3, 4)
+
+# Aplatir (Flatten)
+flat = mat.flatten()`
                         }
                     ]
                 },
                 {
-                    id: 'testing',
-                    title: 'Tests Unitaires (Pytest)',
-                    description: 'Vérifier que le code fait ce qu\'il doit faire.',
+                    id: 'math_ops',
+                    title: '11. Opérations Mathématiques',
+                    subCategory: 'Calcul Numérique',
+                    description: 'Calculs vectorisés.',
                     snippets: [
                         {
-                            id: 'pytest_basic',
-                            title: 'Premier Test avec Pytest',
-                            description: 'Simple, lisible et puissant.',
-                            code: `# fichier: test_calcul.py
+                            id: 'basic_math',
+                            title: 'Calculs de base',
+                            description: 'Opérations élément par élément.',
+                            code: `a = np.array([1, 2, 3])
+b = np.array([10, 20, 30])
 
-def addition(a, b):
-    return a + b
-
-def test_addition():
-    assert addition(2, 3) == 5
-    assert addition(-1, 1) == 0
-
-# Lancer les tests dans le terminal :
-# pytest`
-                        }
-                    ]
-                },
-                {
-                    id: 'optimization',
-                    title: 'Optimisation & Performance',
-                    description: 'Écrire du code rapide.',
-                    snippets: [
+print(a + b) # [11, 22, 33]
+print(a * 2) # [2, 4, 6]
+print(a ** 2) # [1, 4, 9]`
+                        },
                         {
-                            id: 'vectorization',
-                            title: 'Vectorisation vs Boucles',
-                            description: 'Pourquoi il ne faut JAMAIS boucler sur un DataFrame.',
-                            code: `import pandas as pd
-import numpy as np
+                            id: 'stats_np',
+                            title: 'Statistiques',
+                            description: 'Moyenne, écart-type, etc.',
+                            code: `arr = np.array([1, 2, 3, 4, 5])
 
-df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
-
-# ❌ LENT (Boucle for)
-# for i in range(len(df)):
-#     df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
-
-# ✅ RAPIDE (Vectorisation)
-df['c'] = df['a'] + df['b']
-
-# ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`
+print(np.mean(arr))  # Moyenne
+print(np.std(arr))   # Écart-type
+print(np.median(arr)) # Médiane
+print(np.max(arr))    # Maximum`
                         }
                     ]
                 }
             ]
         },
+
         {
             id: 'polars',
             title: 'Polars',
@@ -2001,178 +2164,172 @@ df_resumed = agg.fit_transform(df_commandes)`
             ]
         },
         {
-            id: 'numpy',
-            title: 'Numpy',
-            description: 'Calcul Numérique & Matriciel',
+            id: 'engineering',
+            title: 'Engineering & Web',
+            description: 'Production, APIs et Qualité de Code.',
             categories: [
-
                 {
-                    id: 'arrays',
-                    title: 'Tableaux (Arrays)',
-                    description: 'Création et manipulation.',
+                    id: 'environment',
+                    title: '1. Environnement Virtuel',
+                    description: 'Isoler ses projets (Indispensable !)',
                     snippets: [
                         {
-                            id: 'create_array',
-                            title: 'Création',
-                            description: 'Différentes façons de créer des arrays.',
-                            code: `import numpy as np
+                            id: 'venv',
+                            title: 'Venv (Standard)',
+                            description: 'Créer et activer un environnement virtuel.',
+                            code: `import pytest
 
-# À partir d'une liste
-arr = np.array([1, 2, 3])
+# 1. Créer l'environnement (dans le dossier du projet)
+python -m venv .venv
 
-# Zéros et Uns
-zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
-ones = np.ones((2, 4))   # Matrice 2x4 de 1
+# 2. Activer l'environnement
+# Windows :
+.venv\\Scripts\\activate
+# Mac/Linux :
+source .venv/bin/activate
 
-# Séquences
-range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
-linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`
-                        },
-                        {
-                            id: 'reshape',
-                            title: 'Dimensions & Reshape',
-                            description: 'Changer la forme des données.',
-                            code: `arr = np.arange(12) # [0..11]
+# 3. Installer des paquets
+pip install pandas
 
-# Changer en matrice 3x4
-mat = arr.reshape(3, 4)
-
-# Aplatir (Flatten)
-flat = mat.flatten()`
+# 4. Sauvegarder les dépendances
+pip freeze > requirements.txt`
                         }
                     ]
                 },
                 {
-                    id: 'math_ops',
-                    title: 'Opérations Mathématiques',
-                    description: 'Calculs vectorisés.',
+                    id: 'testing',
+                    title: '2. Tests Unitaires (Pytest)',
+                    description: 'Vérifier que le code fait ce qu\'il doit faire.',
                     snippets: [
                         {
-                            id: 'basic_math',
-                            title: 'Calculs de base',
-                            description: 'Opérations élément par élément.',
-                            code: `a = np.array([1, 2, 3])
-b = np.array([10, 20, 30])
+                            id: 'pytest_basic',
+                            title: 'Premier Test avec Pytest',
+                            description: 'Simple, lisible et puissant.',
+                            code: `# fichier: test_calcul.py
 
-print(a + b) # [11, 22, 33]
-print(a * 2) # [2, 4, 6]
-print(a ** 2) # [1, 4, 9]`
-                        },
-                        {
-                            id: 'stats_np',
-                            title: 'Statistiques',
-                            description: 'Moyenne, écart-type, etc.',
-                            code: `arr = np.array([1, 2, 3, 4, 5])
+def addition(a, b):
+    return a + b
 
-print(np.mean(arr))  # Moyenne
-print(np.std(arr))   # Écart-type
-print(np.median(arr)) # Médiane
-print(np.max(arr))    # Maximum`
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            id: 'statsmodels',
-            title: 'Statsmodels',
-            description: 'Modélisation Statistique',
-            categories: [
+def test_addition():
+    assert addition(2, 3) == 5
+    assert addition(-1, 1) == 0
 
-                {
-                    id: 'regression_sm',
-                    title: 'Régression (OLS)',
-                    description: 'Moindres Carrés Ordinaires.',
-                    snippets: [
-                        {
-                            id: 'ols_formula',
-                            title: 'OLS (Formule)',
-                            description: 'Syntaxe style R (plus simple).',
-                            code: `import statsmodels.api as sm
-import statsmodels.formula.api as smf
-
-# Fit du modèle (y ~ x1 + x2)
-model = smf.ols('ventes ~ pub_tv + pub_radio', data=df).fit()
-
-# Résumé complet (R-squared, p-values...)
-print(model.summary())`
-                        },
-                        {
-                            id: 'ols_arrays',
-                            title: 'OLS (Arrays)',
-                            description: 'Avec X et y (comme Scikit-Learn).',
-                            code: `# Il faut ajouter une constante (intercept) manuellement !
-X = sm.add_constant(X)
-
-model = sm.OLS(y, X).fit()
-print(model.summary())`
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            id: 'streamlit',
-            title: 'Streamlit',
-            description: 'Applications Web Data',
-            categories: [
-
-                {
-                    id: 'st_basics',
-                    title: 'Éléments de Base',
-                    description: 'Titres, textes et données.',
-                    snippets: [
-                        {
-                            id: 'st_text',
-                            title: 'Texte & Titres',
-                            description: 'Structurer la page.',
-                            code: `import streamlit as st
-
-st.title("Mon Application Data")
-st.header("Une section importante")
-st.subheader("Une sous-section")
-st.text("Du texte brut.")
-st.markdown("**Du markdown** avec du *style*.")`
-                        },
-                        {
-                            id: 'st_data',
-                            title: 'Afficher des Données',
-                            description: 'DataFrames et Métriques.',
-                            code: `# DataFrame interactif
-st.dataframe(df)
-
-# Table statique
-st.table(df.head())
-
-# Métrique (KPI)
-st.metric(label="Chiffre d'Affaires", value="50k€", delta="+5%")`
+# Lancer les tests dans le terminal :
+# pytest`
                         }
                     ]
                 },
                 {
-                    id: 'st_widgets',
-                    title: 'Widgets Interactifs',
-                    description: 'Boutons, Sliders, Inputs.',
+                    id: 'optimization',
+                    title: '3. Optimisation & Performance',
+                    description: 'Écrire du code rapide.',
                     snippets: [
                         {
-                            id: 'st_input',
-                            title: 'Entrées Utilisateur',
-                            description: 'Récupérer des valeurs.',
-                            code: `nom = st.text_input("Votre nom")
-age = st.number_input("Votre âge", min_value=0, max_value=120)
+                            id: 'vectorization',
+                            title: 'Vectorisation vs Boucles',
+                            description: 'Pourquoi il ne faut JAMAIS boucler sur un DataFrame.',
+                            code: `import pandas as pd
+import numpy as np
 
-if st.button("Valider"):
-    st.write(f"Bonjour {nom} !")`
+df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
+
+# ❌ LENT (Boucle for)
+# for i in range(len(df)):
+#     df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
+
+# ✅ RAPIDE (Vectorisation)
+df['c'] = df['a'] + df['b']
+
+# ✅ ENCORE PLUS RAPIDE (Numpy)
+df['c'] = df['a'].values + df['b'].values`
+                        }
+                    ]
+                },
+                {
+                    id: 'api_web',
+                    title: '4. APIs & Web',
+                    description: 'Interagir avec le web (Requests, FastAPI).',
+                    snippets: [
+                        {
+                            id: 'requests_get',
+                            title: 'Requêtes HTTP (Requests)',
+                            description: 'Récupérer des données depuis une API.',
+                            code: `import requests
+
+# Faire une requête GET
+response = requests.get('https://api.github.com/users/octocat')
+
+# Vérifier le statut (200 = OK)
+if response.status_code == 200:
+    data = response.json() # Convertir la réponse JSON en dictionnaire Python
+    print(f"User: {data['login']}")
+    print(f"Bio: {data['bio']}")
+else:
+    print("Erreur lors de la requête")`
                         },
                         {
-                            id: 'st_sidebar',
-                            title: 'Sidebar',
-                            description: 'Barre latérale pour les filtres.',
-                            code: `with st.sidebar:
-    st.header("Filtres")
-    ville = st.selectbox("Choisir une ville", ["Paris", "Lyon", "Marseille"])
-    
-st.write(f"Ville sélectionnée : {ville}")`
+                            id: 'beautifulsoup',
+                            title: 'Web Scraping (BeautifulSoup)',
+                            description: 'Extraire des données d\'une page HTML.',
+                            code: `from bs4 import BeautifulSoup
+import requests
+
+html = "<html><body><h1>Titre</h1><p>Paragraphe</p></body></html>"
+soup = BeautifulSoup(html, 'html.parser')
+
+# Extraire le texte du h1
+titre = soup.h1.text
+print(titre) # Titre
+
+# Trouver tous les liens
+# links = soup.find_all('a')`
+                        },
+                        {
+                            id: 'fastapi_basic',
+                            title: 'API avec FastAPI',
+                            description: 'Créer une API moderne et rapide.',
+                            code: `from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+
+# Lancer le serveur :
+# uvicorn main:app --reload`
+                        }
+                    ]
+                },
+                {
+                    id: 'data_quality',
+                    title: '5. Qualité des Données (Pydantic)',
+                    description: 'Validation de données robuste.',
+                    snippets: [
+                        {
+                            id: 'pydantic_model',
+                            title: 'Modèle Pydantic',
+                            description: 'Définir et valider la structure des données.',
+                            code: `from pydantic import BaseModel, ValidationError
+from typing import Optional
+
+# Définition du schéma
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    age: Optional[int] = None # Champ optionnel
+
+# Validation automatique
+try:
+    user = User(id=1, name="Alice", email="alice@example.com", age="30")
+    print(user) # age est automatiquement converti en int !
+except ValidationError as e:
+    print(e)`
                         }
                     ]
                 }
