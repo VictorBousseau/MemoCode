@@ -4,6 +4,9 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css'; // Import CSS for math styling
 import MermaidDiagram from './MermaidDiagram';
 
 export default function CodeCard({ snippet, language = 'python' }) {
@@ -47,7 +50,8 @@ export default function CodeCard({ snippet, language = 'python' }) {
             {snippet.markdown && (
                 <div className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0">
                     <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
                         components={{
                             code({ node, inline, className, children, ...props }) {
                                 const match = /language-(\w+)/.exec(className || '');

@@ -391,7 +391,7 @@ CALCULATE(
                 },
                 {
                     id: 'tips_practices',
-                    title: '4. Tips & Bonnes Pratiques',
+                    title: '7. Tips & Bonnes Pratiques',
                     description: 'Le best-of pour briller en DAX.',
                     snippets: [
                         {
@@ -512,7 +512,7 @@ SELECTEDVALUE('Geo'[Pays], "Monde Entier")`
                 },
                 {
                     id: 'dynamic_features',
-                    title: '5. Fonctionnalités Dynamiques (Expert)',
+                    title: '8. Fonctionnalités Dynamiques (Expert)',
                     description: 'Calculation Groups & Field Parameters.',
                     snippets: [
                         {

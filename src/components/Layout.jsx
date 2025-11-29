@@ -4,9 +4,9 @@ import { Search } from 'lucide-react';
 
 export default function Layout({ children, selectedLanguage, onSelectLanguage, searchQuery, setSearchQuery }) {
     return (
-        <div className="flex min-h-screen bg-black text-zinc-100 font-sans selection:bg-blue-500/30">
+        <div className="flex h-screen bg-black text-zinc-100 font-sans selection:bg-blue-500/30 overflow-hidden">
             <Sidebar selectedLanguage={selectedLanguage} onSelectLanguage={onSelectLanguage} />
-            <main className="flex-1 overflow-y-auto h-screen">
+            <main className="flex-1 overflow-y-auto h-full">
                 <div className="p-8">
                     <div className="flex items-center justify-between mb-8 border-b border-zinc-800 pb-4">
                         <h1 className="text-4xl font-bold text-white">

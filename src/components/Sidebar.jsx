@@ -9,12 +9,13 @@ const languages = [
     { name: 'PySpark', icon: Zap },
     { name: 'DAX', icon: TrendingUp },
     { name: 'Power Query (M)', icon: Table },
+    { name: 'NoSQL', icon: Database },
     { name: 'Exemples', icon: FileCode2 },
 ];
 
 export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
     return (
-        <aside className="w-64 bg-zinc-900 text-white flex flex-col border-r border-zinc-800 h-screen sticky top-0">
+        <aside className="w-64 bg-zinc-900 text-white flex flex-col border-r border-zinc-800 h-full overflow-y-auto">
             <div className="p-6 border-b border-zinc-800">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     MemoCode

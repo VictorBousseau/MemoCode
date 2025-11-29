@@ -26,6 +26,14 @@ const languages = [
         description: "Le langage universel des bases de données. Apprenez à extraire, filtrer et agréger vos données, des requêtes simples aux fonctions de fenêtrage complexes."
     },
     {
+        id: 'NoSQL',
+        name: 'NoSQL',
+        icon: Database,
+        color: 'text-indigo-400',
+        bg: 'bg-indigo-400/10',
+        description: "Au-delà des tables relationnelles. Découvrez MongoDB pour les documents JSON et Neo4j pour l'analyse de graphes et de relations complexes."
+    },
+    {
         id: 'PySpark',
         name: 'PySpark',
         icon: Zap,

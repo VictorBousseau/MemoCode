@@ -9,6 +9,7 @@ import { daxContent } from './data/daxContent';
 import { rContent } from './data/rContent';
 import { examplesContent } from './data/examplesContent';
 import { mContent } from './data/mContent';
+import { nosqlContent } from './data/nosqlContent';
 import Overview from './components/Overview';
 
 export default function App() {
@@ -31,6 +32,8 @@ export default function App() {
         return daxContent;
       case 'Power Query (M)':
         return mContent;
+      case 'NoSQL':
+        return nosqlContent;
       case 'R':
         return rContent;
       case 'Exemples':

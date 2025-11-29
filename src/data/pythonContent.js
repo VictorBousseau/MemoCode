@@ -477,6 +477,18 @@ plt.show()`
                     description: 'Relations entre deux variables',
                     snippets: [
                         {
+                            id: 'boxplot_bivariate',
+                            title: 'Boxplot Bivarié',
+                            description: 'Distribution d\'une variable numérique par catégorie.',
+                            image: '/MemoCode/images/boxplot.png',
+                            code: `# Boxplot Bivarié
+# x : Variable Catégorielle (Groupes)
+# y : Variable Numérique (Mesure)
+sns.boxplot(data=df, x='categorie', y='montant')
+plt.title('Distribution du Montant par Catégorie')
+plt.show()`
+                        },
+                        {
                             id: 'scatterplot',
                             title: 'Scatter Plot',
                             description: 'Relation numérique vs numérique.',
@@ -742,210 +754,414 @@ X_test_scaled = scaler.transform(X_test)`
                     ]
                 },
                 {
-                    id: 'regression_models',
-                    title: '2.1 Modèles de Régression',
+                    id: 'supervised_classification',
+                    title: '2. Classification Supervisée',
                     subCategory: 'Machine Learning',
-                    description: 'Prédire une valeur continue',
+                    description: 'Apprendre à classer à partir d\'exemples étiquetés.',
                     snippets: [
                         {
-                            id: 'linear_regression',
-                            title: 'Régression Linéaire',
-                            description: `Type : Régression
-                            Concept : Trace une ligne droite qui passe au plus près de tous les points.
-                            Quand l'utiliser ?
-                            - Prédire le prix d'une maison selon sa surface.
-                            - Estimer le chiffre d'affaires futur.
-                            Input : Variables numériques (et catégorielles encodées). Sensible aux outliers.
-                            Output : Une valeur numérique continue.
-                            Avantages : Simple, très interprétable, rapide.`,
-                            code: `from sklearn.linear_model import LinearRegression
+                            id: 'lda_qda_logistic',
+                            title: 'Discriminante & Logistique',
+                            description: 'Approches probabilistes.',
+                            markdown: `### 📐 Formules & Concepts
 
-model = LinearRegression()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)`
-                        },
-                        {
-                            id: 'ridge_lasso',
-                            title: 'Régression Ridge & Lasso',
-                            description: `Type : Régression (Régularisée)
-                            Concept : Comme la Linéaire, mais pénalise les coefficients trop grands pour éviter le sur-apprentissage.
-                            - Ridge (L2) : Réduit les coefficients (jamais à 0).
-                            - Lasso (L1) : Peut mettre des coefficients à 0 (sélection de variables).
-                            Quand l'utiliser ?
-                            - Quand il y a beaucoup de variables (risque d'overfitting).
-                            - Lasso : Pour sélectionner les variables importantes.`,
-                            code: `from sklearn.linear_model import Ridge, Lasso
+**1. Régression Logistique**
+Modélise la probabilité d'appartenance à la classe 1 via une sigmoïde.
+$$ P(Y=1|X) = \\frac{1}{1 + e^{-(\\beta_0 + \\beta_1 X)}} $$
+*   **Frontière** : Linéaire.
 
-# alpha : Force de la régularisation (plus grand = plus de contrainte)
-ridge = Ridge(alpha=1.0)
-ridge.fit(X_train, y_train)
+**2. Analyse Discriminante Linéaire (LDA)**
+Suppose que les classes suivent une loi Normale avec la **même covariance** (homoscédasticité).
+*   **Frontière** : Linéaire.
+*   **Projection** : Maximise la séparation entre les classes tout en minimisant la variance interne.
 
-lasso = Lasso(alpha=0.1)
-lasso.fit(X_train, y_train)`
-                        },
-                        {
-                            id: 'svr',
-                            title: 'SVR (Support Vector Regression)',
-                            description: `Type : Régression
-                            Concept : Trouve un "tube" qui contient un maximum de points avec une marge d'erreur tolérée.
-                            Quand l'utiliser ?
-                            - Données non-linéaires (avec kernel='rbf').
-                            - Petits datasets complexes.
-                            Input : Scaling OBLIGATOIRE.`,
-                            code: `from sklearn.svm import SVR
+**3. Analyse Discriminante Quadratique (QDA)**
+Comme la LDA, mais chaque classe a sa **propre covariance** (hétéroscédasticité).
+*   **Frontière** : Quadratique (Courbe).
 
-# kernel='rbf' : Pour capturer des relations non-linéaires
-# C : Pénalité (grand C = moins d'erreur tolérée sur le train)
-model = SVR(kernel='rbf', C=1.0)
-model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`
-                        },
-                        {
-                            id: 'mlp_regressor',
-                            title: 'Réseau de Neurones (MLP Regressor)',
-                            description: `Type : Régression (Deep Learning)
-                            Concept : Couches de neurones connectés pour apprendre des relations très complexes.
-                            Quand l'utiliser ?
-                            - Données très complexes, non-linéaires.
-                            - Beaucoup de données disponibles.
-                            Input : Scaling OBLIGATOIRE.`,
-                            code: `from sklearn.neural_network import MLPRegressor
-
-# hidden_layer_sizes=(100, 50) : 2 couches cachées de 100 et 50 neurones
-# max_iter=500 : Nombre d'époques d'entraînement
-model = MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
-model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`
-                        }
-                    ]
-                },
-                {
-                    id: 'classification_models',
-                    title: '2.2 Modèles de Classification',
-                    subCategory: 'Machine Learning',
-                    description: 'Prédire une classe / catégorie',
-                    snippets: [
-                        {
-                            id: 'logistic_regression',
-                            title: 'Régression Logistique',
-                            description: `Type : Classification
-                            Concept : Sépare deux groupes par une frontière linéaire (utilise une fonction sigmoïde).
-                            Quand l'utiliser ?
-                            - Prédire si un client va churner (Oui/Non).
-                            - Détecter un email spam.
-                            Input : Numériques et catégorielles encodées. Nécessite souvent un Scaling.
-                            Output : Probabilité d'appartenance à une classe.
-                            Avantages : Donne des probabilités bien calibrées, interprétable.`,
+---
+*   📍 **Situation** : Classification binaire ou multi-classes simple. LDA/QDA si les hypothèses de normalité sont respectées.
+*   ✅ **Qualité** : Probabilités bien calibrées, interprétable, rapide.
+*   ❌ **Défaut** : Hypothèses statistiques fortes (linéarité, normalité).`,
                             code: `from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 
-model = LogisticRegression()
-model.fit(X_train_scaled, y_train) # Scaling recommandé
-predictions = model.predict(X_test_scaled)`
-                        },
-                        {
-                            id: 'knn',
-                            title: 'K-Nearest Neighbors (KNN)',
-                            description: `Type : Classification (et Régression)
-                            Concept : "Dis-moi qui sont tes voisins, je te dirai qui tu es". Regarde les k points les plus proches.
-                            Quand l'utiliser ?
-                            - Classification simple, intuitive.
-                            - Petits datasets.
-                            Input : Scaling OBLIGATOIRE (car basé sur la distance).`,
-                            code: `from sklearn.neighbors import KNeighborsClassifier
+# 1. Logistique (Le standard)
+log_reg = LogisticRegression()
+log_reg.fit(X_train, y_train)
 
-# n_neighbors=5 : Nombre de voisins à considérer
-model = KNeighborsClassifier(n_neighbors=5)
-model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`
-                        },
-                        {
-                            id: 'svm',
-                            title: 'SVM (Support Vector Machine)',
-                            description: `Type : Classification
-                            Concept : Cherche l'hyperplan qui sépare le mieux les classes avec la plus grande marge possible.
-                            Quand l'utiliser ?
-                            - Données complexes, haute dimension.
-                            - Classification binaire ou multi-classes.
-                            Input : Scaling OBLIGATOIRE.`,
-                            code: `from sklearn.svm import SVC
+# 2. LDA (Si on suppose même variance)
+lda = LinearDiscriminantAnalysis()
+lda.fit(X_train, y_train)
 
-# probability=True : Pour avoir predict_proba()
-model = SVC(kernel='rbf', C=1.0, probability=True)
-model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`
+# 3. QDA (Si variances différentes)
+qda = QuadraticDiscriminantAnalysis()
+qda.fit(X_train, y_train)`
                         },
                         {
                             id: 'decision_tree',
                             title: 'Arbre de Décision',
-                            description: `Type : Classification & Régression
-                            Concept : Série de questions (Si Age > 25 alors...) pour diviser les données.
-                            Quand l'utiliser ?
-                            - Besoin d'explicabilité totale (règles claires).
-                            - Pas besoin de scaling.
-                            Attention : Tendance au sur-apprentissage (overfitting) si trop profond.`,
-                            code: `from sklearn.tree import DecisionTreeClassifier, plot_tree
+                            description: 'Diviser pour mieux régner.',
+                            markdown: `### 🌳 Critères de Split
 
-# max_depth : Limite la profondeur pour éviter l'overfitting
-model = DecisionTreeClassifier(max_depth=5, random_state=42)
-model.fit(X_train, y_train)
+L'arbre cherche la question qui sépare le mieux les données en minimisant l'impureté.
 
-# Visualiser l'arbre (optionnel)
-# plot_tree(model, filled=True)`
+**1. Indice de Gini (Défaut)**
+Mesure la probabilité de mal classer un élément choisi au hasard.
+$$ Gini = 1 - \\sum_{i=1}^{C} p_i^2 $$
+*   0 = Pur (tous les éléments sont de la même classe).
+
+**2. Entropie (Théorie de l'information)**
+Mesure le désordre.
+$$ Entropie = - \\sum_{i=1}^{C} p_i \\log_2(p_i) $$
+
+---
+*   📍 **Situation** : Besoin de règles claires ("Si Age > 25 alors...").
+*   ✅ **Qualité** : Explicabilité totale, pas besoin de scaling, gère mix numérique/catégoriel.
+*   ❌ **Défaut** : Instable (change si les données changent un peu), sur-apprentissage facile.`,
+                            code: `from sklearn.tree import DecisionTreeClassifier
+
+# criterion='gini' (ou 'entropy')
+# max_depth=5 : Limite la profondeur pour éviter le sur-apprentissage
+tree = DecisionTreeClassifier(criterion='gini', max_depth=5)
+tree.fit(X_train, y_train)`
                         },
                         {
-                            id: 'random_forest',
-                            title: 'Random Forest',
-                            description: `Type : Classification & Régression
-                            Concept : Une forêt d'arbres de décision où chaque arbre vote pour la prédiction finale.
-                            Quand l'utiliser ?
-                            - Presque tout le temps ! (C'est le couteau suisse).
-                            - Données complexes, non-linéaires.
-                            Input : Accepte tout, peu sensible aux outliers et au scaling.
-                            Output : Classe (vote majoritaire) ou Valeur (moyenne).
-                            Avantages : Très performant, robuste, gère bien le sur-apprentissage.`,
-                            code: `from sklearn.ensemble import RandomForestClassifier
+                            id: 'svm',
+                            title: 'SVM (Séparateur à Vaste Marge)',
+                            description: 'Maximiser la marge entre les classes.',
+                            markdown: `### 🛣️ Le Concept
 
-# n_estimators=100 : Nombre d'arbres
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)`
+Le SVM cherche l'hyperplan qui sépare les classes avec la plus grande **marge** possible (la "rue" la plus large).
+
+**Les Noyaux (Kernels)**
+Si les données ne sont pas séparables linéairement, on les projette dans une dimension supérieure ("Kernel Trick").
+*   **Linéaire** : $$ K(x, x') = x \\cdot x' $$
+*   **Polynomial** : $$ K(x, x') = (\\gamma x \\cdot x' + r)^d $$
+*   **RBF (Radial Basis Function)** : Le plus utilisé.
+    $$ K(x, x') = e^{-\\gamma ||x - x'||^2} $$
+
+---
+*   📍 **Situation** : Données complexes, haute dimension, pas trop de bruit.
+*   ✅ **Qualité** : Très performant en haute dimension, robuste si bien paramétré.
+*   ❌ **Défaut** : Lent sur grands datasets, sensible au bruit, "Boîte noire".`,
+                            code: `from sklearn.svm import SVC
+
+# C : Pénalité (Grand C = Marge étroite, risque d'overfitting / Petit C = Marge large)
+# kernel='rbf' : Pour les frontières non-linéaires
+svm = SVC(kernel='rbf', C=1.0)
+svm.fit(X_train_scaled, y_train) # SCALING OBLIGATOIRE !`
                         },
                         {
-                            id: 'gradient_boosting',
-                            title: 'Gradient Boosting (XGBoost/LGBM)',
-                            description: `Type : Classification & Régression
-                            Concept : Construit les arbres séquentiellement, chaque nouvel arbre corrige les erreurs du précédent.
-                            Quand l'utiliser ?
-                            - Compétitions Kaggle, recherche de performance pure.
-                            - Données tabulaires structurées.
-                            Avantages : Souvent le plus précis.`,
-                            code: `from sklearn.ensemble import GradientBoostingClassifier
+                            id: 'perceptron',
+                            title: 'Perceptron',
+                            description: 'L\'ancêtre des réseaux de neurones.',
+                            markdown: `### 🧠 Neurone Artificiel Simple
 
-# Il existe aussi XGBoost, LightGBM, CatBoost (librairies externes)
-model = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3)
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)`
+Le Perceptron est un classifieur linéaire simple.
+$$ f(x) = \\begin{cases} 1 & \\text{si } w \\cdot x + b > 0 \\\\ 0 & \\text{sinon} \\end{cases} $$
+
+Il met à jour ses poids $w$ uniquement quand il se trompe.
+
+---
+*   📍 **Situation** : Historique ou problèmes linéairement séparables très simples.
+*   ✅ **Qualité** : Simple, base du Deep Learning.
+*   ❌ **Défaut** : Ne converge pas si les données ne sont pas linéairement séparables.`,
+                            code: `from sklearn.linear_model import Perceptron
+
+perc = Perceptron(tol=1e-3, random_state=0)
+perc.fit(X_train_scaled, y_train)`
+                        }
+                    ]
+                },
+                {
+                    id: 'unsupervised_classification',
+                    title: '3. Classification Non Supervisée',
+                    subCategory: 'Machine Learning',
+                    description: 'Regrouper des données sans étiquettes (Clustering).',
+                    snippets: [
+                        {
+                            id: 'distances',
+                            title: '📏 Les Distances',
+                            description: 'Fondamental pour le Clustering.',
+                            markdown: `### 📐 Formules des Distances
+
+La notion de "proximité" dépend de la distance choisie. Soit deux points $A(x_1, ..., x_n)$ et $B(y_1, ..., y_n)$.
+
+**1. Distance Euclidienne (L2)**
+La ligne droite (vol d'oiseau).
+$$ d(A, B) = \\sqrt{\\sum (x_i - y_i)^2} $$
+
+**2. Distance de Manhattan (L1)**
+Déplacement en grille (comme un taxi dans New York).
+$$ d(A, B) = \\sum |x_i - y_i| $$
+
+**3. Distance de Minkowski**
+Généralisation des deux précédentes (paramètre $p$).
+$$ d(A, B) = (\\sum |x_i - y_i|^p)^{1/p} $$
+
+**4. Distance de Chebyshev (L∞)**
+La plus grande différence sur une seule dimension.
+$$ d(A, B) = \\max_i |x_i - y_i| $$
+
+**5. Distance Cosinus**
+Mesure l'angle (indépendant de la magnitude). Utilisé en NLP.
+$$ d(A, B) = 1 - \\frac{A \\cdot B}{||A|| \\times ||B||} $$`
                         },
                         {
-                            id: 'mlp_classifier',
-                            title: 'Réseau de Neurones (MLP Classifier)',
-                            description: `Type : Classification (Deep Learning)
-                            Concept : Couches de neurones connectés pour apprendre des relations très complexes.
-                            Quand l'utiliser ?
-                            - Données très complexes (images, sons, texte, ou tabulaire complexe).
-                            - Beaucoup de données.
-                            Input : Scaling OBLIGATOIRE.`,
-                            code: `from sklearn.neural_network import MLPClassifier
+                            id: 'kmeans_clouds',
+                            title: 'K-Moyennes & Nuées Dynamiques',
+                            description: 'Partitionnement itératif.',
+                            markdown: `### 🎯 K-Means
 
-# hidden_layer_sizes=(100, 50) : 2 couches cachées
-model = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
-model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`
+L'algorithme cherche à minimiser l'**Inertie Intra-Classe** (Variance au sein des clusters).
+$$ I = \\sum_{k=1}^{K} \\sum_{x_i \\in C_k} ||x_i - \\mu_k||^2 $$
+
+**Paramètres Clés :**
+*   \`n_clusters\` (K) : Nombre de groupes (à définir a priori).
+*   \`init\` : Méthode d'initialisation ('k-means++' pour optimiser le départ).
+
+**Nuées Dynamiques** : C'est une généralisation du K-Means qui permet d'utiliser d'autres noyaux que la moyenne (ex: K-Medoids).
+
+---
+*   📍 **Situation** : Gros volumes de données, on connait le nombre de clusters (ou on l'estime).
+*   ✅ **Qualité** : Rapide, scalable.
+*   ❌ **Défaut** : Sensible à l'initialisation, suppose des clusters sphériques, nécessite K.`,
+                            code: `from sklearn.cluster import KMeans
+
+# 1. Définir le modèle
+kmeans = KMeans(n_clusters=3, init='k-means++', random_state=42)
+
+# 2. Entraîner (Pas de y !)
+kmeans.fit(X_scaled)
+
+# 3. Récupérer les labels et les centres
+labels = kmeans.labels_
+centres = kmeans.cluster_centers_`
+                        },
+                        {
+                            id: 'cah',
+                            title: 'Classification Hiérarchique (CAH)',
+                            description: 'Arbre de regroupement (Dendrogramme).',
+                            image: '/MemoCode/images/dendrogram.png',
+                            markdown: `### 🌳 Agglomerative Clustering
+
+On part de N clusters (chaque point est seul) et on fusionne les plus proches itérativement.
+
+**Critères de Lien (Linkage) :**
+Comment calculer la distance entre deux clusters A et B ?
+*   **Ward** (Défaut) : Minimise l'augmentation de la variance interne. (Clusters compacts).
+*   **Single** (Saut minimum) : Distance entre les deux points les plus proches. (Effet chaîne).
+*   **Complete** (Saut maximum) : Distance entre les deux points les plus éloignés.
+
+---
+*   📍 **Situation** : Petits datasets, besoin de visualiser la hiérarchie (Dendrogramme).
+*   ✅ **Qualité** : Pas besoin de choisir K au départ, visuel riche.
+*   ❌ **Défaut** : Très lent sur gros volumes (complexité cubique ou quadratique).`,
+                            code: `from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch
+import matplotlib.pyplot as plt
+
+# 1. Dendrogramme (Pour choisir le nombre de clusters)
+plt.figure(figsize=(10, 7))
+dendrogram = sch.dendrogram(sch.linkage(X_scaled, method='ward'))
+plt.show()
+
+# 2. Modèle
+cah = AgglomerativeClustering(n_clusters=3, linkage='ward')
+labels = cah.fit_predict(X_scaled)`
+                        },
+                        {
+                            id: 'kohonen',
+                            title: 'Réseau de Kohonen (SOM)',
+                            description: 'Carte Auto-Organisatrice.',
+                            markdown: `### 🗺️ Self-Organizing Map (SOM)
+
+Un réseau de neurones non supervisé qui projette des données de haute dimension sur une carte 2D (grille de neurones), en préservant la **topologie** (les voisins restent voisins).
+
+**Concept :**
+Chaque neurone de la grille a un vecteur de poids. Le neurone le plus proche de la donnée d'entrée (Best Matching Unit) est "tiré" vers elle, entraînant ses voisins avec lui.
+
+---
+*   📍 **Situation** : Visualisation de données complexes en 2D, réduction de dimension non-linéaire.
+*   ✅ **Qualité** : Préservation de la topologie, visualisation puissante.
+*   ❌ **Défaut** : Lent à entraîner, difficile à paramétrer.`,
+                            code: `# Nécessite une librairie externe comme 'minisom' ou 'sklearn-som'
+# pip install minisom
+from minisom import MiniSom
+
+# Grille 6x6, input_len = nb features
+som = MiniSom(x=6, y=6, input_len=X_scaled.shape[1], sigma=1.0, learning_rate=0.5)
+som.random_weights_init(X_scaled)
+som.train_random(X_scaled, 100) # 100 itérations`
+                        }
+                    ]
+                },
+                {
+                    id: 'math_reference',
+                    title: '4. Rappel Mathématiques',
+                    subCategory: 'Machine Learning',
+                    description: 'Exemples concrets de calculs (Gini, Entropie, Distances).',
+                    snippets: [
+                        {
+                            id: 'variable_types',
+                            title: 'Types de Variables',
+                            description: 'Quali vs Quanti, Discret vs Continu.',
+                            markdown: `### 📊 Classification des Variables
+
+#### 1. Quantitative (Numérique)
+On peut faire des calculs dessus (Moyenne, Somme).
+*   **Continue** : Peut prendre une infinité de valeurs (ex: Taille, Prix, Température).
+*   **Discrète** : Valeurs dénombrables, souvent des entiers (ex: Nombre d'enfants, Nombre de clics).
+
+#### 2. Qualitative (Catégorielle)
+Décrit une caractéristique. Pas de calcul mathématique direct.
+*   **Nominale** : Pas d'ordre naturel (ex: Couleur, Ville, Sexe).
+*   **Ordinale** : Il existe un ordre hiérarchique (ex: Satisfaction [Faible, Moyen, Fort], Niveau d'étude).`
+                        },
+                        {
+                            id: 'gini_entropy_calc',
+                            title: 'Gini vs Entropie',
+                            description: 'Calcul détaillé sur un exemple simple.',
+                            markdown: `### 🧮 Exemple Concret
+
+Imaginons un noeud de l'arbre contenant **5 billes** :
+*   🔴 **3 Rouges**
+*   🔵 **2 Bleues**
+
+Probabilités :
+$$ p_{rouge} = \\frac{3}{5} = 0.6, \\quad p_{bleu} = \\frac{2}{5} = 0.4 $$
+
+#### 1. Indice de Gini
+$$
+\\begin{aligned}
+Gini &= 1 - (p_{rouge}^2 + p_{bleu}^2) \\\\
+&= 1 - (0.6^2 + 0.4^2) \\\\
+&= 1 - (0.36 + 0.16) \\\\
+&= 1 - 0.52 = \\mathbf{0.48}
+\\end{aligned}
+$$
+
+#### 2. Entropie (Shannon)
+$$
+\\begin{aligned}
+E &= - (p_{rouge} \\log_2(p_{rouge}) + p_{bleu} \\log_2(p_{bleu})) \\\\
+&= - (0.6 \\times -0.737 + 0.4 \\times -1.322) \\\\
+&= - (-0.442 - 0.529) \\\\
+&= \\mathbf{0.971}
+\\end{aligned}
+$$
+
+> **Note** : L'entropie est plus sensible au "désordre" que Gini, mais le calcul de log est plus coûteux.`
+                        },
+                        {
+                            id: 'distance_calc',
+                            title: 'Calcul de Distances',
+                            description: 'Euclidienne vs Manhattan.',
+                            markdown: `### 📏 Exemple Concret
+
+Soit deux points dans un plan 2D :
+*   **A (1, 2)**
+*   **B (4, 6)**
+
+#### 1. Distance Euclidienne (Vol d'oiseau)
+$$
+\\begin{aligned}
+d(A, B) &= \\sqrt{(x_B - x_A)^2 + (y_B - y_A)^2} \\\\
+&= \\sqrt{(4 - 1)^2 + (6 - 2)^2} \\\\
+&= \\sqrt{3^2 + 4^2} = \\sqrt{9 + 16} = \\sqrt{25} = \\mathbf{5}
+\\end{aligned}
+$$
+
+#### 2. Distance de Manhattan (Taxi)
+$$
+\\begin{aligned}
+d(A, B) &= |x_B - x_A| + |y_B - y_A| \\\\
+&= |4 - 1| + |6 - 2| \\\\
+&= 3 + 4 = \\mathbf{7}
+\\end{aligned}
+$$`
+                        },
+                        {
+                            id: 'normalization_standardization',
+                            title: 'Normalisation vs Standardisation',
+                            description: 'Mise à l\'échelle des données.',
+                            markdown: `### 📏 Pourquoi mettre à l'échelle ?
+
+Certains algorithmes (SVM, K-Means, KNN) sont sensibles aux ordres de grandeur.
+
+#### 1. Normalisation (Min-Max Scaling)
+Ramène les valeurs entre **0 et 1**.
+$$ X_{norm} = \\frac{X - X_{min}}{X_{max} - X_{min}} $$
+*   📍 **Utile quand** : On veut des bornes fixes (ex: image pixel 0-255).
+*   ⚠️ **Sensible** aux outliers (valeurs extrêmes).
+
+#### 2. Standardisation (Z-Score)
+Centre les données sur **0** avec un écart-type de **1**.
+$$ Z = \\frac{X - \\mu}{\\sigma} $$
+*   📍 **Utile quand** : La distribution est Gaussienne (Normale).
+*   ✅ **Plus robuste** aux outliers.`
+                        },
+                        {
+                            id: 'classification_metrics',
+                            title: 'Métriques de Classification',
+                            description: 'Précision, Rappel & F1-Score.',
+                            markdown: `### 🎯 Au-delà de l'Accuracy
+
+Dans un problème déséquilibré (ex: 99% de non-malades), l'accuracy ne suffit pas.
+
+#### 1. Précision (Precision)
+"Quand je prédis POSITIF, ai-je raison ?"
+$$ Précision = \\frac{TP}{TP + FP} $$
+*   📍 **Maximiser si** : Le coût d'un Faux Positif est élevé (ex: Spam - on ne veut pas jeter un bon mail).
+
+#### 2. Rappel (Recall)
+"Ai-je trouvé TOUS les POSITIFS ?"
+$$ Rappel = \\frac{TP}{TP + FN} $$
+*   📍 **Maximiser si** : Le coût d'un Faux Négatif est critique (ex: **Cancer** - on préfère une fausse alerte qu'un malade non détecté).
+
+#### 3. F1-Score (Moyenne Harmonique)
+Le compromis entre Précision et Rappel.
+$$ F1 = 2 \\times \\frac{Précision \\times Rappel}{Précision + Rappel} $$
+*   📍 **Utile quand** : On cherche un équilibre.`
+                        },
+                        {
+                            id: 'gradient_descent',
+                            title: 'Descente de Gradient',
+                            description: 'Le moteur de l\'apprentissage.',
+                            markdown: `### 📉 L'Algorithme d'Optimisation
+
+Imaginez descendre une montagne dans le brouillard pour trouver la vallée la plus basse.
+
+**La Formule de Mise à Jour :**
+On corrige les poids $w$ dans la direction opposée à la pente (le gradient $\\nabla J$).
+
+$$ w_{nouveau} = w_{ancien} - \\eta \\cdot \\nabla J(w) $$
+
+*   $w$ : Les poids du modèle.
+*   $\\eta$ (Eta) : **Learning Rate** (Vitesse d'apprentissage - la taille du pas).
+*   $\\nabla J(w)$ : Le Gradient de l'erreur (la pente).`
+                        },
+                        {
+                            id: 'bayes_theorem',
+                            title: 'Théorème de Bayes',
+                            description: 'Probabilités Conditionnelles.',
+                            markdown: `### 🎲 La Base du Naive Bayes
+
+Comment mettre à jour nos croyances avec de nouvelles preuves ?
+
+$$ P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)} $$
+
+*   $P(A|B)$ : Probabilité de A sachant B (**Postérieure**).
+*   $P(B|A)$ : Vraisemblance (Likelihood).
+*   $P(A)$ : Probabilité de A (**Priori**).
+*   $P(B)$ : Probabilité de la preuve (Evidence).`
                         }
                     ]
                 },
                 {
                     id: 'evaluation',
-                    title: '3. Évaluation & Interprétabilité',
+                    title: '5. Évaluation & Interprétabilité',
                     subCategory: 'Machine Learning',
                     description: 'Métriques et Graphiques de performance',
                     snippets: [
@@ -1020,7 +1236,7 @@ plt.show()`
                 },
                 {
                     id: 'regression_sm',
-                    title: '4. Régression (OLS)',
+                    title: '6. Régression (OLS)',
                     subCategory: 'Statistiques',
                     description: 'Moindres Carrés Ordinaires.',
                     snippets: [
@@ -1051,7 +1267,7 @@ print(model.summary())`
                 },
                 {
                     id: 'tensorflow_unified',
-                    title: '5. TensorFlow',
+                    title: '7. TensorFlow',
                     description: 'Réseaux de neurones profonds (Deep Learning).',
                     snippets: [
                         {
@@ -2306,7 +2522,7 @@ division(5, 0)  # Écrira ERROR dans le fichier`
                 },
                 {
                     id: 'optimization',
-                    title: '3. Optimisation & Performance',
+                    title: '4. Optimisation & Performance',
                     description: 'Écrire du code rapide.',
                     snippets: [
                         {
@@ -2333,7 +2549,7 @@ df['c'] = df['a'].values + df['b'].values`
 
                 {
                     id: 'api_web',
-                    title: '4. APIs & Web',
+                    title: '5. APIs & Web',
                     description: 'Interagir avec le web (Requests, FastAPI).',
                     snippets: [
                         {
@@ -2416,7 +2632,7 @@ def read_item(item_id: int, q: str = None):
                 },
                 {
                     id: 'data_quality',
-                    title: '5. Qualité des Données (Pydantic)',
+                    title: '6. Qualité des Données (Pydantic)',
                     description: 'Validation de données robuste.',
                     snippets: [
                         {
