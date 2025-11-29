@@ -1580,7 +1580,7 @@ def classer_age(age):
 ])
 def test_classer_age(age_input, expected_label):
     # Ce test sera lancé 5 fois avec des valeurs différentes
-    assert classer_age(age_input) == expected_label`}]},{id:"logging",title:"12. Logging (vs Print)",description:"Pourquoi Print est dangereux en production.",snippets:[{id:"logging_vs_print",title:"Avant/Après : Print vs Log",description:"Comparaison directe.",markdown:`### ❌ AVANT (Print)
+    assert classer_age(age_input) == expected_label`}]},{id:"logging",title:"3. Logging (vs Print)",description:"Pourquoi Print est dangereux en production.",snippets:[{id:"logging_vs_print",title:"Avant/Après : Print vs Log",description:"Comparaison directe.",markdown:`### ❌ AVANT (Print)
 \`\`\`python
 print("Début du traitement") 
 # Problème : On ne sait pas QUAND ça s'est passé, ni si c'est grave.
@@ -1616,7 +1616,7 @@ def division(a, b):
 
 # Test
 division(10, 2) # Écrira INFO dans le fichier
-division(5, 0)  # Écrira ERROR dans le fichier`}]},{id:"optimization",title:"13. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+division(5, 0)  # Écrira ERROR dans le fichier`}]},{id:"optimization",title:"4. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
@@ -1629,7 +1629,7 @@ df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 df['c'] = df['a'] + df['b']
 
 # ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"14. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Le Navigateur)",description:"Garder la connexion et les cookies.",markdown:`### 🧠 L'Analogie du Navigateur
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"5. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Le Navigateur)",description:"Garder la connexion et les cookies.",markdown:`### 🧠 L'Analogie du Navigateur
 *   **Requests.get()** simple : C'est comme ouvrir une fenêtre de **Navigation Privée**, aller sur un site, et fermer la fenêtre immédiatement. Vous perdez tout (cookies, connexion).
 *   **Session()** : C'est comme ouvrir **Chrome**. Vous vous connectez une fois, et le navigateur retient qui vous êtes pour les pages suivantes.`,code:`import requests
 
@@ -1692,7 +1692,7 @@ def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
 # Lancer le serveur :
-# uvicorn main:app --reload`}]},{id:"data_quality",title:"15. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"why_pydantic",title:"Pourquoi Pydantic ?",description:"Comparaison : Code manuel vs Pydantic.",markdown:`### ❌ Sans Pydantic (Validation Manuelle)
+# uvicorn main:app --reload`}]},{id:"data_quality",title:"6. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"why_pydantic",title:"Pourquoi Pydantic ?",description:"Comparaison : Code manuel vs Pydantic.",markdown:`### ❌ Sans Pydantic (Validation Manuelle)
 C'est verbeux, fragile et difficile à maintenir.
 \`\`\`python
 def process_user(data):
