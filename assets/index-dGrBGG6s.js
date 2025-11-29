@@ -329,17 +329,28 @@ Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traiteme
 
 \`\`\`mermaid
 graph LR
+    %% Nodes
     A[Données Brutes] --> B(Preprocessing)
     B --> C{Modèle}
     C --> D[Prédiction]
     
-    subgraph Pipeline
-    B -- Scaling / Encodage --> C
+    %% Subgraph
+    subgraph Pipeline [Pipeline Scikit-Learn]
+        direction LR
+        B -- Scaling / Encodage --> C
     end
     
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style D fill:#9f9,stroke:#333,stroke-width:2px
-    style Pipeline fill:#e1f5fe,stroke:#01579b,stroke-width:2px,stroke-dasharray: 5 5
+    %% Styles
+    classDef default fill:#27272a,stroke:#52525b,stroke-width:1px,color:#f4f4f5;
+    classDef input fill:#3f3f46,stroke:#71717a,color:#fff,stroke-width:2px;
+    classDef output fill:#059669,stroke:#10b981,color:#fff,stroke-width:2px;
+    classDef process fill:#2563eb,stroke:#3b82f6,color:#fff,stroke-width:2px;
+    
+    class A input;
+    class D output;
+    class B,C process;
+    
+    style Pipeline fill:none,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5,color:#93c5fd
 \`\`\`
 `},{id:"make_pipeline",title:"Créer un Pipeline",description:"Exemple simple avec make_pipeline.",code:`from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
