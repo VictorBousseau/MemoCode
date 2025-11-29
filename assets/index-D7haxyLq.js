@@ -1655,7 +1655,19 @@ CALCULATE(
     SUM('Stock'[Quantité]),
     PREVIOUSDAY(FIRSTDATE('Temps'[Date]))
 )`}]},{id:"hierarchies",title:"5. Hiérarchies Parent-Enfant",description:"Gérer les organigrammes (PATH).",snippets:[{id:"path_function",title:"Aplatir la Hiérarchie (PATH)",description:"Créer une chaîne de tous les parents.",markdown:"Pour une table avec `EmployeeID` et `ManagerID`.",code:`Chemin Complet = PATH('Employés'[EmployeeID], 'Employés'[ManagerID])
--- Résultat : "1|5|12" (Le chef du chef du chef)`},{id:"path_item",title:"Extraire un Niveau (PATHITEM)",description:"Récupérer le N-ième manager.",markdown:'### 📊 Exemple Concret\nImaginons la hiérarchie suivante : **CEO (1) > Directeur (5) > Manager (12)**.\nLe chemin (`PATH`) est : `"1|5|12"`.\n\n| Niveau | Fonction | Résultat | Rôle |\n| :--- | :--- | :--- | :--- |\n| **1** | `PATHITEM(Path, 1)` | **1** | CEO |\n| **2** | `PATHITEM(Path, 2)` | **5** | Directeur |\n| **3** | `PATHITEM(Path, 3)` | **12** | Manager |',code:`Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
+-- Résultat : "1|5|12" (Le chef du chef du chef)`},{id:"path_item",title:"Extraire un Niveau (PATHITEM)",description:"Récupérer le N-ième manager.",markdown:`### 📊 Exemple Concret
+Imaginons une chaîne hiérarchique avec des **Identifiants Employés (ID)** :
+*   **CEO** (ID = 1)
+*   **Directeur** (ID = 5) -> Son chef est le 1
+*   **Manager** (ID = 12) -> Son chef est le 5
+
+Le chemin (\`PATH\`) calculé pour le Manager (12) est donc : \`"1|5|12"\`.
+
+| Niveau | Fonction | Résultat | Rôle |
+| :--- | :--- | :--- | :--- |
+| **1** | \`PATHITEM(Path, 1)\` | **1** | CEO |
+| **2** | \`PATHITEM(Path, 2)\` | **5** | Directeur |
+| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |`,code:`Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
 Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
 Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`}]},{id:"relationships",title:"6. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
 Mais on ne peut avoir qu'une seule relation active vers la table **Temps**.
