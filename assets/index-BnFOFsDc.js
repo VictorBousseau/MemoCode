@@ -318,7 +318,7 @@ plt.show()`},{id:"msno_bar",title:"Barplot des Manquants",description:"Quantité
 # Affiche le nombre de valeurs non-nulles par colonne
 # Permet d'identifier rapidement les colonnes très vides
 msno.bar(df)
-plt.show()`}]}]},{id:"ml",title:"Machine Learning",description:"Modélisation avec Scikit-Learn",categories:[{id:"pipelines",title:"0. Pipelines & Workflow",description:"Automatiser et sécuriser le ML.",snippets:[{id:"pipeline_concept",title:"Comprendre les Pipelines",description:"Pourquoi utiliser un Pipeline ?",markdown:`### ⛓️ Le Pipeline Scikit-Learn
+plt.show()`}]}]},{id:"ml",title:"Machine Learning",description:"Modélisation avec Scikit-Learn",categories:[{id:"pipelines",title:"0. Pipelines & Workflow",description:"Automatiser et sécuriser le ML.",snippets:[{id:"pipeline_concept",title:"Comprendre les Pipelines",description:"Pourquoi utiliser un Pipeline ?",image:"/MemoCode/images/sklearn_pipeline.png",markdown:`### ⛓️ Le Pipeline Scikit-Learn
 
 Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traitement des données jusqu'au modèle final.
 
@@ -326,21 +326,6 @@ Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traiteme
 1.  **Zéro Fuite de Données (Data Leakage)** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises *uniquement* sur le train set et appliquées aveuglément sur le test set.
 2.  **Reproductibilité** : Tout le processus est contenu dans un seul objet.
 3.  **Simplicité** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
-
-\`\`\`mermaid
-graph LR
-    A[Données Brutes] --> B(Preprocessing)
-    B --> C{Modèle}
-    C --> D[Prédiction]
-    
-    subgraph Pipeline
-    B -- Scaling / Encodage --> C
-    end
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style D fill:#9f9,stroke:#333,stroke-width:2px
-    style Pipeline fill:#e1f5fe,stroke:#01579b,stroke-width:2px,stroke-dasharray: 5 5
-\`\`\`
 `},{id:"make_pipeline",title:"Créer un Pipeline",description:"Exemple simple avec make_pipeline.",code:`from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -1039,7 +1024,7 @@ agg = Aggregator(
     cols_to_summarize=['montant', 'date']
 )
 
-df_resumed = agg.fit_transform(df_commandes)`}]},{id:"skrub_cheat",title:"Récapitulatif",description:"Les fonctions clés de Skrub.",snippets:[{id:"skrub_cheat_sheet",title:"Cheat Sheet",description:"Tableau récapitulatif des fonctions.",markdown:"### 🛠️ Fonctions Clés de Skrub\n\n| Fonction | Usage Principal | Scikit-Learn Equivalent (approx) |\n| :--- | :--- | :--- |\n| `TableReport` | Audit rapide des données (HTML) | `df.describe()` (en mieux) |\n| `TableVectorizer` | Preprocessing tout-terrain | `ColumnTransformer` |\n| `MinHashEncoder` | Catégories sales / Cardinalité élevée | `OneHotEncoder` (mais scalable) |\n| `GapEncoder` | Topics dans du texte court | `NMF` / `LatentDirichletAllocation` |\n| `SimilarityEncoder` | Encodage par similarité | - |\n| `Joiner` | Jointure floue (Fuzzy Join) | - |\n| `Aggregator` | Feature Engineering relationnel | `groupby().agg()` |\n"}]}]},{id:"numpy",title:"Numpy",description:"Calcul Numérique & Matriciel",categories:[{id:"arrays",title:"Tableaux (Arrays)",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
+df_resumed = agg.fit_transform(df_commandes)`}]},{id:"skrub_cheat",title:"Récapitulatif",description:"Les fonctions clés de Skrub.",snippets:[{id:"skrub_cheat_sheet",title:"Cheat Sheet",description:"Tableau récapitulatif des fonctions.",markdown:'### 🛠️ Fonctions Clés de Skrub\n\n| Fonction | Usage Principal | Réel Avantage 🚀 | Scikit-Learn Equivalent |\n| :--- | :--- | :--- | :--- |\n| `TableReport` | Audit rapide (HTML) | **Vision immédiate** des problèmes (types, manques). | `df.describe()` |\n| `TableVectorizer` | Preprocessing Auto | **Gère tout** (dates, catégories, nombres) sans config. | `ColumnTransformer` |\n| `MinHashEncoder` | Catégories sales | **Tolère les fautes** de frappe et variantes. | `OneHotEncoder` |\n| `GapEncoder` | Topics (Texte court) | **Interprétable** (donne les mots-clés des sujets). | `NMF` |\n| `Joiner` | Jointure floue | **Joint sans clé exacte** (ex: "Apple" = "Apple Inc"). | - |\n| `Aggregator` | Agrégation relationnelle | **Crée des features** auto depuis une table liée. | `groupby()` |\n'}]}]},{id:"numpy",title:"Numpy",description:"Calcul Numérique & Matriciel",categories:[{id:"arrays",title:"Tableaux (Arrays)",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
 
 # À partir d'une liste
 arr = np.array([1, 2, 3])
