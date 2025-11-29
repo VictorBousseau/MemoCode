@@ -1282,12 +1282,13 @@ with gp.Env() as env, gp.Model(name, env=env) as model:
     if model.SolCount:
         print(f"Total cost = {model.ObjVal:.2f}")
         for t in range(H):
-            print(f"t={t:2d}: y={int(y[t].X)} x={x[t].X:.1f} I={I[t].X:.1f}")`}]}]},{id:"data_science",title:"Data Science",description:"Projets complets de Machine Learning",categories:[{id:"shoppers_intention",title:"Projet Complet (Shoppers Intention)",description:"Prédiction de l'intention d'achat (Classification)",snippets:[{id:"eda",title:"1. Exploration des Données (EDA)",description:"Chargement, analyse de la target et corrélations.",code:`import pandas as pd
+            print(f"t={t:2d}: y={int(y[t].X)} x={x[t].X:.1f} I={I[t].X:.1f}")`}]}]},{id:"data_science",title:"Data Science",description:"Projets complets de Machine Learning",categories:[{id:"shoppers_intention",title:"Projet Complet (Shoppers Intention)",description:"Prédiction de l'intention d'achat (Classification)",snippets:[{id:"eda",title:"1. Exploration des Données (EDA)",description:"Chargement, analyse de la target et corrélations. [Télécharger le dataset](/MemoCode/data/online_shoppers_intention.csv)",code:`import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Chargement des données
-df = pd.read_csv('public/data/online_shoppers_intention.csv')
+# Assurez-vous d'avoir le fichier 'online_shoppers_intention.csv'
+df = pd.read_csv('online_shoppers_intention.csv')
 
 print("Dimensions du dataset :", df.shape)
 print(df.head())
@@ -1302,26 +1303,37 @@ plt.show()
 plt.figure(figsize=(12, 10))
 sns.heatmap(df.corr(numeric_only=True), annot=False, cmap='coolwarm')
 plt.title('Matrice de Corrélation')
-plt.show()`},{id:"preprocessing",title:"2. Preprocessing & Feature Engineering",description:"Encodage des variables et mise à l'échelle.",code:`from sklearn.preprocessing import LabelEncoder, StandardScaler
+plt.show()`},{id:"preprocessing",title:"2. Preprocessing & Feature Engineering",description:"Encodage, gestion des valeurs manquantes et SMOTE.",code:`from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from imblearn.over_sampling import SMOTE
 
-# Encodage des variables catégorielles (Month, VisitorType, etc.)
-# Pour simplifier, on utilise LabelEncoder ici (OneHotEncoder serait mieux pour certaines)
+# 1. Gestion des valeurs manquantes (si nécessaire)
+# Remplacement des NaN par la médiane pour les colonnes numériques
+numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+imputer = SimpleImputer(strategy='median')
+df[numeric_cols] = imputer.fit_transform(df[numeric_cols])
+
+# 2. Encodage des variables catégorielles
 le = LabelEncoder()
 categorical_cols = df.select_dtypes(include=['object', 'bool']).columns
 
 for col in categorical_cols:
     df[col] = le.fit_transform(df[col])
 
-print("Aperçu après encodage :")
-print(df.head())
-
-# Séparation Features (X) / Target (y)
+# 3. Séparation Features (X) / Target (y)
 X = df.drop('Revenue', axis=1)
 y = df['Revenue']
 
-# Scaling (Standardisation)
+# 4. Scaling (Standardisation)
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)`},{id:"modeling",title:"3. Modélisation & Évaluation",description:"Entraînement d'un modèle et analyse des performances.",code:`from sklearn.model_selection import train_test_split
+X_scaled = scaler.fit_transform(X)
+
+# 5. Gestion du déséquilibre de classe (SMOTE)
+# La classe 'Revenue=True' est souvent minoritaire
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_scaled, y)
+
+print(f"Taille originale : {X.shape}, Taille après SMOTE : {X_resampled.shape}")`},{id:"modeling",title:"3. Modélisation & Évaluation",description:"Entraînement d'un modèle et analyse des performances.",code:`from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
