@@ -1443,7 +1443,40 @@ FROM users
 WHERE email ~* '@(gmail|hotmail)\\.com'; -- ~* = Regex insensible à la casse (Postgres)
 
 -- Sur BigQuery / MySQL :
--- WHERE REGEXP_CONTAINS(email, r'@(gmail|hotmail)\\.com')`}]}]}]},NL={themes:[{id:"git_basics",title:"Git & GitHub",description:"Version Control & Collaboration",categories:[{id:"config_init",title:"1. Configuration & Initialisation",description:"À faire une seule fois (ou presque).",snippets:[{id:"git_config",title:"Configuration de l'identité",description:"Indispensable pour que vos commits vous soient attribués.",code:`# Définir votre nom (apparaîtra dans l'historique)
+-- WHERE REGEXP_CONTAINS(email, r'@(gmail|hotmail)\\.com')`}]}]},{id:"sql_expert",title:"SQL Expert & Performance",description:"Manipulation avancée et Optimisation.",categories:[{id:"text_manipulation",title:"1. Manipulation de Texte",description:"Nettoyer et transformer les chaînes.",snippets:[{id:"concat_substring",title:"Concaténer et Extraire",description:"CONCAT, ||, SUBSTRING.",code:`-- Concaténation (Standard SQL: ||)
+SELECT first_name || ' ' || last_name as full_name
+FROM users;
+
+-- Sur MySQL/SQL Server : CONCAT(first_name, ' ', last_name)
+
+-- Extraire une partie (SUBSTRING)
+-- Ex: Extraire l'année "2023" de "2023-01-01" (si c'est du texte)
+SELECT SUBSTRING('2023-01-01', 1, 4); -- Commence à 1, longueur 4`},{id:"trim_coalesce",title:"Nettoyer et Gérer les NULL",description:"TRIM et COALESCE.",code:`-- TRIM : Enlever les espaces inutiles
+SELECT TRIM(email) FROM users;
+
+-- COALESCE : Remplacer NULL par une valeur par défaut
+-- Très utile pour l'affichage ou les calculs
+SELECT 
+    product_name,
+    COALESCE(description, 'Pas de description') as desc_safe,
+    COALESCE(discount_rate, 0) as discount_safe -- Évite les erreurs de calcul
+FROM products;`}]},{id:"json_handling",title:"2. Gestion du JSON",description:"Requêter des données semi-structurées.",snippets:[{id:"json_extract",title:"Lire du JSON (PostgreSQL/BigQuery)",description:"Accéder aux clés d'un objet JSON stocké en texte.",code:`-- Supposons une colonne 'metadata' : {"browser": "Chrome", "clicks": 12}
+
+-- PostgreSQL
+SELECT 
+    metadata->>'browser' as browser_name, -- ->> renvoie du texte
+    (metadata->>'clicks')::int as clicks -- Cast en entier
+FROM events;
+
+-- BigQuery
+SELECT 
+    JSON_EXTRACT_SCALAR(metadata, '$.browser') as browser_name
+FROM events;`}]},{id:"performance",title:"3. Performance & Index",description:"Pourquoi ma requête est lente ?",snippets:[{id:"explain_analyze",title:"Comprendre le Plan (EXPLAIN)",description:"Voir comment le moteur exécute la requête.",code:`-- Ajoutez EXPLAIN devant votre requête pour voir le plan
+EXPLAIN SELECT * FROM orders WHERE user_id = 123;
+
+-- Recherchez :
+-- "Seq Scan" (Scan complet de la table) -> ❌ LENT sur grosse table
+-- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`},{id:"indexes",title:"Les Index",description:"Le sommaire du livre.",markdown:'🚀 **Le concept**\nSans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".\nAvec un index, elle va à la fin, trouve "H", et va directement à la page.\n\n**Quand créer un index ?**\nSur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: `user_id`, `email`, `created_at`).'}]}]}]},NL={themes:[{id:"git_basics",title:"Git & GitHub",description:"Version Control & Collaboration",categories:[{id:"config_init",title:"1. Configuration & Initialisation",description:"À faire une seule fois (ou presque).",snippets:[{id:"git_config",title:"Configuration de l'identité",description:"Indispensable pour que vos commits vous soient attribués.",code:`# Définir votre nom (apparaîtra dans l'historique)
 git config --global user.name "Votre Prénom Nom"
 
 # Définir votre email (doit correspondre à celui de GitHub)
@@ -1608,7 +1641,23 @@ RANKX(
     [Primes Acquises],
     ,
     DESC
-)`}]},{id:"relationships",title:"3. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
+)`}]},{id:"context_transition",title:"3. Context Transition",description:"Le concept le plus complexe et puissant.",snippets:[{id:"context_transition_concept",title:"Row Context -> Filter Context",description:"Comment une ligne devient un filtre.",markdown:'🧠 **Le Concept Clé**\nLe **Context Transition** est le mécanisme par lequel un **Row Context** (itération ligne par ligne) est transformé en un **Filter Context** équivalent.\n\nIl est déclenché automatiquement par `CALCULATE`.\n\n**Exemple :**\nDans une colonne calculée `[Ventes Max]` :\n```dax\n= CALCULATE( MAX(Ventes[Montant]) )\n```\n1. On est dans une colonne calculée -> Row Context (on voit la ligne actuelle).\n2. `CALCULATE` invoque le Context Transition.\n3. Le Row Context (ex: Produit="A", Date="2023-01-01") devient un Filter Context.\n4. Le calcul `MAX` se fait uniquement sur les lignes filtrées par ce nouveau contexte.'},{id:"context_transition_measure",title:"Appeler une Mesure",description:"Une mesure a un CALCULATE implicite.",markdown:"⚠️ **Piège Classique**\nAppeler une mesure dans un itérateur (comme `SUMX`) déclenche le Context Transition, car une mesure est toujours entourée d'un `CALCULATE` implicite.\n\n```dax\n-- Ce code déclenche le Context Transition pour chaque ligne de 'Produit'\nSUMX(\n    'Produit',\n    [Total Ventes] -- = CALCULATE(SUM(Ventes[Montant]))\n)\n```"}]},{id:"semi_additive",title:"4. Semi-Additive Measures",description:"Stocks et Soldes (Opening/Closing).",snippets:[{id:"semi_additive_concept",title:"Le Problème des Stocks",description:"On ne somme pas des stocks dans le temps.",markdown:`📉 **Pourquoi Semi-Additif ?**
+*   **Additif** : Les ventes (On peut sommer sur les régions ET sur le temps).
+*   **Semi-Additif** : Les stocks (On peut sommer sur les régions, mais **PAS sur le temps**).
+    *   Stock Janvier : 100
+    *   Stock Février : 120
+    *   Stock Total : 220 ? ❌ NON ! C'est 120 (le dernier stock).`},{id:"closing_balance",title:"Closing Balance (Stock Fin)",description:"Prendre la valeur de la dernière date.",code:`Stock Fin de Période = 
+CALCULATE(
+    SUM('Stock'[Quantité]),
+    LASTDATE('Temps'[Date])
+)`},{id:"opening_balance",title:"Opening Balance (Stock Début)",description:"Prendre la valeur de la veille du début.",code:`Stock Début de Période = 
+CALCULATE(
+    SUM('Stock'[Quantité]),
+    PREVIOUSDAY(FIRSTDATE('Temps'[Date]))
+)`}]},{id:"hierarchies",title:"5. Hiérarchies Parent-Enfant",description:"Gérer les organigrammes (PATH).",snippets:[{id:"path_function",title:"Aplatir la Hiérarchie (PATH)",description:"Créer une chaîne de tous les parents.",markdown:"Pour une table avec `EmployeeID` et `ManagerID`.",code:`Chemin Complet = PATH('Employés'[EmployeeID], 'Employés'[ManagerID])
+-- Résultat : "1|5|12" (Le chef du chef du chef)`},{id:"path_item",title:"Extraire un Niveau (PATHITEM)",description:"Récupérer le N-ième manager.",code:`Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
+Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
+Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`}]},{id:"relationships",title:"6. Relations Multiples",description:"USERELATIONSHIP pour les dates multiples.",snippets:[{id:"userelationship_concept",title:"Problème : Dates Multiples",description:"Survenance vs Déclaration.",markdown:`Un sinistre a deux dates : **Survenance** et **Déclaration**.
 Mais on ne peut avoir qu'une seule relation active vers la table **Temps**.
 La relation active est souvent sur la **Survenance**.
 Comment analyser par **Date de Déclaration** sans dupliquer la table Temps ?`},{id:"userelationship_code",title:"Solution : USERELATIONSHIP",description:"Activer une relation inactive à la demande.",code:`Sinistres (Vue Déclaration) = 
