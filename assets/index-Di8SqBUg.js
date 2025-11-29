@@ -593,11 +593,11 @@ print(model.summary())`},{id:"ols_arrays",title:"OLS (Arrays)",description:"Avec
 X = sm.add_constant(X)
 
 model = sm.OLS(y, X).fit()
-print(model.summary())`}]},{id:"tf_concepts",title:"5. Concepts & Tenseurs",subCategory:"Deep Learning",description:"Comprendre les bases avant de coder.",snippets:[{id:"dl_intro",title:"Deep Learning vs ML Classique",description:"Quand utiliser le Deep Learning ?",markdown:`🧠 **Deep Learning (Réseaux de Neurones)**
+print(model.summary())`}]},{id:"tensorflow_unified",title:"5. TensorFlow",description:"Réseaux de neurones profonds (Deep Learning).",snippets:[{id:"dl_intro",title:"Deep Learning vs ML Classique",subCategory:"5.1 Concepts & Tenseurs",description:"Quand utiliser le Deep Learning ?",markdown:`🧠 **Deep Learning (Réseaux de Neurones)**
 Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
 
 **Le concept clé :**
-Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`},{id:"tensors",title:"Les Tenseurs",description:"La brique de base de TensorFlow.",markdown:`📦 **Qu'est-ce qu'un Tenseur ?**
+Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`},{id:"tensors",title:"Les Tenseurs",subCategory:"5.1 Concepts & Tenseurs",description:"La brique de base de TensorFlow.",markdown:`📦 **Qu'est-ce qu'un Tenseur ?**
 C'est une généralisation des matrices à N dimensions.
 *   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
 *   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
@@ -605,7 +605,7 @@ C'est une généralisation des matrices à N dimensions.
 *   **Tenseur 3D** : Un cube (ex: une image couleur RGB)
 *   **Tenseur 4D** : Un lot d'images (Batch)
 
-En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`}]},{id:"keras_workflow",title:"6. Workflow Keras",subCategory:"Deep Learning",description:"Construire un modèle étape par étape.",snippets:[{id:"sequential",title:"L'Architecture (Sequential)",description:"Empiler des couches comme des Lego.",code:`import tensorflow as tf
+En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`},{id:"sequential",title:"L'Architecture (Sequential)",subCategory:"5.2 Workflow Keras",description:"Empiler des couches comme des Lego.",code:`import tensorflow as tf
 from tensorflow.keras import layers, models
 
 # Création d'un modèle vide
@@ -615,17 +615,17 @@ model = models.Sequential()
 # Dense = Couche entièrement connectée (chaque neurone est relié à tous les précédents)
 model.add(layers.Dense(64, activation='relu', input_shape=(10,))) # 10 features en entrée
 model.add(layers.Dense(32, activation='relu'))
-model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`},{id:"activation",title:"Fonctions d'Activation",description:"Donner de la non-linéarité au modèle.",markdown:"⚡ **Pourquoi une fonction d'activation ?**\nSans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.\n\n*   **ReLU** (`relu`) : La plus utilisée dans les couches cachées. Rapide et efficace.\n*   **Sigmoid** (`sigmoid`) : Pour la sortie d'une classification binaire (0 ou 1).\n*   **Softmax** (`softmax`) : Pour la sortie d'une classification multi-classes (probabilités).\n*   **Linear** (`linear`) : Pour la sortie d'une régression (valeur continue)."},{id:"compile",title:"Compilation",description:"Définir comment le modèle apprend.",code:`model.compile(
+model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`},{id:"activation",title:"Fonctions d'Activation",subCategory:"5.2 Workflow Keras",description:"Donner de la non-linéarité au modèle.",markdown:"⚡ **Pourquoi une fonction d'activation ?**\nSans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.\n\n*   **ReLU** (`relu`) : La plus utilisée dans les couches cachées. Rapide et efficace.\n*   **Sigmoid** (`sigmoid`) : Pour la sortie d'une classification binaire (0 ou 1).\n*   **Softmax** (`softmax`) : Pour la sortie d'une classification multi-classes (probabilités).\n*   **Linear** (`linear`) : Pour la sortie d'une régression (valeur continue)."},{id:"compile",title:"Compilation",subCategory:"5.2 Workflow Keras",description:"Définir comment le modèle apprend.",code:`model.compile(
     optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
     loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
     metrics=['mae']        # Métriques à suivre (Mean Absolute Error)
-)`}]},{id:"training",title:"7. Entraînement",subCategory:"Deep Learning",description:"Lancer l'apprentissage (Fit).",snippets:[{id:"fit",title:"Entraîner le modèle (Fit)",description:"Epochs et Batch Size.",code:`history = model.fit(
+)`},{id:"fit",title:"Entraîner le modèle (Fit)",subCategory:"5.3 Entraînement",description:"Epochs et Batch Size.",code:`history = model.fit(
     X_train, y_train,
     epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
     batch_size=32,         # Nombre d'exemples traités avant de mettre à jour les poids
     validation_split=0.2,  # 20% des données gardées pour valider pendant l'entraînement
     verbose=1
-)`},{id:"overfitting",title:"Éviter le Sur-apprentissage",description:"Early Stopping et Dropout.",code:`from tensorflow.keras.callbacks import EarlyStopping
+)`},{id:"overfitting",title:"Éviter le Sur-apprentissage",subCategory:"5.3 Entraînement",description:"Early Stopping et Dropout.",code:`from tensorflow.keras.callbacks import EarlyStopping
 
 # Arrêter si la validation ne s'améliore plus après 5 epochs
 early_stop = EarlyStopping(monitor='val_loss', patience=5)
@@ -634,7 +634,7 @@ model.fit(
     X_train, y_train,
     epochs=100,
     callbacks=[early_stop]
-)`}]},{id:"tf_example",title:"8. Exemple Complet",subCategory:"Deep Learning",description:"Régression de bout en bout.",snippets:[{id:"full_regression",title:"Régression (Prix Immo)",description:"Prédire une valeur continue.",code:`import tensorflow as tf
+)`},{id:"full_regression",title:"Régression (Prix Immo)",subCategory:"5.4 Exemple Complet",description:"Prédire une valeur continue.",code:`import tensorflow as tf
 from tensorflow.keras import layers, models
 
 # 1. Architecture
