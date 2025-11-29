@@ -1146,29 +1146,72 @@ df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 df['c'] = df['a'] + df['b']
 
 # ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_get",title:"Requêtes HTTP (Requests)",description:"Récupérer des données depuis une API.",code:`import requests
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
 
-# Faire une requête GET
-response = requests.get('https://api.github.com/users/octocat')
+url = "https://api.github.com/search/repositories"
 
-# Vérifier le statut (200 = OK)
-if response.status_code == 200:
-    data = response.json() # Convertir la réponse JSON en dictionnaire Python
-    print(f"User: {data['login']}")
-    print(f"Bio: {data['bio']}")
-else:
-    print("Erreur lors de la requête")`},{id:"beautifulsoup",title:"Web Scraping (BeautifulSoup)",description:"Extraire des données d'une page HTML.",code:`from bs4 import BeautifulSoup
-import requests
+# 1. Paramètres (Query String)
+# ?q=python&sort=stars
+params = {
+    "q": "python",
+    "sort": "stars",
+    "per_page": 5
+}
 
-html = "<html><body><h1>Titre</h1><p>Paragraphe</p></body></html>"
-soup = BeautifulSoup(html, 'html.parser')
+# 2. Headers (User-Agent, Auth...)
+headers = {
+    "User-Agent": "MonApp/1.0",
+    "Accept": "application/vnd.github.v3+json"
+}
 
-# Extraire le texte du h1
-titre = soup.h1.text
-print(titre) # Titre
+try:
+    response = requests.get(url, params=params, headers=headers, timeout=5)
+    
+    # 3. Vérification automatique des erreurs (4xx, 5xx)
+    response.raise_for_status() 
+    
+    data = response.json()
+    print(f"Top repo: {data['items'][0]['name']}")
+    
+except requests.exceptions.HTTPError as err:
+    print(f"Erreur HTTP: {err}")
+except requests.exceptions.Timeout:
+    print("Le serveur a mis trop de temps à répondre.")`},{id:"beautifulsoup_complex",title:"Web Scraping (BeautifulSoup)",description:"Exemple concret : Liste de produits.",code:`from bs4 import BeautifulSoup
 
-# Trouver tous les liens
-# links = soup.find_all('a')`},{id:"fastapi_basic",title:"API avec FastAPI",description:"Créer une API moderne et rapide.",code:`from fastapi import FastAPI
+# Simulation d'une page HTML de e-commerce
+html_doc = """
+<div class="product-list">
+    <article class="product">
+        <h2 class="title"><a href="/p/1">Smartphone X</a></h2>
+        <span class="price">599€</span>
+        <span class="stock in-stock">En stock</span>
+    </article>
+    <article class="product">
+        <h2 class="title"><a href="/p/2">Laptop Pro</a></h2>
+        <span class="price">1299€</span>
+        <span class="stock out-of-stock">Rupture</span>
+    </article>
+</div>
+"""
+
+soup = BeautifulSoup(html_doc, 'html.parser')
+
+# Trouver tous les articles
+products = soup.find_all('article', class_='product')
+
+data = []
+for prod in products:
+    item = {
+        # .find() cherche le premier élément correspondant
+        'name': prod.find('h2', class_='title').text.strip(),
+        'price': prod.find('span', class_='price').text,
+        # On peut vérifier la présence d'une classe CSS
+        'available': 'in-stock' in prod.find('span', class_='stock')['class']
+    }
+    data.append(item)
+
+print(data)
+# [{'name': 'Smartphone X', 'price': '599€', 'available': True}, ...]`},{id:"fastapi_basic",title:"API avec FastAPI",description:"Créer une API moderne et rapide.",code:`from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -1181,22 +1224,59 @@ def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
 # Lancer le serveur :
-# uvicorn main:app --reload`}]},{id:"data_quality",title:"5. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"pydantic_model",title:"Modèle Pydantic",description:"Définir et valider la structure des données.",code:`from pydantic import BaseModel, ValidationError
-from typing import Optional
+# uvicorn main:app --reload`}]},{id:"data_quality",title:"5. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"why_pydantic",title:"Pourquoi Pydantic ?",description:"Comparaison : Code manuel vs Pydantic.",markdown:`### ❌ Sans Pydantic (Validation Manuelle)
+C'est verbeux, fragile et difficile à maintenir.
+\`\`\`python
+def process_user(data):
+    if not isinstance(data, dict):
+        raise ValueError("Data must be a dict")
+    
+    if 'id' not in data or not isinstance(data['id'], int):
+        raise ValueError("ID invalide")
+        
+    # Et ainsi de suite pour chaque champ...
+    # Gestion des types (str "30" -> int 30) à faire à la main.
+\`\`\`
 
-# Définition du schéma
+### ✅ Avec Pydantic
+Déclaratif, typé, et conversion automatique (parsing).
+\`\`\`python
 class User(BaseModel):
     id: int
     name: str
-    email: str
-    age: Optional[int] = None # Champ optionnel
+    age: int # Convertira "30" en 30 automatiquement
+\`\`\``},{id:"pydantic_config",title:"Cas Réel : Configuration",description:"Valider une config imbriquée (Nested).",code:`from pydantic import BaseModel, Field, HttpUrl, EmailStr
+from typing import List, Optional
 
-# Validation automatique
-try:
-    user = User(id=1, name="Alice", email="alice@example.com", age="30")
-    print(user) # age est automatiquement converti en int !
-except ValidationError as e:
-    print(e)`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+# 1. Sous-modèle
+class DatabaseConfig(BaseModel):
+    host: str = "localhost"
+    port: int = Field(5432, ge=1024, le=65535) # Validation : port entre 1024 et 65535
+    password: str
+
+# 2. Modèle Principal
+class AppConfig(BaseModel):
+    app_name: str
+    admin_email: EmailStr # Vérifie le format email
+    db: DatabaseConfig    # Imbrication
+    allowed_origins: List[HttpUrl] # Liste d'URLs valides
+    debug: bool = False
+
+# Données brutes (ex: fichier JSON ou YAML)
+raw_data = {
+    "app_name": "MonApp",
+    "admin_email": "admin@example.com",
+    "db": {
+        "password": "secret_password",
+        "port": 5432 
+    },
+    "allowed_origins": ["https://google.com"]
+}
+
+# Parsing & Validation
+config = AppConfig(**raw_data)
+print(config.db.host) # "localhost" (valeur par défaut)
+print(config.admin_email) # "admin@example.com"`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
