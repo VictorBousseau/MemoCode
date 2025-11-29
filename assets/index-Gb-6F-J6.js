@@ -536,7 +536,12 @@ sns.countplot(
     order=df['colonne_categorie'].value_counts().index
 )
 plt.title('Fréquence par catégorie')
-plt.show()`}]},{id:"bivariate",title:"2. Analyse Bivariée",description:"Relations entre deux variables",snippets:[{id:"scatterplot",title:"Scatter Plot",description:"Relation numérique vs numérique.",image:"/MemoCode/images/scatterplot.png",code:`# Nuage de points (Scatter Plot)
+plt.show()`}]},{id:"bivariate",title:"2. Analyse Bivariée",description:"Relations entre deux variables",snippets:[{id:"boxplot_bivariate",title:"Boxplot Bivarié",description:"Distribution d'une variable numérique par catégorie.",image:"/MemoCode/images/boxplot.png",code:`# Boxplot Bivarié
+# x : Variable Catégorielle (Groupes)
+# y : Variable Numérique (Mesure)
+sns.boxplot(data=df, x='categorie', y='montant')
+plt.title('Distribution du Montant par Catégorie')
+plt.show()`},{id:"scatterplot",title:"Scatter Plot",description:"Relation numérique vs numérique.",image:"/MemoCode/images/scatterplot.png",code:`# Nuage de points (Scatter Plot)
 # Idéal pour voir la corrélation entre deux variables numériques
 # hue : colore les points selon une variable catégorielle
 # alpha : transparence des points (utile si beaucoup de données)
@@ -857,7 +862,17 @@ from minisom import MiniSom
 # Grille 6x6, input_len = nb features
 som = MiniSom(x=6, y=6, input_len=X_scaled.shape[1], sigma=1.0, learning_rate=0.5)
 som.random_weights_init(X_scaled)
-som.train_random(X_scaled, 100) # 100 itérations`}]},{id:"math_reference",title:"4. Rappel Mathématiques",subCategory:"Machine Learning",description:"Exemples concrets de calculs (Gini, Entropie, Distances).",snippets:[{id:"gini_entropy_calc",title:"Gini vs Entropie",description:"Calcul détaillé sur un exemple simple.",markdown:`### 🧮 Exemple Concret
+som.train_random(X_scaled, 100) # 100 itérations`}]},{id:"math_reference",title:"4. Rappel Mathématiques",subCategory:"Machine Learning",description:"Exemples concrets de calculs (Gini, Entropie, Distances).",snippets:[{id:"variable_types",title:"Types de Variables",description:"Quali vs Quanti, Discret vs Continu.",markdown:`### 📊 Classification des Variables
+
+#### 1. Quantitative (Numérique)
+On peut faire des calculs dessus (Moyenne, Somme).
+*   **Continue** : Peut prendre une infinité de valeurs (ex: Taille, Prix, Température).
+*   **Discrète** : Valeurs dénombrables, souvent des entiers (ex: Nombre d'enfants, Nombre de clics).
+
+#### 2. Qualitative (Catégorielle)
+Décrit une caractéristique. Pas de calcul mathématique direct.
+*   **Nominale** : Pas d'ordre naturel (ex: Couleur, Ville, Sexe).
+*   **Ordinale** : Il existe un ordre hiérarchique (ex: Satisfaction [Faible, Moyen, Fort], Niveau d'étude).`},{id:"gini_entropy_calc",title:"Gini vs Entropie",description:"Calcul détaillé sur un exemple simple.",markdown:`### 🧮 Exemple Concret
 
 Imaginons un noeud de l'arbre contenant **5 billes** :
 *   🔴 **3 Rouges**
