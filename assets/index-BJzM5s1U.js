@@ -1225,38 +1225,6 @@ with requests.Session() as s:
     
     # 3. Deuxième appel
     # Plus rapide car on réutilise la même connexion !
-    # Les cookies reçus au premier appel sont renvoyés automatiquement ici.
-    r2 = s.get('https://api.example.com/my-orders')`},{id:"requests_advanced",title:"Requêtes HTTP Avancées",description:"Headers, Paramètres et Gestion d'erreurs.",code:`import requests
-
-url = "https://api.github.com/search/repositories"
-
-# 1. Paramètres (Query String)
-# ?q=python&sort=stars
-params = {
-    "q": "python",
-    "sort": "stars",
-    "per_page": 5
-}
-
-# 2. Headers (User-Agent, Auth...)
-headers = {
-    "User-Agent": "MonApp/1.0",
-    "Accept": "application/vnd.github.v3+json"
-}
-
-try:
-    response = requests.get(url, params=params, headers=headers, timeout=5)
-    
-    # 3. Vérification automatique des erreurs (4xx, 5xx)
-    response.raise_for_status() 
-    
-    data = response.json()
-    print(f"Top repo: {data['items'][0]['name']}")
-    
-except requests.exceptions.HTTPError as err:
-    print(f"Erreur HTTP: {err}")
-except requests.exceptions.Timeout:
-    print("Le serveur a mis trop de temps à répondre.")`},{id:"beautifulsoup_complex",title:"Web Scraping (BeautifulSoup)",description:"Exemple concret : Liste de produits.",code:`from bs4 import BeautifulSoup
 
 # Simulation d'une page HTML de e-commerce
 html_doc = """
