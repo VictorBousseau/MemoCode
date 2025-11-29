@@ -1479,15 +1479,35 @@ CALCULATE(
 [Nb Propos Gagnés] = CALCULATE(
     [Nb Propos], 
     'Propositions'[Statut] = "Gagné"
-)`},{id:"formatting",title:"Formatage du Code",description:"Pour ne pas devenir fou.",code:`Ma Mesure Complexe = 
-VAR _Montant = [Montant Total]
-VAR _Seuil = 1000
+)`},{id:"variables_var",title:"Variables (VAR / RETURN)",description:"Performance et Lisibilité.",markdown:`💡 **Pourquoi utiliser des Variables ?**
+
+1.  **Performance** : Une variable est calculée **une seule fois**, même si elle est utilisée plusieurs fois dans le RETURN.
+2.  **Débogage** : Permet de décomposer une formule complexe étape par étape.
+3.  **Lisibilité** : Donne un nom explicite aux étapes intermédiaires.`,code:`Croissance YoY = 
+VAR _VentesAnneeN = [Ventes Total]
+VAR _VentesAnneeN_1 = CALCULATE([Ventes Total], SAMEPERIODLASTYEAR('Temps'[Date]))
+VAR _Difference = _VentesAnneeN - _VentesAnneeN_1
+
 RETURN
-    IF(
-        _Montant >= _Seuil,
-        "Premium",
-        "Standard"
-    )`}]}]}]},OL={themes:[{id:"r_basics",title:"R (Tidyverse)",description:"Manipulation de données moderne",categories:[{id:"dplyr_basics",title:"Dplyr Basics",description:"Les verbes essentiels",snippets:[{id:"select_filter",title:"Select & Filter",description:"Choisir colonnes et lignes.",code:`library(dplyr)
+    DIVIDE(_Difference, _VentesAnneeN_1, 0)`},{id:"filter_columns",title:"Filtrer les Colonnes, pas les Tables",description:"Optimisation majeure de performance.",markdown:"⚠️ **Attention à FILTER()**\n\n`FILTER('Table', ...)` scanne **toute la table** (toutes les colonnes). C'est très lent sur les gros volumes.\nPréférez filtrer uniquement la colonne nécessaire avec `VALUES` ou `ALL`.",code:`-- ❌ LENT (Charge toute la table en mémoire)
+CALCULATE(
+    [Mesure],
+    FILTER('Grosses Ventes', 'Grosses Ventes'[Region] = "Europe")
+)
+
+-- ✅ RAPIDE (Ne scanne que la colonne Region)
+CALCULATE(
+    [Mesure],
+    KEEPFILTERS('Grosses Ventes'[Region] = "Europe")
+)
+-- OU
+CALCULATE(
+    [Mesure],
+    FILTER(
+        VALUES('Grosses Ventes'[Region]), 
+        'Grosses Ventes'[Region] = "Europe"
+    )
+)`}]}]}]},OL={themes:[{id:"r_basics",title:"R (Tidyverse)",description:"Manipulation de données moderne",categories:[{id:"dplyr_basics",title:"Dplyr Basics",description:"Les verbes essentiels",snippets:[{id:"select_filter",title:"Select & Filter",description:"Choisir colonnes et lignes.",code:`library(dplyr)
 
 # Sélectionner des colonnes
 df %>% select(nom, age)
