@@ -1088,28 +1088,65 @@ print(model.summary())`},{id:"ols_arrays",title:"OLS (Arrays)",description:"Avec
 X = sm.add_constant(X)
 
 model = sm.OLS(y, X).fit()
-print(model.summary())`}]}]},{id:"streamlit",title:"Streamlit",description:"Applications Web Data",categories:[{id:"st_basics",title:"Éléments de Base",description:"Titres, textes et données.",snippets:[{id:"st_text",title:"Texte & Titres",description:"Structurer la page.",code:`import streamlit as st
+print(model.summary())`}]}]},{id:"tensorflow",title:"TensorFlow & Deep Learning",description:"Réseaux de neurones profonds (Deep Learning).",categories:[{id:"tf_concepts",title:"1. Concepts & Tenseurs",description:"Comprendre les bases avant de coder.",snippets:[{id:"dl_intro",title:"Deep Learning vs ML Classique",description:"Quand utiliser le Deep Learning ?",markdown:`🧠 **Deep Learning (Réseaux de Neurones)**
+Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
 
-st.title("Mon Application Data")
-st.header("Une section importante")
-st.subheader("Une sous-section")
-st.text("Du texte brut.")
-st.markdown("**Du markdown** avec du *style*.")`},{id:"st_data",title:"Afficher des Données",description:"DataFrames et Métriques.",code:`# DataFrame interactif
-st.dataframe(df)
+**Le concept clé :**
+Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`},{id:"tensors",title:"Les Tenseurs",description:"La brique de base de TensorFlow.",markdown:`📦 **Qu'est-ce qu'un Tenseur ?**
+C'est une généralisation des matrices à N dimensions.
+*   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
+*   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
+*   **Matrice** (2D) : Un tableau (ex: une image noir & blanc)
+*   **Tenseur 3D** : Un cube (ex: une image couleur RGB)
+*   **Tenseur 4D** : Un lot d'images (Batch)
 
-# Table statique
-st.table(df.head())
+En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`}]},{id:"keras_workflow",title:"2. Workflow Keras",description:"Construire un modèle étape par étape.",snippets:[{id:"sequential",title:"L'Architecture (Sequential)",description:"Empiler des couches comme des Lego.",code:`import tensorflow as tf
+from tensorflow.keras import layers, models
 
-# Métrique (KPI)
-st.metric(label="Chiffre d'Affaires", value="50k€", delta="+5%")`}]},{id:"st_widgets",title:"Widgets Interactifs",description:"Boutons, Sliders, Inputs.",snippets:[{id:"st_input",title:"Entrées Utilisateur",description:"Récupérer des valeurs.",code:`nom = st.text_input("Votre nom")
-age = st.number_input("Votre âge", min_value=0, max_value=120)
+# Création d'un modèle vide
+model = models.Sequential()
 
-if st.button("Valider"):
-    st.write(f"Bonjour {nom} !")`},{id:"st_sidebar",title:"Sidebar",description:"Barre latérale pour les filtres.",code:`with st.sidebar:
-    st.header("Filtres")
-    ville = st.selectbox("Choisir une ville", ["Paris", "Lyon", "Marseille"])
-    
-st.write(f"Ville sélectionnée : {ville}")`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+# Ajout de couches (Layers)
+# Dense = Couche entièrement connectée (chaque neurone est relié à tous les précédents)
+model.add(layers.Dense(64, activation='relu', input_shape=(10,))) # 10 features en entrée
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`},{id:"activation",title:"Fonctions d'Activation",description:"Donner de la non-linéarité au modèle.",markdown:"⚡ **Pourquoi une fonction d'activation ?**\nSans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.\n\n*   **ReLU** (`relu`) : La plus utilisée dans les couches cachées. Rapide et efficace.\n*   **Sigmoid** (`sigmoid`) : Pour la sortie d'une classification binaire (0 ou 1).\n*   **Softmax** (`softmax`) : Pour la sortie d'une classification multi-classes (probabilités).\n*   **Linear** (`linear`) : Pour la sortie d'une régression (valeur continue)."},{id:"compile",title:"Compilation",description:"Définir comment le modèle apprend.",code:`model.compile(
+    optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
+    loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
+    metrics=['mae']        # Métriques à suivre (Mean Absolute Error)
+)`}]},{id:"training",title:"3. Entraînement",description:"Lancer l'apprentissage (Fit).",snippets:[{id:"fit",title:"Entraîner le modèle (Fit)",description:"Epochs et Batch Size.",code:`history = model.fit(
+    X_train, y_train,
+    epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
+    batch_size=32,         # Nombre d'exemples traités avant de mettre à jour les poids
+    validation_split=0.2,  # 20% des données gardées pour valider pendant l'entraînement
+    verbose=1
+)`},{id:"overfitting",title:"Éviter le Sur-apprentissage",description:"Early Stopping et Dropout.",code:`from tensorflow.keras.callbacks import EarlyStopping
+
+# Arrêter si la validation ne s'améliore plus après 5 epochs
+early_stop = EarlyStopping(monitor='val_loss', patience=5)
+
+model.fit(
+    X_train, y_train,
+    epochs=100,
+    callbacks=[early_stop]
+)`}]},{id:"tf_example",title:"4. Exemple Complet",description:"Régression de bout en bout.",snippets:[{id:"full_regression",title:"Régression (Prix Immo)",description:"Prédire une valeur continue.",code:`import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# 1. Architecture
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1) # Pas d'activation pour une régression (ou linear)
+])
+
+# 2. Compilation
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+# 3. Entraînement
+history = model.fit(X_train, y_train, epochs=50, validation_split=0.2)
+
+# 4. Prédiction
+predictions = model.predict(X_test)`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
