@@ -1616,7 +1616,7 @@ def division(a, b):
 
 # Test
 division(10, 2) # Écrira INFO dans le fichier
-division(5, 0)  # Écrira ERROR dans le fichier`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+division(5, 0)  # Écrira ERROR dans le fichier`}]},{id:"optimization",title:"4. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
@@ -1629,7 +1629,7 @@ df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 df['c'] = df['a'] + df['b']
 
 # ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Le Navigateur)",description:"Garder la connexion et les cookies.",markdown:`### 🧠 L'Analogie du Navigateur
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"5. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_session",title:"Requests Session (Le Navigateur)",description:"Garder la connexion et les cookies.",markdown:`### 🧠 L'Analogie du Navigateur
 *   **Requests.get()** simple : C'est comme ouvrir une fenêtre de **Navigation Privée**, aller sur un site, et fermer la fenêtre immédiatement. Vous perdez tout (cookies, connexion).
 *   **Session()** : C'est comme ouvrir **Chrome**. Vous vous connectez une fois, et le navigateur retient qui vous êtes pour les pages suivantes.`,code:`import requests
 
@@ -1692,7 +1692,7 @@ def read_item(item_id: int, q: str = None):
     return {"item_id": item_id, "q": q}
 
 # Lancer le serveur :
-# uvicorn main:app --reload`}]},{id:"data_quality",title:"5. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"why_pydantic",title:"Pourquoi Pydantic ?",description:"Comparaison : Code manuel vs Pydantic.",markdown:`### ❌ Sans Pydantic (Validation Manuelle)
+# uvicorn main:app --reload`}]},{id:"data_quality",title:"6. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"why_pydantic",title:"Pourquoi Pydantic ?",description:"Comparaison : Code manuel vs Pydantic.",markdown:`### ❌ Sans Pydantic (Validation Manuelle)
 C'est verbeux, fragile et difficile à maintenir.
 \`\`\`python
 def process_user(data):
@@ -2475,7 +2475,7 @@ Comment analyser par **Date de Déclaration** sans dupliquer la table Temps ?`},
 CALCULATE(
     [Montant Sinistres],
     USERELATIONSHIP('Sinistres'[DateDeclaration], 'Temps'[Date])
-)`}]},{id:"tips_practices",title:"4. Tips & Bonnes Pratiques",description:"Le best-of pour briller en DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
+)`}]},{id:"tips_practices",title:"7. Tips & Bonnes Pratiques",description:"Le best-of pour briller en DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
 
 Il ne faut jamais écrire l'agrégation directement dans un \`CALCULATE\`.
 Créez d'abord une mesure de base, puis réutilisez-la.
@@ -2542,7 +2542,7 @@ IF(
 )`},{id:"dynamic_title",title:"Titre de Visuel Dynamique",description:"Afficher la sélection en cours.",markdown:`🏷️ **Titre Intelligent**
 Créez une mesure pour le titre, puis dans le visuel > Général > Titre > (fx) > Sélectionnez la mesure.`,code:`Titre Dynamique = 
 "Analyse des Ventes : " & 
-SELECTEDVALUE('Geo'[Pays], "Monde Entier")`}]},{id:"dynamic_features",title:"5. Fonctionnalités Dynamiques (Expert)",description:"Calculation Groups & Field Parameters.",snippets:[{id:"calculation_groups",title:"Calculation Groups",description:"Changer la logique de calcul dynamiquement (YTD, MTD...).",markdown:"🚀 **La Révolution des Calculation Groups**\nAu lieu de créer 3 mesures pour chaque KPI (`Ventes`, `Ventes YTD`, `Ventes YoY`), vous créez un **Groupe de Calcul**.\n\n**Exemple d'Item de Calcul (YTD) :**\n```dax\nCALCULATE(\n    SELECTEDMEASURE(), -- Remplace la mesure utilisée dans le visuel\n    DATESYTD('Temps'[Date])\n)\n```\nEnsuite, l'utilisateur choisit \"YTD\" dans un segment, et **toutes** les mesures du graphique passent en YTD."},{id:"field_parameters",title:"Field Parameters",description:"Laisser l'utilisateur choisir l'axe ou la mesure.",markdown:`🎛️ **Paramètres de Champs**
+SELECTEDVALUE('Geo'[Pays], "Monde Entier")`}]},{id:"dynamic_features",title:"8. Fonctionnalités Dynamiques (Expert)",description:"Calculation Groups & Field Parameters.",snippets:[{id:"calculation_groups",title:"Calculation Groups",description:"Changer la logique de calcul dynamiquement (YTD, MTD...).",markdown:"🚀 **La Révolution des Calculation Groups**\nAu lieu de créer 3 mesures pour chaque KPI (`Ventes`, `Ventes YTD`, `Ventes YoY`), vous créez un **Groupe de Calcul**.\n\n**Exemple d'Item de Calcul (YTD) :**\n```dax\nCALCULATE(\n    SELECTEDMEASURE(), -- Remplace la mesure utilisée dans le visuel\n    DATESYTD('Temps'[Date])\n)\n```\nEnsuite, l'utilisateur choisit \"YTD\" dans un segment, et **toutes** les mesures du graphique passent en YTD."},{id:"field_parameters",title:"Field Parameters",description:"Laisser l'utilisateur choisir l'axe ou la mesure.",markdown:`🎛️ **Paramètres de Champs**
 Permet de changer dynamiquement les axes ou les légendes d'un graphique.
 
 **Comment faire :**
