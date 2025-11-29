@@ -318,7 +318,7 @@ plt.show()`},{id:"msno_bar",title:"Barplot des Manquants",description:"Quantité
 # Affiche le nombre de valeurs non-nulles par colonne
 # Permet d'identifier rapidement les colonnes très vides
 msno.bar(df)
-plt.show()`}]}]},{id:"ml",title:"Machine Learning",description:"Modélisation avec Scikit-Learn",categories:[{id:"pipelines",title:"0. Pipelines & Workflow",description:"Automatiser et sécuriser le ML.",snippets:[{id:"pipeline_concept",title:"Comprendre les Pipelines",description:"Pourquoi utiliser un Pipeline ?",markdown:`### ⛓️ Le Pipeline Scikit-Learn
+plt.show()`}]}]},{id:"ml",title:"Modélisation & AI",description:"Machine Learning, Stats et Deep Learning.",categories:[{id:"pipelines",title:"0. Pipelines & Workflow",subCategory:"Machine Learning",description:"Automatiser et sécuriser le ML.",snippets:[{id:"pipeline_concept",title:"Comprendre les Pipelines",description:"Pourquoi utiliser un Pipeline ?",markdown:`### ⛓️ Le Pipeline Scikit-Learn
 
 Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traitement des données jusqu'au modèle final.
 
@@ -372,7 +372,7 @@ pipe = make_pipeline(
 pipe.fit(X_train, y_train)
 
 # 4. Prédire (le scaling est appliqué automatiquement !)
-y_pred = pipe.predict(X_test)`}]},{id:"preprocessing",title:"1. Préparation (Preprocessing)",description:"Split, Encodage et Scaling",snippets:[{id:"train_test_split",title:"Séparation Train / Test",description:"Diviser les données pour évaluer le modèle.",code:`import numpy as np
+y_pred = pipe.predict(X_test)`}]},{id:"preprocessing",title:"1. Préparation (Preprocessing)",subCategory:"Machine Learning",description:"Split, Encodage et Scaling",snippets:[{id:"train_test_split",title:"Séparation Train / Test",description:"Diviser les données pour évaluer le modèle.",code:`import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -419,7 +419,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 
 # Transform uniquement sur le Test
-X_test_scaled = scaler.transform(X_test)`}]},{id:"regression_models",title:"2.1 Modèles de Régression",description:"Prédire une valeur continue",snippets:[{id:"linear_regression",title:"Régression Linéaire",description:`Type : Régression
+X_test_scaled = scaler.transform(X_test)`}]},{id:"regression_models",title:"2.1 Modèles de Régression",subCategory:"Machine Learning",description:"Prédire une valeur continue",snippets:[{id:"linear_regression",title:"Régression Linéaire",description:`Type : Régression
                             Concept : Trace une ligne droite qui passe au plus près de tous les points.
                             Quand l'utiliser ?
                             - Prédire le prix d'une maison selon sa surface.
@@ -464,7 +464,7 @@ model.fit(X_train_scaled, y_train) # Attention : X_train_scaled !`},{id:"mlp_reg
 # max_iter=500 : Nombre d'époques d'entraînement
 model = MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
 model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`}]},{id:"classification_models",title:"2.2 Modèles de Classification",description:"Prédire une classe / catégorie",snippets:[{id:"logistic_regression",title:"Régression Logistique",description:`Type : Classification
+predictions = model.predict(X_test_scaled)`}]},{id:"classification_models",title:"2.2 Modèles de Classification",subCategory:"Machine Learning",description:"Prédire une classe / catégorie",snippets:[{id:"logistic_regression",title:"Régression Logistique",description:`Type : Classification
                             Concept : Sépare deux groupes par une frontière linéaire (utilise une fonction sigmoïde).
                             Quand l'utiliser ?
                             - Prédire si un client va churner (Oui/Non).
@@ -539,7 +539,7 @@ predictions = model.predict(X_test)`},{id:"mlp_classifier",title:"Réseau de Neu
 # hidden_layer_sizes=(100, 50) : 2 couches cachées
 model = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=500, random_state=42)
 model.fit(X_train_scaled, y_train)
-predictions = model.predict(X_test_scaled)`}]},{id:"evaluation",title:"3. Évaluation & Interprétabilité",description:"Métriques et Graphiques de performance",snippets:[{id:"metrics",title:"Métriques de Base",description:"Classification Report et Erreurs.",code:`from sklearn.metrics import classification_report, mean_squared_error, r2_score
+predictions = model.predict(X_test_scaled)`}]},{id:"evaluation",title:"3. Évaluation & Interprétabilité",subCategory:"Machine Learning",description:"Métriques et Graphiques de performance",snippets:[{id:"metrics",title:"Métriques de Base",description:"Classification Report et Erreurs.",code:`from sklearn.metrics import classification_report, mean_squared_error, r2_score
 
 # --- Pour la Classification ---
 # Affiche Précision, Rappel, F1-Score pour chaque classe
@@ -582,7 +582,76 @@ df_imp = df_imp.sort_values('importance', ascending=False)
 plt.figure(figsize=(10, 6))
 sns.barplot(data=df_imp, x='importance', y='feature')
 plt.title("Importance des Variables (Feature Importance)")
-plt.show()`}]}]},{id:"python_basics",title:"Python Basics",description:"Les fondamentaux du langage",categories:[{id:"std_libs",title:"1. Modules Standards",description:"Math, Random, Datetime, OS...",snippets:[{id:"math_lib",title:"Mathématiques (math)",description:"Fonctions mathématiques de base.",code:`import math
+plt.show()`}]},{id:"regression_sm",title:"4. Régression (OLS)",subCategory:"Statistiques",description:"Moindres Carrés Ordinaires.",snippets:[{id:"ols_formula",title:"OLS (Formule)",description:"Syntaxe style R (plus simple).",code:`import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Fit du modèle (y ~ x1 + x2)
+model = smf.ols('ventes ~ pub_tv + pub_radio', data=df).fit()
+
+# Résumé complet (R-squared, p-values...)
+print(model.summary())`},{id:"ols_arrays",title:"OLS (Arrays)",description:"Avec X et y (comme Scikit-Learn).",code:`# Il faut ajouter une constante (intercept) manuellement !
+X = sm.add_constant(X)
+
+model = sm.OLS(y, X).fit()
+print(model.summary())`}]},{id:"tf_concepts",title:"5. Concepts & Tenseurs",subCategory:"Deep Learning",description:"Comprendre les bases avant de coder.",snippets:[{id:"dl_intro",title:"Deep Learning vs ML Classique",description:"Quand utiliser le Deep Learning ?",markdown:`🧠 **Deep Learning (Réseaux de Neurones)**
+Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
+
+**Le concept clé :**
+Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`},{id:"tensors",title:"Les Tenseurs",description:"La brique de base de TensorFlow.",markdown:`📦 **Qu'est-ce qu'un Tenseur ?**
+C'est une généralisation des matrices à N dimensions.
+*   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
+*   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
+*   **Matrice** (2D) : Un tableau (ex: une image noir & blanc)
+*   **Tenseur 3D** : Un cube (ex: une image couleur RGB)
+*   **Tenseur 4D** : Un lot d'images (Batch)
+
+En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`}]},{id:"keras_workflow",title:"6. Workflow Keras",subCategory:"Deep Learning",description:"Construire un modèle étape par étape.",snippets:[{id:"sequential",title:"L'Architecture (Sequential)",description:"Empiler des couches comme des Lego.",code:`import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# Création d'un modèle vide
+model = models.Sequential()
+
+# Ajout de couches (Layers)
+# Dense = Couche entièrement connectée (chaque neurone est relié à tous les précédents)
+model.add(layers.Dense(64, activation='relu', input_shape=(10,))) # 10 features en entrée
+model.add(layers.Dense(32, activation='relu'))
+model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`},{id:"activation",title:"Fonctions d'Activation",description:"Donner de la non-linéarité au modèle.",markdown:"⚡ **Pourquoi une fonction d'activation ?**\nSans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.\n\n*   **ReLU** (`relu`) : La plus utilisée dans les couches cachées. Rapide et efficace.\n*   **Sigmoid** (`sigmoid`) : Pour la sortie d'une classification binaire (0 ou 1).\n*   **Softmax** (`softmax`) : Pour la sortie d'une classification multi-classes (probabilités).\n*   **Linear** (`linear`) : Pour la sortie d'une régression (valeur continue)."},{id:"compile",title:"Compilation",description:"Définir comment le modèle apprend.",code:`model.compile(
+    optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
+    loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
+    metrics=['mae']        # Métriques à suivre (Mean Absolute Error)
+)`}]},{id:"training",title:"7. Entraînement",subCategory:"Deep Learning",description:"Lancer l'apprentissage (Fit).",snippets:[{id:"fit",title:"Entraîner le modèle (Fit)",description:"Epochs et Batch Size.",code:`history = model.fit(
+    X_train, y_train,
+    epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
+    batch_size=32,         # Nombre d'exemples traités avant de mettre à jour les poids
+    validation_split=0.2,  # 20% des données gardées pour valider pendant l'entraînement
+    verbose=1
+)`},{id:"overfitting",title:"Éviter le Sur-apprentissage",description:"Early Stopping et Dropout.",code:`from tensorflow.keras.callbacks import EarlyStopping
+
+# Arrêter si la validation ne s'améliore plus après 5 epochs
+early_stop = EarlyStopping(monitor='val_loss', patience=5)
+
+model.fit(
+    X_train, y_train,
+    epochs=100,
+    callbacks=[early_stop]
+)`}]},{id:"tf_example",title:"8. Exemple Complet",subCategory:"Deep Learning",description:"Régression de bout en bout.",snippets:[{id:"full_regression",title:"Régression (Prix Immo)",description:"Prédire une valeur continue.",code:`import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# 1. Architecture
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1) # Pas d'activation pour une régression (ou linear)
+])
+
+# 2. Compilation
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+# 3. Entraînement
+history = model.fit(X_train, y_train, epochs=50, validation_split=0.2)
+
+# 4. Prédiction
+predictions = model.predict(X_test)`}]}]},{id:"python_basics",title:"Langage & Outils",description:"Les fondamentaux, astuces et calcul numérique.",categories:[{id:"std_libs",title:"1. Modules Standards",subCategory:"Bases",description:"Math, Random, Datetime, OS...",snippets:[{id:"math_lib",title:"Mathématiques (math)",description:"Fonctions mathématiques de base.",code:`import math
 
 # Constantes
 print(math.pi)  # 3.14159...
@@ -666,7 +735,7 @@ print(compteur.most_common(1)) # [('a', 3)]
 d = defaultdict(int) # Valeur par défaut : 0
 d['a'] += 1
 print(d['a']) # 1
-print(d['z']) # 0 (créé automatiquement)`}]},{id:"control_flow",title:"2. Contrôle de Flux",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
+print(d['z']) # 0 (créé automatiquement)`}]},{id:"control_flow",title:"2. Contrôle de Flux",subCategory:"Bases",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
 import random
 import datetime
 import os
@@ -700,7 +769,7 @@ statut = "Majeur" if age >= 18 else "Mineur"`},{id:"break_continue",title:"Break
         continue # Passe à l'itération suivante (saute 3)
     if i == 8:
         break # Arrête complètement la boucle
-    print(i)`}]},{id:"functions",title:"3. Fonctions",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message="Bonjour"):
+    print(i)`}]},{id:"functions",title:"3. Fonctions",subCategory:"Bases",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message="Bonjour"):
     """
     Affiche un message de salutation.
     message est un paramètre optionnel (valeur par défaut).
@@ -726,7 +795,7 @@ print(carre(5)) # 25
 
 # Souvent utilisé avec map() ou filter()
 nombres = [1, 2, 3, 4]
-pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`}]},{id:"data_structures",title:"4. Structures de Données",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
+pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`}]},{id:"data_structures",title:"4. Structures de Données",subCategory:"Bases",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
 
 # Ajout
 ma_liste.append(4) # [1, 2, 3, 4]
@@ -750,7 +819,7 @@ a = {1, 2, 3}
 b = {3, 4, 5}
 
 print(a.intersection(b)) # {3}
-print(a.union(b)) # {1, 2, 3, 4, 5}`}]},{id:"error_handling",title:"5. Gestion d'Erreurs",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
+print(a.union(b)) # {1, 2, 3, 4, 5}`}]},{id:"error_handling",title:"5. Gestion d'Erreurs",subCategory:"Bases",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
     resultat = 10 / 0
 except ZeroDivisionError:
     print("Erreur : Division par zéro impossible !")
@@ -759,7 +828,7 @@ except Exception as e:
 else:
     print("Tout s'est bien passé (si pas d'erreur)")
 finally:
-    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]}]},{id:"python_tips",title:"Python Tips",description:"Astuces et Bonnes Pratiques",categories:[{id:"string_formatting",title:"1. Formatage de Chaînes (f-strings)",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
+    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]},{id:"string_formatting",title:"6. Formatage de Chaînes (f-strings)",subCategory:"Astuces",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
 
 nom = "Alice"
 age = 30
@@ -779,7 +848,7 @@ print(f"Taux : {pourcentage:.1%}") # 12.3%
 
 # Debug facile (affiche nom_variable = valeur)
 x = 10
-print(f"{x=}") # x=10`}]},{id:"documentation",title:"2. Documentation",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
+print(f"{x=}") # x=10`}]},{id:"documentation",title:"7. Documentation",subCategory:"Astuces",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
     """
     Effectue un calcul complexe entre x et y.
 
@@ -793,7 +862,7 @@ print(f"{x=}") # x=10`}]},{id:"documentation",title:"2. Documentation",descripti
     return x * y + 10
 
 # Accéder à la doc
-help(calcul_complexe)`}]},{id:"pythonic_idioms",title:'3. Astuces "Pythoniques"',description:"Écrire du code plus élégant et concis.",snippets:[{id:"unpacking",title:"Unpacking (Déballage)",description:"Assigner plusieurs variables en une ligne.",code:`coords = (10, 20)
+help(calcul_complexe)`}]},{id:"pythonic_idioms",title:'8. Astuces "Pythoniques"',subCategory:"Astuces",description:"Écrire du code plus élégant et concis.",snippets:[{id:"unpacking",title:"Unpacking (Déballage)",description:"Assigner plusieurs variables en une ligne.",code:`coords = (10, 20)
 x, y = coords # x=10, y=20
 
 # Échanger deux variables sans variable temporaire
@@ -811,7 +880,7 @@ for i, fruit in enumerate(fruits):
 ages = [25, 30]
 
 for nom, age in zip(noms, ages):
-    print(f"{nom} a {age} ans")`}]},{id:"jupyter_magic",title:"4. Jupyter & Notebooks",description:"Magics commands pour gagner du temps.",snippets:[{id:"timeit",title:"Mesurer le temps (%timeit)",description:"Chronometrer une ligne de code.",code:`# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
+    print(f"{nom} a {age} ans")`}]},{id:"jupyter_magic",title:"9. Jupyter & Notebooks",subCategory:"Astuces",description:"Magics commands pour gagner du temps.",snippets:[{id:"timeit",title:"Mesurer le temps (%timeit)",description:"Chronometrer une ligne de code.",code:`# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
 %timeit [x**2 for x in range(1000)]
 
 # Pour une cellule entière :
@@ -820,45 +889,34 @@ for nom, age in zip(noms, ages):
 %autoreload 2
 
 import mon_module_perso
-# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]},{id:"environment",title:"5. Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]},{id:"arrays",title:"10. Tableaux (Arrays)",subCategory:"Calcul Numérique",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
 
-# 1. Créer l'environnement (dans le dossier du projet)
-python -m venv .venv
+# À partir d'une liste
+arr = np.array([1, 2, 3])
 
-# 2. Activer l'environnement
-# Windows :
-.venv\\Scripts\\activate
-# Mac/Linux :
-source .venv/bin/activate
+# Zéros et Uns
+zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
+ones = np.ones((2, 4))   # Matrice 2x4 de 1
 
-# 3. Installer des paquets
-pip install pandas
+# Séquences
+range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
+linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`},{id:"reshape",title:"Dimensions & Reshape",description:"Changer la forme des données.",code:`arr = np.arange(12) # [0..11]
 
-# 4. Sauvegarder les dépendances
-pip freeze > requirements.txt`}]},{id:"testing",title:"6. Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
+# Changer en matrice 3x4
+mat = arr.reshape(3, 4)
 
-def addition(a, b):
-    return a + b
+# Aplatir (Flatten)
+flat = mat.flatten()`}]},{id:"math_ops",title:"11. Opérations Mathématiques",subCategory:"Calcul Numérique",description:"Calculs vectorisés.",snippets:[{id:"basic_math",title:"Calculs de base",description:"Opérations élément par élément.",code:`a = np.array([1, 2, 3])
+b = np.array([10, 20, 30])
 
-def test_addition():
-    assert addition(2, 3) == 5
-    assert addition(-1, 1) == 0
+print(a + b) # [11, 22, 33]
+print(a * 2) # [2, 4, 6]
+print(a ** 2) # [1, 4, 9]`},{id:"stats_np",title:"Statistiques",description:"Moyenne, écart-type, etc.",code:`arr = np.array([1, 2, 3, 4, 5])
 
-# Lancer les tests dans le terminal :
-# pytest`}]},{id:"optimization",title:"7. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
-import numpy as np
-
-df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
-
-# ❌ LENT (Boucle for)
-# for i in range(len(df)):
-#     df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
-
-# ✅ RAPIDE (Vectorisation)
-df['c'] = df['a'] + df['b']
-
-# ✅ ENCORE PLUS RAPIDE (Numpy)
-df['c'] = df['a'].values + df['b'].values`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 **Pourquoi Polars est plus rapide ?**
+print(np.mean(arr))  # Moyenne
+print(np.std(arr))   # Écart-type
+print(np.median(arr)) # Médiane
+print(np.max(arr))    # Maximum`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 **Pourquoi Polars est plus rapide ?**
 
 1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
 2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
@@ -1050,103 +1108,95 @@ agg = Aggregator(
     cols_to_summarize=['montant', 'date']
 )
 
-df_resumed = agg.fit_transform(df_commandes)`}]},{id:"skrub_cheat",title:"Récapitulatif",description:"Les fonctions clés de Skrub.",snippets:[{id:"skrub_cheat_sheet",title:"Cheat Sheet",description:"Tableau récapitulatif des fonctions.",markdown:'### 🛠️ Fonctions Clés de Skrub\n\n| Fonction | Usage Principal | Réel Avantage 🚀 | Scikit-Learn Equivalent |\n| :--- | :--- | :--- | :--- |\n| `TableReport` | Audit rapide (HTML) | **Vision immédiate** des problèmes (types, manques). | `df.describe()` |\n| `TableVectorizer` | Preprocessing Auto | **Gère tout** (dates, catégories, nombres) sans config. | `ColumnTransformer` |\n| `MinHashEncoder` | Catégories sales | **Tolère les fautes** de frappe et variantes. | `OneHotEncoder` |\n| `GapEncoder` | Topics (Texte court) | **Interprétable** (donne les mots-clés des sujets). | `NMF` |\n| `Joiner` | Jointure floue | **Joint sans clé exacte** (ex: "Apple" = "Apple Inc"). | - |\n| `Aggregator` | Agrégation relationnelle | **Crée des features** auto depuis une table liée. | `groupby()` |\n'}]}]},{id:"numpy",title:"Numpy",description:"Calcul Numérique & Matriciel",categories:[{id:"arrays",title:"Tableaux (Arrays)",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
+df_resumed = agg.fit_transform(df_commandes)`}]},{id:"skrub_cheat",title:"Récapitulatif",description:"Les fonctions clés de Skrub.",snippets:[{id:"skrub_cheat_sheet",title:"Cheat Sheet",description:"Tableau récapitulatif des fonctions.",markdown:'### 🛠️ Fonctions Clés de Skrub\n\n| Fonction | Usage Principal | Réel Avantage 🚀 | Scikit-Learn Equivalent |\n| :--- | :--- | :--- | :--- |\n| `TableReport` | Audit rapide (HTML) | **Vision immédiate** des problèmes (types, manques). | `df.describe()` |\n| `TableVectorizer` | Preprocessing Auto | **Gère tout** (dates, catégories, nombres) sans config. | `ColumnTransformer` |\n| `MinHashEncoder` | Catégories sales | **Tolère les fautes** de frappe et variantes. | `OneHotEncoder` |\n| `GapEncoder` | Topics (Texte court) | **Interprétable** (donne les mots-clés des sujets). | `NMF` |\n| `Joiner` | Jointure floue | **Joint sans clé exacte** (ex: "Apple" = "Apple Inc"). | - |\n| `Aggregator` | Agrégation relationnelle | **Crée des features** auto depuis une table liée. | `groupby()` |\n'}]}]},{id:"engineering",title:"Engineering & Web",description:"Production, APIs et Qualité de Code.",categories:[{id:"environment",title:"1. Environnement Virtuel",description:"Isoler ses projets (Indispensable !)",snippets:[{id:"venv",title:"Venv (Standard)",description:"Créer et activer un environnement virtuel.",code:`import pytest
 
-# À partir d'une liste
-arr = np.array([1, 2, 3])
+# 1. Créer l'environnement (dans le dossier du projet)
+python -m venv .venv
 
-# Zéros et Uns
-zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
-ones = np.ones((2, 4))   # Matrice 2x4 de 1
+# 2. Activer l'environnement
+# Windows :
+.venv\\Scripts\\activate
+# Mac/Linux :
+source .venv/bin/activate
 
-# Séquences
-range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
-linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`},{id:"reshape",title:"Dimensions & Reshape",description:"Changer la forme des données.",code:`arr = np.arange(12) # [0..11]
+# 3. Installer des paquets
+pip install pandas
 
-# Changer en matrice 3x4
-mat = arr.reshape(3, 4)
+# 4. Sauvegarder les dépendances
+pip freeze > requirements.txt`}]},{id:"testing",title:"2. Tests Unitaires (Pytest)",description:"Vérifier que le code fait ce qu'il doit faire.",snippets:[{id:"pytest_basic",title:"Premier Test avec Pytest",description:"Simple, lisible et puissant.",code:`# fichier: test_calcul.py
 
-# Aplatir (Flatten)
-flat = mat.flatten()`}]},{id:"math_ops",title:"Opérations Mathématiques",description:"Calculs vectorisés.",snippets:[{id:"basic_math",title:"Calculs de base",description:"Opérations élément par élément.",code:`a = np.array([1, 2, 3])
-b = np.array([10, 20, 30])
+def addition(a, b):
+    return a + b
 
-print(a + b) # [11, 22, 33]
-print(a * 2) # [2, 4, 6]
-print(a ** 2) # [1, 4, 9]`},{id:"stats_np",title:"Statistiques",description:"Moyenne, écart-type, etc.",code:`arr = np.array([1, 2, 3, 4, 5])
+def test_addition():
+    assert addition(2, 3) == 5
+    assert addition(-1, 1) == 0
 
-print(np.mean(arr))  # Moyenne
-print(np.std(arr))   # Écart-type
-print(np.median(arr)) # Médiane
-print(np.max(arr))    # Maximum`}]}]},{id:"statsmodels",title:"Statsmodels",description:"Modélisation Statistique",categories:[{id:"regression_sm",title:"Régression (OLS)",description:"Moindres Carrés Ordinaires.",snippets:[{id:"ols_formula",title:"OLS (Formule)",description:"Syntaxe style R (plus simple).",code:`import statsmodels.api as sm
-import statsmodels.formula.api as smf
+# Lancer les tests dans le terminal :
+# pytest`}]},{id:"optimization",title:"3. Optimisation & Performance",description:"Écrire du code rapide.",snippets:[{id:"vectorization",title:"Vectorisation vs Boucles",description:"Pourquoi il ne faut JAMAIS boucler sur un DataFrame.",code:`import pandas as pd
+import numpy as np
 
-# Fit du modèle (y ~ x1 + x2)
-model = smf.ols('ventes ~ pub_tv + pub_radio', data=df).fit()
+df = pd.DataFrame({'a': range(1000000), 'b': range(1000000)})
 
-# Résumé complet (R-squared, p-values...)
-print(model.summary())`},{id:"ols_arrays",title:"OLS (Arrays)",description:"Avec X et y (comme Scikit-Learn).",code:`# Il faut ajouter une constante (intercept) manuellement !
-X = sm.add_constant(X)
+# ❌ LENT (Boucle for)
+# for i in range(len(df)):
+#     df.loc[i, 'c'] = df.loc[i, 'a'] + df.loc[i, 'b']
 
-model = sm.OLS(y, X).fit()
-print(model.summary())`}]}]},{id:"tensorflow",title:"TensorFlow & Deep Learning",description:"Réseaux de neurones profonds (Deep Learning).",categories:[{id:"tf_concepts",title:"1. Concepts & Tenseurs",description:"Comprendre les bases avant de coder.",snippets:[{id:"dl_intro",title:"Deep Learning vs ML Classique",description:"Quand utiliser le Deep Learning ?",markdown:`🧠 **Deep Learning (Réseaux de Neurones)**
-Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
+# ✅ RAPIDE (Vectorisation)
+df['c'] = df['a'] + df['b']
 
-**Le concept clé :**
-Le réseau apprend ses propres "features" (caractéristiques) couche par couche, du plus simple au plus abstrait.`},{id:"tensors",title:"Les Tenseurs",description:"La brique de base de TensorFlow.",markdown:`📦 **Qu'est-ce qu'un Tenseur ?**
-C'est une généralisation des matrices à N dimensions.
-*   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
-*   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
-*   **Matrice** (2D) : Un tableau (ex: une image noir & blanc)
-*   **Tenseur 3D** : Un cube (ex: une image couleur RGB)
-*   **Tenseur 4D** : Un lot d'images (Batch)
+# ✅ ENCORE PLUS RAPIDE (Numpy)
+df['c'] = df['a'].values + df['b'].values`}]},{id:"api_web",title:"4. APIs & Web",description:"Interagir avec le web (Requests, FastAPI).",snippets:[{id:"requests_get",title:"Requêtes HTTP (Requests)",description:"Récupérer des données depuis une API.",code:`import requests
 
-En TensorFlow, les données circulent sous forme de tenseurs entre les couches du réseau.`}]},{id:"keras_workflow",title:"2. Workflow Keras",description:"Construire un modèle étape par étape.",snippets:[{id:"sequential",title:"L'Architecture (Sequential)",description:"Empiler des couches comme des Lego.",code:`import tensorflow as tf
-from tensorflow.keras import layers, models
+# Faire une requête GET
+response = requests.get('https://api.github.com/users/octocat')
 
-# Création d'un modèle vide
-model = models.Sequential()
+# Vérifier le statut (200 = OK)
+if response.status_code == 200:
+    data = response.json() # Convertir la réponse JSON en dictionnaire Python
+    print(f"User: {data['login']}")
+    print(f"Bio: {data['bio']}")
+else:
+    print("Erreur lors de la requête")`},{id:"beautifulsoup",title:"Web Scraping (BeautifulSoup)",description:"Extraire des données d'une page HTML.",code:`from bs4 import BeautifulSoup
+import requests
 
-# Ajout de couches (Layers)
-# Dense = Couche entièrement connectée (chaque neurone est relié à tous les précédents)
-model.add(layers.Dense(64, activation='relu', input_shape=(10,))) # 10 features en entrée
-model.add(layers.Dense(32, activation='relu'))
-model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une régression)`},{id:"activation",title:"Fonctions d'Activation",description:"Donner de la non-linéarité au modèle.",markdown:"⚡ **Pourquoi une fonction d'activation ?**\nSans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.\n\n*   **ReLU** (`relu`) : La plus utilisée dans les couches cachées. Rapide et efficace.\n*   **Sigmoid** (`sigmoid`) : Pour la sortie d'une classification binaire (0 ou 1).\n*   **Softmax** (`softmax`) : Pour la sortie d'une classification multi-classes (probabilités).\n*   **Linear** (`linear`) : Pour la sortie d'une régression (valeur continue)."},{id:"compile",title:"Compilation",description:"Définir comment le modèle apprend.",code:`model.compile(
-    optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
-    loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
-    metrics=['mae']        # Métriques à suivre (Mean Absolute Error)
-)`}]},{id:"training",title:"3. Entraînement",description:"Lancer l'apprentissage (Fit).",snippets:[{id:"fit",title:"Entraîner le modèle (Fit)",description:"Epochs et Batch Size.",code:`history = model.fit(
-    X_train, y_train,
-    epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
-    batch_size=32,         # Nombre d'exemples traités avant de mettre à jour les poids
-    validation_split=0.2,  # 20% des données gardées pour valider pendant l'entraînement
-    verbose=1
-)`},{id:"overfitting",title:"Éviter le Sur-apprentissage",description:"Early Stopping et Dropout.",code:`from tensorflow.keras.callbacks import EarlyStopping
+html = "<html><body><h1>Titre</h1><p>Paragraphe</p></body></html>"
+soup = BeautifulSoup(html, 'html.parser')
 
-# Arrêter si la validation ne s'améliore plus après 5 epochs
-early_stop = EarlyStopping(monitor='val_loss', patience=5)
+# Extraire le texte du h1
+titre = soup.h1.text
+print(titre) # Titre
 
-model.fit(
-    X_train, y_train,
-    epochs=100,
-    callbacks=[early_stop]
-)`}]},{id:"tf_example",title:"4. Exemple Complet",description:"Régression de bout en bout.",snippets:[{id:"full_regression",title:"Régression (Prix Immo)",description:"Prédire une valeur continue.",code:`import tensorflow as tf
-from tensorflow.keras import layers, models
+# Trouver tous les liens
+# links = soup.find_all('a')`},{id:"fastapi_basic",title:"API avec FastAPI",description:"Créer une API moderne et rapide.",code:`from fastapi import FastAPI
 
-# 1. Architecture
-model = models.Sequential([
-    layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
-    layers.Dense(32, activation='relu'),
-    layers.Dense(1) # Pas d'activation pour une régression (ou linear)
-])
+app = FastAPI()
 
-# 2. Compilation
-model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
-# 3. Entraînement
-history = model.fit(X_train, y_train, epochs=50, validation_split=0.2)
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
 
-# 4. Prédiction
-predictions = model.predict(X_test)`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+# Lancer le serveur :
+# uvicorn main:app --reload`}]},{id:"data_quality",title:"5. Qualité des Données (Pydantic)",description:"Validation de données robuste.",snippets:[{id:"pydantic_model",title:"Modèle Pydantic",description:"Définir et valider la structure des données.",code:`from pydantic import BaseModel, ValidationError
+from typing import Optional
+
+# Définition du schéma
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    age: Optional[int] = None # Champ optionnel
+
+# Validation automatique
+try:
+    user = User(id=1, name="Alice", email="alice@example.com", age="30")
+    print(user) # age est automatiquement converti en int !
+except ValidationError as e:
+    print(e)`}]}]}]},wL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
