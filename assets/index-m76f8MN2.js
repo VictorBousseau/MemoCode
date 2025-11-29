@@ -1457,7 +1457,7 @@ Comment analyser par **Date de Déclaration** sans dupliquer la table Temps ?`},
 CALCULATE(
     [Montant Sinistres],
     USERELATIONSHIP('Sinistres'[DateDeclaration], 'Temps'[Date])
-)`}]},{id:"best_practices",title:"4. Bonnes Pratiques",description:"Optimiser et sécuriser son code DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
+)`}]},{id:"tips_practices",title:"9. Tips & Bonnes Pratiques",description:"Le best-of pour briller en DAX.",snippets:[{id:"measure_branching",title:"Utiliser des Mesures Explicites",description:"Ne jamais réécrire une agrégation dans CALCULATE.",markdown:`💡 **La Règle d'Or : Measure Branching**
 
 Il ne faut jamais écrire l'agrégation directement dans un \`CALCULATE\`.
 Créez d'abord une mesure de base, puis réutilisez-la.
@@ -1507,7 +1507,7 @@ CALCULATE(
         VALUES('Grosses Ventes'[Region]), 
         'Grosses Ventes'[Region] = "Europe"
     )
-)`}]},{id:"visual_tips",title:"5. Tips Visuels & UX",description:"Astuces pour des rapports dynamiques.",snippets:[{id:"dynamic_format",title:"Formatage Dynamique",description:"Changer le format selon la valeur.",markdown:"💡 **Format Strings**\nVous pouvez utiliser la fonction `FORMAT` pour convertir un nombre en texte formaté.\nUtile pour des cartes (KPIs) ou des titres, mais attention : le résultat est du **TEXTE** (ne peut pas être mis sur un axe Y).",code:`Label KPI = 
+)`},{id:"dynamic_format",title:"Formatage Dynamique",description:"Changer le format selon la valeur.",markdown:"💡 **Format Strings**\nVous pouvez utiliser la fonction `FORMAT` pour convertir un nombre en texte formaté.\nUtile pour des cartes (KPIs) ou des titres, mais attention : le résultat est du **TEXTE** (ne peut pas être mis sur un axe Y).",code:`Label KPI = 
 VAR _Val = [Mon KPI]
 RETURN
     SWITCH(TRUE(),
