@@ -1665,16 +1665,26 @@ df_stats = df.groupBy("departement").agg(
     sum("bonus").alias("total_bonus")
 )
 
-df_stats.show()`}]},{id:"joins",title:"7. Jointures (Joins)",description:"Fusionner des DataFrames.",snippets:[{id:"joins_basics",title:"Les Jointures",description:"Inner, Left, Right, Full.",code:`# Syntaxe : df1.join(df2, on, how)
+df_stats.show()`}]},{id:"joins",title:"7. Jointures (Joins)",description:"Fusionner des DataFrames.",snippets:[{id:"joins_basics",title:"Les Jointures",description:"Inner, Left, Right, Full et Multi-clés.",code:`# Syntaxe : df1.join(df2, on, how)
 
-# Jointure simple (si la colonne de jointure a le même nom)
+# 1. Jointure simple (même nom de colonne)
 df_result = df_users.join(df_orders, "user_id", "inner")
 
-# Jointure avec condition explicite (si noms différents)
+# 2. Jointure avec noms différents
 df_result = df_users.join(
     df_orders, 
     df_users.id == df_orders.customer_id, 
     "left"
+)
+
+# 3. Jointure complexe (Plusieurs clés + Condition)
+# On joint sur 'id' ET 'date', en filtrant ceux qui ont un montant > 100
+df_complex = df_a.join(
+    df_b,
+    (df_a.id == df_b.id) & 
+    (df_a.date == df_b.date) & 
+    (df_b.montant > 100),
+    "inner"
 )
 
 # Types courants : "inner", "left", "right", "outer", "cross"`}]},{id:"sql_interaction",title:"8. SQL & Views",description:"Utiliser le SQL standard sur les DataFrames.",snippets:[{id:"spark_sql",title:"Utiliser SQL",description:"Interroger les DataFrames avec SQL.",code:`# 1. Créer une vue temporaire (référence le DataFrame)
