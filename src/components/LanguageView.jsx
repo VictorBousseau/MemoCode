@@ -14,8 +14,11 @@ const themeIcons = {
     snippets_utiles: Code,
     numpy: Binary,
     statsmodels: TrendingUp,
+    statsmodels: TrendingUp,
     streamlit: Layout,
-    dax_mastery: BarChart // Reusing BarChart or finding a better one
+    dax_mastery: BarChart,
+    power_query_ui: Layout,
+    m_language: Code
 };
 
 export default function LanguageView({ content, searchQuery }) {
@@ -35,7 +38,9 @@ export default function LanguageView({ content, searchQuery }) {
     } else if (content.themes.some(t => t.id === 'git_basics')) {
         language = 'bash';
     } else if (content.themes.some(t => t.id === 'dax_basics' || t.id === 'dax_mastery')) {
-        language = 'dax'; // Prism supports 'dax'
+        language = 'dax';
+    } else if (content.themes.some(t => t.id === 'power_query_ui')) {
+        language = 'powerquery';
     } else if (content.themes.some(t => t.id === 'r_basics')) {
         language = 'r';
     }

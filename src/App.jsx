@@ -8,13 +8,17 @@ import { pysparkContent } from './data/pysparkContent';
 import { daxContent } from './data/daxContent';
 import { rContent } from './data/rContent';
 import { examplesContent } from './data/examplesContent';
+import { mContent } from './data/mContent';
+import Overview from './components/Overview';
 
 export default function App() {
-  const [selectedLanguage, setSelectedLanguage] = useState('Python');
+  const [selectedLanguage, setSelectedLanguage] = useState('Overview');
   const [searchQuery, setSearchQuery] = useState('');
 
   const getContent = () => {
     switch (selectedLanguage) {
+      case 'Overview':
+        return null; // Special case handled in render
       case 'Python':
         return pythonContent;
       case 'SQL':
@@ -25,6 +29,8 @@ export default function App() {
         return pysparkContent;
       case 'DAX':
         return daxContent;
+      case 'Power Query (M)':
+        return mContent;
       case 'R':
         return rContent;
       case 'Exemples':
@@ -41,7 +47,11 @@ export default function App() {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     >
-      <LanguageView content={getContent()} searchQuery={searchQuery} />
+      {selectedLanguage === 'Overview' ? (
+        <Overview onNavigate={setSelectedLanguage} />
+      ) : (
+        <LanguageView content={getContent()} searchQuery={searchQuery} />
+      )}
     </Layout>
   );
 }

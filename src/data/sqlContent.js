@@ -413,6 +413,34 @@ Avec un index, elle va à la fin, trouve "H", et va directement à la page.
 Sur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: \`user_id\`, \`email\`, \`created_at\`).`
                         }
                     ]
+                },
+                {
+                    id: 'pivot_unpivot',
+                    title: '4. Pivot & Unpivot',
+                    description: 'Changer la forme des données.',
+                    snippets: [
+                        {
+                            id: 'sql_pivot',
+                            title: 'Pivot (Lignes -> Colonnes)',
+                            description: 'Créer un tableau croisé avec CASE WHEN.',
+                            code: `-- Objectif : Une colonne par année
+SELECT 
+    product_id,
+    SUM(CASE WHEN year = 2022 THEN amount ELSE 0 END) as sales_2022,
+    SUM(CASE WHEN year = 2023 THEN amount ELSE 0 END) as sales_2023
+FROM sales
+GROUP BY product_id;`
+                        },
+                        {
+                            id: 'sql_unpivot',
+                            title: 'Unpivot (Colonnes -> Lignes)',
+                            description: 'Aplatir un tableau avec UNION ALL.',
+                            code: `-- Objectif : Transformer sales_2022 et sales_2023 en une colonne 'year'
+SELECT product_id, 2022 as year, sales_2022 as amount FROM sales
+UNION ALL
+SELECT product_id, 2023 as year, sales_2023 as amount FROM sales;`
+                        }
+                    ]
                 }
             ]
         }

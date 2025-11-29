@@ -181,6 +181,88 @@ git pull origin main
                         }
                     ]
                 }
+            ],
+        },
+        {
+            id: 'git_advanced',
+            title: 'Git Avancé',
+            description: 'Pour un historique propre et maîtrisé.',
+            categories: [
+                {
+                    id: 'clean_history',
+                    title: '1. Historique Propre',
+                    description: 'Rebase et Cherry-pick.',
+                    snippets: [
+                        {
+                            id: 'rebase_vs_merge',
+                            title: 'Rebase vs Merge',
+                            description: 'Garder un historique linéaire.',
+                            markdown: `### 🌿 Merge vs Rebase
+**Merge** : Crée un commit de fusion ("Merge branch..."). Préserve la réalité historique mais peut polluer le graphe.
+**Rebase** : Réécrit l'histoire. Place vos commits **à la suite** de la branche cible.
+
+\`\`\`bash
+# Se placer sur sa branche
+git checkout ma-feature
+
+# Rebaser sur main (Mettre mes changements APRES ceux de main)
+git rebase main
+\`\`\`
+⚠️ **Règle d'or** : Ne jamais rebaser une branche partagée (déjà pushée) !`
+                        },
+                        {
+                            id: 'cherry_pick',
+                            title: 'Cherry-Pick',
+                            description: 'Picorer un commit spécifique.',
+                            code: `# Vous voulez juste le commit "Fix bug" de la branche "dev" sur votre branche "main"
+# sans tout fusionner.
+
+git cherry-pick <hash_du_commit>`
+                        }
+                    ]
+                },
+                {
+                    id: 'ignoring',
+                    title: '2. Ignorer des fichiers (.gitignore)',
+                    description: 'Ne polluez pas votre dépôt !',
+                    snippets: [
+                        {
+                            id: 'gitignore_guide',
+                            title: 'Guide : Créer son .gitignore',
+                            description: 'Pas à pas pour exclure les fichiers indésirables.',
+                            markdown: `### 📝 La Procédure
+1.  Créez un fichier nommé exactement \`.gitignore\` à la racine du projet.
+2.  Listez les fichiers/dossiers à ignorer (un par ligne).
+
+### ⚠️ Le Piège Classique
+Si un fichier a **déjà été commité** (suivi par Git), l'ajouter au .gitignore ne suffit pas ! Il continuera d'être suivi.
+Il faut le retirer de l'index Git (sans le supprimer de votre disque) :
+\`\`\`bash
+git rm --cached mon_fichier_secret.json
+git commit -m "Stop tracking secret file"
+\`\`\``,
+                            code: `# Exemple de contenu .gitignore standard Python :
+
+# 1. Fichiers Système (Inutiles pour les autres)
+.DS_Store
+Thumbs.db
+
+# 2. Environnements Virtuels (Lourds, on les recrée)
+.venv/
+env/
+__pycache__/
+
+# 3. Secrets & Config Locale (DANGER !)
+.env
+config_local.json
+secrets.yaml
+
+# 4. Dossiers de Build/Dist
+dist/
+build/`
+                        }
+                    ]
+                }
             ]
         },
         {

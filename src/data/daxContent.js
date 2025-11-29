@@ -342,7 +342,21 @@ Le chemin (\`PATH\`) calculé pour le Manager (12) est donc : \`"1|5|12"\`.
 | :--- | :--- | :--- | :--- |
 | **1** | \`PATHITEM(Path, 1)\` | **1** | CEO |
 | **2** | \`PATHITEM(Path, 2)\` | **5** | Directeur |
-| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |`,
+| **3** | \`PATHITEM(Path, 3)\` | **12** | Manager |
+ 
+### 🎯 À quoi ça sert ?
+Une fois ces colonnes calculées (\`Niveau 1\`, \`Niveau 2\`...), vous pouvez :
+1.  **Créer une Matrice** : Mettez *Niveau 1*, *Niveau 2*, *Niveau 3* en lignes pour permettre le "Drill Down".
+2.  **Filtrer toute une branche** :
+    \`\`\`dax
+    -- Calculer les ventes de toute l'équipe du Directeur 5
+    Ventes Equipe Directeur = 
+    CALCULATE(
+        [Total Ventes],
+        'Employés'[Niveau 2] = "5" 
+        -- Filtre automatiquement le Directeur 5 ET ses Managers (12...)
+    )
+    \`\`\``,
                             code: `Niveau 1 (CEO) = PATHITEM([Chemin Complet], 1)
 Niveau 2 (Directeur) = PATHITEM([Chemin Complet], 2)
 Niveau 3 (Manager) = PATHITEM([Chemin Complet], 3)`
@@ -493,6 +507,44 @@ Créez une mesure pour le titre, puis dans le visuel > Général > Titre > (fx) 
                             code: `Titre Dynamique = 
 "Analyse des Ventes : " & 
 SELECTEDVALUE('Geo'[Pays], "Monde Entier")`
+                        }
+                    ]
+                },
+                {
+                    id: 'dynamic_features',
+                    title: '5. Fonctionnalités Dynamiques (Expert)',
+                    description: 'Calculation Groups & Field Parameters.',
+                    snippets: [
+                        {
+                            id: 'calculation_groups',
+                            title: 'Calculation Groups',
+                            description: 'Changer la logique de calcul dynamiquement (YTD, MTD...).',
+                            markdown: `🚀 **La Révolution des Calculation Groups**
+Au lieu de créer 3 mesures pour chaque KPI (\`Ventes\`, \`Ventes YTD\`, \`Ventes YoY\`), vous créez un **Groupe de Calcul**.
+
+**Exemple d'Item de Calcul (YTD) :**
+\`\`\`dax
+CALCULATE(
+    SELECTEDMEASURE(), -- Remplace la mesure utilisée dans le visuel
+    DATESYTD('Temps'[Date])
+)
+\`\`\`
+Ensuite, l'utilisateur choisit "YTD" dans un segment, et **toutes** les mesures du graphique passent en YTD.`
+                        },
+                        {
+                            id: 'field_parameters',
+                            title: 'Field Parameters',
+                            description: 'Laisser l\'utilisateur choisir l\'axe ou la mesure.',
+                            markdown: `🎛️ **Paramètres de Champs**
+Permet de changer dynamiquement les axes ou les légendes d'un graphique.
+
+**Comment faire :**
+1. Onglet **Modélisation** > **Nouveau paramètre** > **Champs**.
+2. Sélectionnez les champs (ex: Pays, Produit, Segment).
+3. Cela crée une table spéciale.
+4. Mettez cette colonne dans l'axe X de votre graphique.
+
+L'utilisateur peut maintenant cliquer sur "Pays" ou "Produit" pour changer l'analyse instantanément.`
                         }
                     ]
                 }

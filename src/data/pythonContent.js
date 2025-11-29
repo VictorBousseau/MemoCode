@@ -2199,6 +2199,108 @@ def test_addition():
 
 # Lancer les tests dans le terminal :
 # pytest`
+                        },
+                        {
+                            id: 'pytest_fixtures',
+                            title: 'Fixtures (Setup/Teardown)',
+                            description: 'Préparer des données avant chaque test.',
+                            code: `import pytest
+
+@pytest.fixture
+def sample_data():
+    # Setup : Ce code s'exécute avant le test
+    data = {"id": 1, "name": "Test"}
+    return data
+
+def test_data_name(sample_data):
+    # Le test reçoit le résultat de la fixture
+    assert sample_data["name"] == "Test"`
+                        },
+                        {
+                            id: 'pytest_parametrize',
+                            title: 'Parametrize (Le Super-Pouvoir)',
+                            description: 'Tester 10 cas sans copier-coller 10 fois le code.',
+                            markdown: `### 💡 Pourquoi Parametrize ?
+Sans parametrize, pour tester une fonction qui classe les âges, vous feriez :
+\`\`\`python
+def test_enfant(): assert classer_age(10) == "Enfant"
+def test_adulte(): assert classer_age(30) == "Adulte"
+def test_senior(): assert classer_age(70) == "Senior"
+\`\`\`
+C'est répétitif et difficile à maintenir. Avec \`@pytest.mark.parametrize\`, vous définissez une **liste de cas** et Pytest génère les tests pour vous.`,
+                            code: `import pytest
+
+def classer_age(age):
+    if age < 18: return "Enfant"
+    elif age < 65: return "Adulte"
+    else: return "Senior"
+
+# On définit nos cas de test : (Entrée, Sortie Attendue)
+@pytest.mark.parametrize("age_input, expected_label", [
+    (10, "Enfant"),  # Cas 1
+    (30, "Adulte"),  # Cas 2
+    (70, "Senior"),  # Cas 3
+    (17, "Enfant"),  # Cas Limite
+    (18, "Adulte"),  # Cas Limite
+])
+def test_classer_age(age_input, expected_label):
+    # Ce test sera lancé 5 fois avec des valeurs différentes
+    assert classer_age(age_input) == expected_label`
+                        }
+                    ]
+                },
+                {
+                    id: 'logging',
+                    title: '3. Logging (vs Print)',
+                    description: 'Pourquoi Print est dangereux en production.',
+                    snippets: [
+                        {
+                            id: 'logging_vs_print',
+                            title: 'Avant/Après : Print vs Log',
+                            description: 'Comparaison directe.',
+                            markdown: `### ❌ AVANT (Print)
+\`\`\`python
+print("Début du traitement") 
+# Problème : On ne sait pas QUAND ça s'est passé, ni si c'est grave.
+# Si le script tourne la nuit, ce message est perdu dans la console.
+\`\`\`
+
+### ✅ APRÈS (Logging)
+\`\`\`python
+logging.info("Début du traitement")
+# Résultat dans le fichier : "2023-10-27 14:00:01 - INFO - Début du traitement"
+# Avantages :
+# 1. Horodatage automatique (Timestamp)
+# 2. Niveau de gravité (INFO, ERROR...)
+# 3. Persistance (écrit dans un fichier)
+\`\`\``
+                        },
+                        {
+                            id: 'logging_practice',
+                            title: 'Mise en place Complète',
+                            description: 'Le code prêt à l\'emploi.',
+                            code: `import logging
+
+# 1. Configuration (À faire une seule fois au début)
+logging.basicConfig(
+    filename='mon_app.log',       # Fichier de sortie
+    level=logging.INFO,           # Niveau minimum (DEBUG < INFO < WARNING < ERROR)
+    format='%(asctime)s - %(levelname)s - %(message)s' # Format : Date - Niveau - Message
+)
+
+def division(a, b):
+    logging.info(f"Tentative de division : {a} / {b}")
+    try:
+        result = a / b
+        logging.info(f"Succès : {result}")
+        return result
+    except ZeroDivisionError:
+        logging.error("Erreur : Division par zéro détectée !")
+        return None
+
+# Test
+division(10, 2) # Écrira INFO dans le fichier
+division(5, 0)  # Écrira ERROR dans le fichier`
                         }
                     ]
                 },
@@ -2235,46 +2337,26 @@ df['c'] = df['a'].values + df['b'].values`
                     description: 'Interagir avec le web (Requests, FastAPI).',
                     snippets: [
                         {
-                            id: 'requests_advanced',
-                            title: 'Requêtes HTTP Avancées',
-                            description: 'Headers, Paramètres et Gestion d\'erreurs.',
+                            id: 'requests_session',
+                            title: 'Requests Session (Le Navigateur)',
+                            description: 'Garder la connexion et les cookies.',
+                            markdown: `### 🧠 L'Analogie du Navigateur
+*   **Requests.get()** simple : C'est comme ouvrir une fenêtre de **Navigation Privée**, aller sur un site, et fermer la fenêtre immédiatement. Vous perdez tout (cookies, connexion).
+*   **Session()** : C'est comme ouvrir **Chrome**. Vous vous connectez une fois, et le navigateur retient qui vous êtes pour les pages suivantes.`,
                             code: `import requests
 
-url = "https://api.github.com/search/repositories"
-
-# 1. Paramètres (Query String)
-# ?q=python&sort=stars
-params = {
-    "q": "python",
-    "sort": "stars",
-    "per_page": 5
-}
-
-# 2. Headers (User-Agent, Auth...)
-headers = {
-    "User-Agent": "MonApp/1.0",
-    "Accept": "application/vnd.github.v3+json"
-}
-
-try:
-    response = requests.get(url, params=params, headers=headers, timeout=5)
+# Création de la session (Ouverture du navigateur)
+with requests.Session() as s:
+    # 1. Configuration Commune (ex: Token d'authentification)
+    # Ces headers seront envoyés pour TOUTES les requêtes de la session
+    s.headers.update({'Authorization': 'Bearer MON_SUPER_TOKEN'})
     
-    # 3. Vérification automatique des erreurs (4xx, 5xx)
-    response.raise_for_status() 
+    # 2. Premier appel (ex: Login ou Récupération profil)
+    # La connexion TCP est ouverte et gardée au chaud (Keep-Alive)
+    r1 = s.get('https://api.example.com/me')
     
-    data = response.json()
-    print(f"Top repo: {data['items'][0]['name']}")
-    
-except requests.exceptions.HTTPError as err:
-    print(f"Erreur HTTP: {err}")
-except requests.exceptions.Timeout:
-    print("Le serveur a mis trop de temps à répondre.")`
-                        },
-                        {
-                            id: 'beautifulsoup_complex',
-                            title: 'Web Scraping (BeautifulSoup)',
-                            description: 'Exemple concret : Liste de produits.',
-                            code: `from bs4 import BeautifulSoup
+    # 3. Deuxième appel
+    # Plus rapide car on réutilise la même connexion !
 
 # Simulation d'une page HTML de e-commerce
 html_doc = """
@@ -2365,41 +2447,45 @@ class User(BaseModel):
 \`\`\``
                         },
                         {
-                            id: 'pydantic_config',
-                            title: 'Cas Réel : Configuration',
-                            description: 'Valider une config imbriquée (Nested).',
-                            code: `from pydantic import BaseModel, Field, HttpUrl, EmailStr
-from typing import List, Optional
+                            id: 'pydantic_io',
+                            title: 'Entrée / Sortie (La Douane)',
+                            description: 'Nettoyage automatique des données sales.',
+                            markdown: `### 🧼 Le Concept
+Pydantic agit comme un **douanier** à l'entrée de votre code.
+1.  **Entrée** : Données en vrac (JSON, API, Excel) souvent mal typées (tout est string).
+2.  **Traitement** : Pydantic valide ET convertit (Cast).
+3.  **Sortie** : Un objet Python propre et typé.`,
+                            code: `from pydantic import BaseModel, EmailStr, ValidationError
 
-# 1. Sous-modèle
-class DatabaseConfig(BaseModel):
-    host: str = "localhost"
-    port: int = Field(5432, ge=1024, le=65535) # Validation : port entre 1024 et 65535
-    password: str
+# 1. Le Modèle (Le Douanier)
+class User(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    is_active: bool = True # Valeur par défaut
 
-# 2. Modèle Principal
-class AppConfig(BaseModel):
-    app_name: str
-    admin_email: EmailStr # Vérifie le format email
-    db: DatabaseConfig    # Imbrication
-    allowed_origins: List[HttpUrl] # Liste d'URLs valides
-    debug: bool = False
-
-# Données brutes (ex: fichier JSON ou YAML)
-raw_data = {
-    "app_name": "MonApp",
-    "admin_email": "admin@example.com",
-    "db": {
-        "password": "secret_password",
-        "port": 5432 
-    },
-    "allowed_origins": ["https://google.com"]
+# 2. Données "Sales" (Entrée)
+# Notez : 'id' est un str, 'is_active' est manquant
+input_data = {
+    "id": "123", 
+    "name": "Alice",
+    "email": "alice@example.com"
 }
 
-# Parsing & Validation
-config = AppConfig(**raw_data)
-print(config.db.host) # "localhost" (valeur par défaut)
-print(config.admin_email) # "admin@example.com"`
+try:
+    # 3. Nettoyage & Validation
+    user = User(**input_data)
+    
+    # 4. Données Propres (Sortie)
+    print(f"ID (int): {user.id} - Type: {type(user.id)}") 
+    # -> ID (int): 123 - Type: <class 'int'>
+    
+    print(user.model_dump())
+    # -> {'id': 123, 'name': 'Alice', 'email': 'alice@example.com', 'is_active': True}
+
+except ValidationError as e:
+    print("Douane : Données refusées !")
+    print(e)`
                         }
                     ]
                 }

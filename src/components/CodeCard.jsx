@@ -44,8 +44,8 @@ export default function CodeCard({ snippet, language = 'python' }) {
                 </div>
             )}
 
-            {snippet.markdown ? (
-                <div className="p-6 text-zinc-300 overflow-x-auto">
+            {snippet.markdown && (
+                <div className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0">
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
@@ -77,7 +77,9 @@ export default function CodeCard({ snippet, language = 'python' }) {
                         {snippet.markdown}
                     </ReactMarkdown>
                 </div>
-            ) : (
+            )}
+
+            {snippet.code && (
                 <div className="relative group">
                     <SyntaxHighlighter
                         language={language}
