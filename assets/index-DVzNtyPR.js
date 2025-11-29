@@ -1293,38 +1293,41 @@ class User(BaseModel):
     id: int
     name: str
     age: int # Convertira "30" en 30 automatiquement
-\`\`\``},{id:"pydantic_config",title:"Cas Réel : Configuration",description:"Valider une config imbriquée (Nested).",code:`from pydantic import BaseModel, Field, HttpUrl, EmailStr
-from typing import List, Optional
+\`\`\``},{id:"pydantic_io",title:"Entrée / Sortie (La Douane)",description:"Nettoyage automatique des données sales.",markdown:`### 🧼 Le Concept
+Pydantic agit comme un **douanier** à l'entrée de votre code.
+1.  **Entrée** : Données en vrac (JSON, API, Excel) souvent mal typées (tout est string).
+2.  **Traitement** : Pydantic valide ET convertit (Cast).
+3.  **Sortie** : Un objet Python propre et typé.`,code:`from pydantic import BaseModel, EmailStr, ValidationError
 
-# 1. Sous-modèle
-class DatabaseConfig(BaseModel):
-    host: str = "localhost"
-    port: int = Field(5432, ge=1024, le=65535) # Validation : port entre 1024 et 65535
-    password: str
+# 1. Le Modèle (Le Douanier)
+class User(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    is_active: bool = True # Valeur par défaut
 
-# 2. Modèle Principal
-class AppConfig(BaseModel):
-    app_name: str
-    admin_email: EmailStr # Vérifie le format email
-    db: DatabaseConfig    # Imbrication
-    allowed_origins: List[HttpUrl] # Liste d'URLs valides
-    debug: bool = False
-
-# Données brutes (ex: fichier JSON ou YAML)
-raw_data = {
-    "app_name": "MonApp",
-    "admin_email": "admin@example.com",
-    "db": {
-        "password": "secret_password",
-        "port": 5432 
-    },
-    "allowed_origins": ["https://google.com"]
+# 2. Données "Sales" (Entrée)
+# Notez : 'id' est un str, 'is_active' est manquant
+input_data = {
+    "id": "123", 
+    "name": "Alice",
+    "email": "alice@example.com"
 }
 
-# Parsing & Validation
-config = AppConfig(**raw_data)
-print(config.db.host) # "localhost" (valeur par défaut)
-print(config.admin_email) # "admin@example.com"`}]}]}]},LL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+try:
+    # 3. Nettoyage & Validation
+    user = User(**input_data)
+    
+    # 4. Données Propres (Sortie)
+    print(f"ID (int): {user.id} - Type: {type(user.id)}") 
+    # -> ID (int): 123 - Type: <class 'int'>
+    
+    print(user.model_dump())
+    # -> {'id': 123, 'name': 'Alice', 'email': 'alice@example.com', 'is_active': True}
+
+except ValidationError as e:
+    print("Douane : Données refusées !")
+    print(e)`}]}]}]},LL={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
