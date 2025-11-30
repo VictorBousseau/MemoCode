@@ -517,7 +517,80 @@ df_outer = pd.merge(adf, bdf, on='x1', how='outer')`},{id:"concat",title:"Concat
 df_total = pd.concat([df_janvier, df_fevrier], axis=0)
 
 # Empiler horizontalement (ajout de colonnes)
-df_large = pd.concat([df_infos, df_metrics], axis=1)`}]}]},{id:"visualization",title:"Visualisation",description:"Graphiques et EDA avec Seaborn",categories:[{id:"univariate",title:"1. Analyse Univariée",description:"Distribution d'une seule variable",snippets:[{id:"histplot",title:"Histogramme",description:"Distribution numérique (kde=True pour la densité).",image:"/MemoCode/images/histogram.png",code:`import matplotlib.pyplot as plt
+df_large = pd.concat([df_infos, df_metrics], axis=1)`}]},{id:"ml_dates",title:"7. Dates & Machine Learning",description:"Préparer les dates pour les modèles prédictifs.",snippets:[{id:"date_feature_engineering_advanced",title:"Feature Engineering Complet",description:"Cyclique, Lags, Rolling et Time Deltas.",markdown:`### 🧠 Pourquoi transformer les dates ?
+
+Les algorithmes de ML (Random Forest, XGBoost, Réseaux de Neurones) ne comprennent pas le format "date" brut. Il faut extraire des signaux numériques exploitables.
+
+#### 1. La Continuité Temporelle (Encodage Cyclique)
+Le mois 12 (Décembre) est très proche du mois 1 (Janvier). Si on laisse les chiffres 1 et 12, le modèle pense qu'ils sont éloignés.
+**Solution** : On projette le temps sur un cercle avec Sinus et Cosinus.
+
+#### 2. La Mémoire (Lags & Rolling)
+Pour prédire le futur, le passé récent est souvent le meilleur indicateur.
+*   **Lag** : "Combien j'ai vendu hier ?"
+*   **Rolling** : "Moyenne des 7 derniers jours ?"
+
+#### 3. L'Ancienneté (Time Deltas)
+Le temps écoulé depuis un événement clé (ex: ouverture de compte, dernière promo) est souvent un facteur décisif.`,code:`import pandas as pd
+import numpy as np
+
+# --- 1. Création d'un Dataset Exemple (Série Temporelle) ---
+# On simule 1 an de ventes quotidiennes
+dates = pd.date_range(start='2024-01-01', periods=365, freq='D')
+df = pd.DataFrame({
+    'date': dates,
+    'ventes': np.random.randint(50, 200, size=365) # Ventes aléatoires
+})
+
+print("--- Données Brutes ---")
+print(df.head())
+
+# --- 2. Encodage Cyclique (Sin/Cos) ---
+# Indispensable pour capturer la saisonnalité (Hiver -> Printemps -> ...)
+df['month'] = df['date'].dt.month
+df['day_of_week'] = df['date'].dt.dayofweek
+
+def encode_cyclical(df, col, max_val):
+    # On normalise entre 0 et 2pi, puis on prend sin et cos
+    df[col + '_sin'] = np.sin(2 * np.pi * df[col] / max_val)
+    df[col + '_cos'] = np.cos(2 * np.pi * df[col] / max_val)
+    return df
+
+# Mois : Cycle de 12
+df = encode_cyclical(df, 'month', 12)
+# Jour de la semaine : Cycle de 7 (0=Lundi, 6=Dimanche)
+df = encode_cyclical(df, 'day_of_week', 7)
+
+# --- 3. Lags (Décalages Temporels) ---
+# "La valeur d'hier aide à prédire aujourd'hui"
+# Attention : Cela crée des NaN au début (qu'il faudra gérer)
+df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille (J-1)
+df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière (J-7)
+
+# --- 4. Fenêtres Glissantes (Rolling Windows) ---
+# Capter la tendance locale (lisser le bruit)
+# Moyenne mobile sur 7 jours
+df['ventes_rolling_mean_7'] = df['ventes'].rolling(window=7).mean()
+# Écart-type sur 7 jours (Volatilité)
+df['ventes_rolling_std_7'] = df['ventes'].rolling(window=7).std()
+
+# --- 5. Temps Écoulé (Time Deltas) ---
+# Utile pour modéliser l'usure, l'ancienneté, ou l'effet "depuis le dernier événement"
+# Ex: Jours depuis le début de l'année (Tendance globale)
+ref_date = pd.Timestamp('2024-01-01')
+df['jours_depuis_debut'] = (df['date'] - ref_date).dt.days
+
+# --- 6. Nettoyage Final ---
+# Les Lags et Rolling créent des NaN au début.
+# Option A : Supprimer les lignes (on perd les 7 premiers jours)
+df_clean = df.dropna()
+
+# Option B : Remplir (ex: avec 0 ou la moyenne), mais attention au Data Leakage !
+# df_clean = df.fillna(0)
+
+print("\\n--- Dataset Enrichi (Feature Engineering) ---")
+cols_to_show = ['date', 'month_sin', 'month_cos', 'ventes', 'ventes_lag_1', 'ventes_rolling_mean_7']
+print(df_clean[cols_to_show].tail())`}]}]},{id:"visualization",title:"Visualisation",description:"Graphiques et EDA avec Seaborn",categories:[{id:"univariate",title:"1. Analyse Univariée",description:"Distribution d'une seule variable",snippets:[{id:"histplot",title:"Histogramme",description:"Distribution numérique (kde=True pour la densité).",image:"/MemoCode/images/histogram.png",code:`import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Histogramme avec courbe de densité (KDE)
@@ -3096,80 +3169,7 @@ if nb_lignes_avant == nb_lignes_apres:
 else:
     print(f"ATTENTION : Le fichier est passé de {nb_lignes_avant} à {nb_lignes_apres} lignes !")
 
-print(df_final.head())`}]},{id:"ml_dates",title:"Dates & Machine Learning",description:"Préparer les dates pour les modèles prédictifs.",snippets:[{id:"date_feature_engineering_advanced",title:"Feature Engineering Complet",description:"Cyclique, Lags, Rolling et Time Deltas.",markdown:`### 🧠 Pourquoi transformer les dates ?
-
-Les algorithmes de ML (Random Forest, XGBoost, Réseaux de Neurones) ne comprennent pas le format "date" brut. Il faut extraire des signaux numériques exploitables.
-
-#### 1. La Continuité Temporelle (Encodage Cyclique)
-Le mois 12 (Décembre) est très proche du mois 1 (Janvier). Si on laisse les chiffres 1 et 12, le modèle pense qu'ils sont éloignés.
-**Solution** : On projette le temps sur un cercle avec Sinus et Cosinus.
-
-#### 2. La Mémoire (Lags & Rolling)
-Pour prédire le futur, le passé récent est souvent le meilleur indicateur.
-*   **Lag** : "Combien j'ai vendu hier ?"
-*   **Rolling** : "Moyenne des 7 derniers jours ?"
-
-#### 3. L'Ancienneté (Time Deltas)
-Le temps écoulé depuis un événement clé (ex: ouverture de compte, dernière promo) est souvent un facteur décisif.`,code:`import pandas as pd
-import numpy as np
-
-# --- 1. Création d'un Dataset Exemple (Série Temporelle) ---
-# On simule 1 an de ventes quotidiennes
-dates = pd.date_range(start='2024-01-01', periods=365, freq='D')
-df = pd.DataFrame({
-    'date': dates,
-    'ventes': np.random.randint(50, 200, size=365) # Ventes aléatoires
-})
-
-print("--- Données Brutes ---")
-print(df.head())
-
-# --- 2. Encodage Cyclique (Sin/Cos) ---
-# Indispensable pour capturer la saisonnalité (Hiver -> Printemps -> ...)
-df['month'] = df['date'].dt.month
-df['day_of_week'] = df['date'].dt.dayofweek
-
-def encode_cyclical(df, col, max_val):
-    # On normalise entre 0 et 2pi, puis on prend sin et cos
-    df[col + '_sin'] = np.sin(2 * np.pi * df[col] / max_val)
-    df[col + '_cos'] = np.cos(2 * np.pi * df[col] / max_val)
-    return df
-
-# Mois : Cycle de 12
-df = encode_cyclical(df, 'month', 12)
-# Jour de la semaine : Cycle de 7 (0=Lundi, 6=Dimanche)
-df = encode_cyclical(df, 'day_of_week', 7)
-
-# --- 3. Lags (Décalages Temporels) ---
-# "La valeur d'hier aide à prédire aujourd'hui"
-# Attention : Cela crée des NaN au début (qu'il faudra gérer)
-df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille (J-1)
-df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière (J-7)
-
-# --- 4. Fenêtres Glissantes (Rolling Windows) ---
-# Capter la tendance locale (lisser le bruit)
-# Moyenne mobile sur 7 jours
-df['ventes_rolling_mean_7'] = df['ventes'].rolling(window=7).mean()
-# Écart-type sur 7 jours (Volatilité)
-df['ventes_rolling_std_7'] = df['ventes'].rolling(window=7).std()
-
-# --- 5. Temps Écoulé (Time Deltas) ---
-# Utile pour modéliser l'usure, l'ancienneté, ou l'effet "depuis le dernier événement"
-# Ex: Jours depuis le début de l'année (Tendance globale)
-ref_date = pd.Timestamp('2024-01-01')
-df['jours_depuis_debut'] = (df['date'] - ref_date).dt.days
-
-# --- 6. Nettoyage Final ---
-# Les Lags et Rolling créent des NaN au début.
-# Option A : Supprimer les lignes (on perd les 7 premiers jours)
-df_clean = df.dropna()
-
-# Option B : Remplir (ex: avec 0 ou la moyenne), mais attention au Data Leakage !
-# df_clean = df.fillna(0)
-
-print("\\n--- Dataset Enrichi (Feature Engineering) ---")
-cols_to_show = ['date', 'month_sin', 'month_cos', 'ventes', 'ventes_lag_1', 'ventes_rolling_mean_7']
-print(df_clean[cols_to_show].tail())`}]}]}]},WO={themes:[{id:"power_query_ui",title:"Tutoriels Interface (UI)",description:"Guides pas-à-pas pour les actions courantes via l'interface.",categories:[{id:"columns_ui",title:"1. Colonnes & Transformations",description:"Manipulations classiques sans coder.",snippets:[{id:"conditional_col",title:"Colonne Conditionnelle",description:"Créer une colonne basée sur des règles (If/Else).",markdown:`### 📝 Marche à suivre
+print(df_final.head())`}]}]}]},WO={themes:[{id:"power_query_ui",title:"Tutoriels Interface (UI)",description:"Guides pas-à-pas pour les actions courantes via l'interface.",categories:[{id:"columns_ui",title:"1. Colonnes & Transformations",description:"Manipulations classiques sans coder.",snippets:[{id:"conditional_col",title:"Colonne Conditionnelle",description:"Créer une colonne basée sur des règles (If/Else).",markdown:`### 📝 Marche à suivre
 1. Allez dans l'onglet **Ajouter une colonne**.
 2. Cliquez sur **Colonne conditionnelle**.
 3. Dans la fenêtre :
