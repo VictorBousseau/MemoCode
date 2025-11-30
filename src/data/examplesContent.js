@@ -497,90 +497,137 @@ def is_return_from_public_holiday(idx, df):
 
 df['jour_ouvre_lendemain_ferie'] = [is_return_from_public_holiday(i, df) for i in range(len(df))]
 
+# 7. Ponts (Faire le pont)
+# Logique :
+# - Lundi est un pont si Mardi est férié
+# - Vendredi est un pont si Jeudi est férié
+is_lundi = df['date'].dt.dayofweek == 0
+is_vendredi = df['date'].dt.dayofweek == 4
+
+# On regarde demain (shift -1) pour le Lundi
+demain_ferie = df['jour_ferie'].shift(-1).fillna(False)
+# On regarde hier (shift 1) pour le Vendredi
+hier_ferie = df['jour_ferie'].shift(1).fillna(False)
+
+df['pont'] = (is_lundi & demain_ferie) | (is_vendredi & hier_ferie)
+
+# 8. Semaine avec jour férié
+# Utile pour l'analyse de saisonnalité (ex: baisse de productivité prévue)
+# On groupe par année/semaine et on regarde s'il y a au moins un jour férié
+df['year'] = df['date'].dt.isocalendar().year
+df['week'] = df['date'].dt.isocalendar().week
+df['semaine_avec_ferie'] = df.groupby(['year', 'week'])['jour_ferie'].transform('any')
+
 # Aperçu
-print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_ferie']].head(15))`
+print(df[['date', 'jour_nom', 'jour_ferie', 'pont', 'semaine_avec_ferie']].head(15))`
                         },
+
                         {
                             id: 'school_holidays',
                             title: 'Vacances Scolaires (Zones A, B, C)',
                             description: 'Récupérer les vacances officielles depuis l\'API du gouvernement.',
                             code: `import pandas as pd
-import requests
-import io
+import numpy as np
 
-# 1. Récupération des données (API Gouvernement)
-# Dataset : "Le calendrier scolaire" sur data.education.gouv.fr
-url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
+# --- 1. CONFIGURATION & DONNÉES ---
+URL_API = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
 
-print("Téléchargement des données...")
-# On lit le CSV directement depuis l'URL
-df_holidays = pd.read_csv(url, sep=';')
-
-# 2. Nettoyage et Préparation
-# On garde les colonnes utiles
-cols = ['Description', 'Zones', 'Date de début', 'Date de fin', 'Annee_scolaire']
-df_holidays = df_holidays[cols].copy()
-
-# Conversion en datetime (UTC pour éviter les soucis de timezone)
-df_holidays['start'] = pd.to_datetime(df_holidays['Date de début'], utc=True).dt.date
-df_holidays['end'] = pd.to_datetime(df_holidays['Date de fin'], utc=True).dt.date
-
-# 3. Filtrage par Département (Plus simple que par Zone)
-# Dictionnaire de mapping (Département -> Zone)
-# Source : Service Public
 DEPARTMENTS_ZONES = {
     # Zone A
-    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A',
-    '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A',
-    '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A',
-    '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A',
-    '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A',
-    '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
-    
+    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A', '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A', '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A', '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A', '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A', '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
     # Zone B
-    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B',
-    '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B',
-    '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B',
-    '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B',
-    '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B',
-    '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B',
-    '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B',
-    '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B',
-    '88': 'Zone B',
-    
+    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B', '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B', '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B', '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B', '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B', '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B', '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B', '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B', '88': 'Zone B',
     # Zone C
-    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C',
-    '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C',
-    '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C',
-    '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C',
-    '95': 'Zone C'
+    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C', '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C', '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C', '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C', '95': 'Zone C',
+    # DOM
+    '971': 'Guadeloupe', '972': 'Martinique', '973': 'Guyane', '974': 'La Réunion', '976': 'Mayotte'
 }
 
-mon_departement = '75' # Paris
-ma_zone = DEPARTMENTS_ZONES.get(mon_departement, 'Zone C') # Par défaut Zone C si inconnu
+def preparer_calendrier_vacances():
+    print("Téléchargement et préparation des vacances...")
+    df = pd.read_csv(URL_API, sep=';')
+    
+    # Nettoyage de base
+    df = df[['Description', 'Zones', 'Date de début', 'Date de fin']].copy()
+    df['start'] = pd.to_datetime(df['Date de début'], utc=True).dt.date
+    df['end'] = pd.to_datetime(df['Date de fin'], utc=True).dt.date
+    
+    # Filtrage des zones
+    df = df[df['Zones'].isin(['Zone A', 'Zone B', 'Zone C'])]
+    
+    # Étape 1 : On explose les périodes en jours individuels
+    holiday_days = []
+    for _, row in df.iterrows():
+        # end est exclusif dans date_range, mais inclusif dans les données éducation ? 
+        # Vérification standard : souvent [start, end[. Si end est le jour de reprise, il faut faire -1 jour.
+        dates_in_holiday = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1))
+        
+        for d in dates_in_holiday:
+            holiday_days.append({
+                'date_ref': d.date(),
+                'zone': row['Zones'],
+                'vacances_nom': row['Description']
+            })
+            
+    df_flat = pd.DataFrame(holiday_days)
+    
+    # --- FIX ANTI-DOUBLONS ---
+    # C'est ici que la magie opère.
+    # On regroupe par [date, zone]. Si doublon, on garde le nom unique ou on concatène.
+    # Ex: Si on a "Vacances Hiver" et "Vacances Hiver" -> on garde une seule fois.
+    df_flat = df_flat.groupby(['date_ref', 'zone'], as_index=False).agg({
+        'vacances_nom': lambda x: ' / '.join(sorted(set(str(v) for v in x if pd.notna(v))))
+    })
+    
+    return df_flat
 
-print(f"Département {mon_departement} -> {ma_zone}")
+# --- 2. EXÉCUTION ---
 
-df_zone = df_holidays[df_holidays['Zones'] == ma_zone].reset_index(drop=True)
+# A. Préparation du référentiel (unique par jour/zone)
+df_calendrier_flat = preparer_calendrier_vacances()
 
-print(f"Vacances récupérées pour {ma_zone} : {len(df_zone)} périodes.")
-
-# 4. Application sur notre DataFrame
-# Créons un DataFrame exemple
+# B. Génération de Données Exemple (pour remplacer le fichier Excel)
+print("Génération de données test...")
 dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
-df = pd.DataFrame({'date': dates})
-df['date_only'] = df['date'].dt.date
+# On simule des départements aléatoires pour l'exemple
+# 75 (Paris - C), 33 (Gironde - A), 69 (Rhône - A), 59 (Nord - B)
+departements_exemples = ['75', '33', '69', '59']
+df_user = pd.DataFrame({
+    'date': dates,
+    'departement': np.random.choice(departements_exemples, size=len(dates))
+})
 
-def est_en_vacances(date_ref, holidays_df):
-    # Vérifie si la date est comprise dans une des périodes de vacances
-    # Note : Pour de gros volumes, préférer une jointure par intervalle ou une structure optimisée
-    mask = (holidays_df['start'] <= date_ref) & (holidays_df['end'] >= date_ref)
-    return mask.any()
+# Sauvegarde du nombre de lignes pour vérification
+nb_lignes_avant = len(df_user)
 
-df['en_vacances'] = df['date_only'].apply(lambda x: est_en_vacances(x, df_zone))
+# C. Préparation Utilisateur
+df_user['date_ref'] = pd.to_datetime(df_user['date']).dt.date
+# Nettoyage département (string, 2 chiffres)
+df_user['departement'] = pd.to_numeric(df_user['departement'], errors='coerce').astype('Int64').astype(str).str.zfill(2)
+df_user['zone'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Hors Zone')
 
-# Aperçu
-print(df[df['en_vacances']].head(10))`
+# D. Fusion (Left Join)
+df_final = pd.merge(
+    df_user,
+    df_calendrier_flat,
+    on=['date_ref', 'zone'],
+    how='left'
+)
+
+# E. Finalisation
+df_final['en_vacances'] = df_final['vacances_nom'].notna()
+df_final['vacances_nom'] = df_final['vacances_nom'].fillna('Non')
+df_final = df_final.drop(columns=['date_ref'])
+
+# VÉRIFICATION FINALE
+nb_lignes_apres = len(df_final)
+print("-" * 30)
+if nb_lignes_avant == nb_lignes_apres:
+    print(f"SUCCÈS : Le fichier contient bien {nb_lignes_apres} lignes (pas de doublons).")
+else:
+    print(f"ATTENTION : Le fichier est passé de {nb_lignes_avant} à {nb_lignes_apres} lignes !")
+
+print(df_final.head())`
                         }
                     ]
                 }

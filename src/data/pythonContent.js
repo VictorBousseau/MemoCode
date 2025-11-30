@@ -131,7 +131,10 @@ df['prix'] = pd.to_numeric(df['prix'], errors='coerce')
 df['date'] = pd.to_datetime(df['date'])
 
 # Vers catégorie (optimisation mémoire)
-df['statut'] = df['statut'].astype('category')`
+df['statut'] = df['statut'].astype('category')
+
+# Vers texte (string/object)
+df['nom'] = df['nom'].astype(str)`
                         },
                         {
                             id: 'missing',
@@ -410,6 +413,93 @@ df_total = pd.concat([df_janvier, df_fevrier], axis=0)
 
 # Empiler horizontalement (ajout de colonnes)
 df_large = pd.concat([df_infos, df_metrics], axis=1)`
+                        }
+                    ]
+                },
+                {
+                    id: 'ml_dates',
+                    title: '7. Dates & Machine Learning',
+                    description: 'Préparer les dates pour les modèles prédictifs.',
+                    snippets: [
+                        {
+                            id: 'date_feature_engineering_advanced',
+                            title: 'Feature Engineering Complet',
+                            description: 'Cyclique, Lags, Rolling et Time Deltas.',
+                            markdown: `### 🧠 Pourquoi transformer les dates ?
+
+Les algorithmes de ML (Random Forest, XGBoost, Réseaux de Neurones) ne comprennent pas le format "date" brut. Il faut extraire des signaux numériques exploitables.
+
+#### 1. La Continuité Temporelle (Encodage Cyclique)
+Le mois 12 (Décembre) est très proche du mois 1 (Janvier). Si on laisse les chiffres 1 et 12, le modèle pense qu'ils sont éloignés.
+**Solution** : On projette le temps sur un cercle avec Sinus et Cosinus.
+
+#### 2. La Mémoire (Lags & Rolling)
+Pour prédire le futur, le passé récent est souvent le meilleur indicateur.
+*   **Lag** : "Combien j'ai vendu hier ?"
+*   **Rolling** : "Moyenne des 7 derniers jours ?"
+
+#### 3. L'Ancienneté (Time Deltas)
+Le temps écoulé depuis un événement clé (ex: ouverture de compte, dernière promo) est souvent un facteur décisif.`,
+                            code: `import pandas as pd
+import numpy as np
+
+# --- 1. Création d'un Dataset Exemple (Série Temporelle) ---
+# On simule 1 an de ventes quotidiennes
+dates = pd.date_range(start='2024-01-01', periods=365, freq='D')
+df = pd.DataFrame({
+    'date': dates,
+    'ventes': np.random.randint(50, 200, size=365) # Ventes aléatoires
+})
+
+print("--- Données Brutes ---")
+print(df.head())
+
+# --- 2. Encodage Cyclique (Sin/Cos) ---
+# Indispensable pour capturer la saisonnalité (Hiver -> Printemps -> ...)
+df['month'] = df['date'].dt.month
+df['day_of_week'] = df['date'].dt.dayofweek
+
+def encode_cyclical(df, col, max_val):
+    # On normalise entre 0 et 2pi, puis on prend sin et cos
+    df[col + '_sin'] = np.sin(2 * np.pi * df[col] / max_val)
+    df[col + '_cos'] = np.cos(2 * np.pi * df[col] / max_val)
+    return df
+
+# Mois : Cycle de 12
+df = encode_cyclical(df, 'month', 12)
+# Jour de la semaine : Cycle de 7 (0=Lundi, 6=Dimanche)
+df = encode_cyclical(df, 'day_of_week', 7)
+
+# --- 3. Lags (Décalages Temporels) ---
+# "La valeur d'hier aide à prédire aujourd'hui"
+# Attention : Cela crée des NaN au début (qu'il faudra gérer)
+df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille (J-1)
+df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière (J-7)
+
+# --- 4. Fenêtres Glissantes (Rolling Windows) ---
+# Capter la tendance locale (lisser le bruit)
+# Moyenne mobile sur 7 jours
+df['ventes_rolling_mean_7'] = df['ventes'].rolling(window=7).mean()
+# Écart-type sur 7 jours (Volatilité)
+df['ventes_rolling_std_7'] = df['ventes'].rolling(window=7).std()
+
+# --- 5. Temps Écoulé (Time Deltas) ---
+# Utile pour modéliser l'usure, l'ancienneté, ou l'effet "depuis le dernier événement"
+# Ex: Jours depuis le début de l'année (Tendance globale)
+ref_date = pd.Timestamp('2024-01-01')
+df['jours_depuis_debut'] = (df['date'] - ref_date).dt.days
+
+# --- 6. Nettoyage Final ---
+# Les Lags et Rolling créent des NaN au début.
+# Option A : Supprimer les lignes (on perd les 7 premiers jours)
+df_clean = df.dropna()
+
+# Option B : Remplir (ex: avec 0 ou la moyenne), mais attention au Data Leakage !
+# df_clean = df.fillna(0)
+
+print("\\n--- Dataset Enrichi (Feature Engineering) ---")
+cols_to_show = ['date', 'month_sin', 'month_cos', 'ventes', 'ventes_lag_1', 'ventes_rolling_mean_7']
+print(df_clean[cols_to_show].tail())`
                         }
                     ]
                 }
@@ -1448,25 +1538,58 @@ print(random.sample(range(100), 5))`
                             id: 'datetime_lib',
                             title: 'Dates & Heures (datetime)',
                             description: 'Manipuler le temps.',
-                            code: `from datetime import datetime, timedelta
+                            code: `from datetime import datetime, date, timedelta
 
-# Maintenant
+# 1. Création
 now = datetime.now()
-print(f"Date actuelle : {now}")
+today = date.today()
+print(f"Maintenant : {now}")
+print(f"Aujourd'hui : {today}")
 
-# Créer une date spécifique
-dt = datetime(2023, 12, 25, 10, 30) # 25 Déc 2023 à 10h30
+dt = datetime(2023, 12, 25, 10, 30) # Noël
 
-# Formatage (Date -> String)
-print(now.strftime("%d/%m/%Y %H:%M")) # "29/11/2025 09:45"
+# 2. Accès aux composants
+print(f"Année : {now.year}, Mois : {now.month}, Jour : {now.day}")
 
-# Parsing (String -> Date)
-date_str = "2023-01-01"
-date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+# 3. Formatage (Date -> String)
+print(now.strftime("%d/%m/%Y %H:%M")) # "25/12/2023 10:30"
 
-# Arithmétique (Ajouter du temps)
+# 4. Parsing (String -> Date)
+date_obj = datetime.strptime("2023-01-01", "%Y-%m-%d")
+
+# 5. Arithmétique (timedelta)
 demain = now + timedelta(days=1)
-dans_une_heure = now + timedelta(hours=1)`
+diff = datetime(2024, 1, 1) - datetime(2023, 1, 1)
+print(f"Jours de différence : {diff.days}")`
+                        },
+                        {
+                            id: 'dateutil_lib',
+                            title: 'Calculs Avancés (dateutil)',
+                            description: 'Gérer les mois et années (relativedelta).',
+                            markdown: `### 🚀 Pourquoi dateutil ?
+\`timedelta\` ne gère pas les **mois** ni les **années** car leur durée varie (28-31 jours, 365-366 jours).
+Pour cela, on utilise \`dateutil.relativedelta\`.
+
+\`\`\`bash
+pip install python-dateutil
+\`\`\``,
+                            code: `from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+now = datetime.now()
+
+# 1. Ajouter des mois ou des années
+next_month = now + relativedelta(months = 1)
+print(f"Mois prochain : {next_month}")
+
+# 2. Aller au dernier jour du mois
+end_of_month = now + relativedelta(day = 31)
+print(f"Fin du mois : {end_of_month}")
+
+# 3. Calculer l'âge précis
+birth_date = datetime(1990, 5, 15)
+age = relativedelta(now, birth_date)
+print(f"Âge : {age.years} ans, {age.months} mois et {age.days} jours")`
                         },
                         {
                             id: 'os_sys_lib',
@@ -1475,21 +1598,21 @@ dans_une_heure = now + timedelta(hours=1)`
                             code: `import os
 import sys
 
-# --- OS (Operating System) ---
+# --- OS(Operating System)-- -
 # Chemin actuel
 print(os.getcwd())
 
 # Lister les fichiers
 # print(os.listdir('.'))
 
-# Construire des chemins (Compatible Windows/Mac/Linux)
-path = os.path.join("dossier", "sous_dossier", "fichier.txt")
+# Construire des chemins(Compatible Windows/ Mac / Linux)
+        path = os.path.join("dossier", "sous_dossier", "fichier.txt")
 
 # Vérifier si un fichier existe
 if os.path.exists("data.csv"):
     print("Fichier trouvé !")
 
-# --- SYS (System) ---
+# --- SYS(System)-- -
 # Arguments de la ligne de commande
 # print(sys.argv)
 
@@ -1505,19 +1628,19 @@ if os.path.exists("data.csv"):
                             description: 'Counter et defaultdict.',
                             code: `from collections import Counter, defaultdict
 
-# --- Counter ---
+# --- Counter-- -
 # Compte les occurrences automatiquement
-liste = ['a', 'b', 'a', 'c', 'b', 'a']
+liste =['a', 'b', 'a', 'c', 'b', 'a']
 compteur = Counter(liste)
-print(compteur) # Counter({'a': 3, 'b': 2, 'c': 1})
+print(compteur) # Counter({ 'a': 3, 'b': 2, 'c': 1 })
 print(compteur.most_common(1)) # [('a', 3)]
 
-# --- DefaultDict ---
-# Dictionnaire avec valeur par défaut (évite les KeyError)
-d = defaultdict(int) # Valeur par défaut : 0
+# --- DefaultDict-- -
+# Dictionnaire avec valeur par défaut(évite les KeyError)
+d = defaultdict(int) # Valeur par défaut: 0
 d['a'] += 1
 print(d['a']) # 1
-print(d['z']) # 0 (créé automatiquement)`
+print(d['z']) # 0(créé automatiquement)`
                         }
                     ]
                 },
@@ -1537,8 +1660,8 @@ import datetime
 import os
 import sys
 
-# Boucle FOR (Itération définie)
-fruits = ["pomme", "banane", "cerise"]
+# Boucle FOR(Itération définie)
+fruits =["pomme", "banane", "cerise"]
 for fruit in fruits:
     print(f"J'aime la {fruit}")
 
@@ -1546,7 +1669,7 @@ for fruit in fruits:
 for i in range(5): # 0 à 4
     print(i)
 
-# Boucle WHILE (Itération indéfinie)
+# Boucle WHILE(Itération indéfinie)
 compteur = 0
 while compteur < 5:
     print(compteur)
@@ -1563,9 +1686,9 @@ if age < 18:
 elif age == 18:
     print("Tout juste majeur")
 else:
-    print("Majeur")
+print("Majeur")
 
-# Opérateur ternaire (One-liner)
+# Opérateur ternaire(One - liner)
 statut = "Majeur" if age >= 18 else "Mineur"`
                         },
                         {
@@ -1575,9 +1698,9 @@ statut = "Majeur" if age >= 18 else "Mineur"`
                             code: `for i in range(10):
     if i == 3:
         continue # Passe à l'itération suivante (saute 3)
-    if i == 8:
-        break # Arrête complètement la boucle
-    print(i)`
+if i == 8:
+    break # Arrête complètement la boucle
+print(i)`
                         }
                     ]
                 },
@@ -1591,12 +1714,12 @@ statut = "Majeur" if age >= 18 else "Mineur"`
                             id: 'def_function',
                             title: 'Définition (def)',
                             description: 'Créer une fonction simple avec paramètres.',
-                            code: `def saluer(nom, message="Bonjour"):
-    """
+                            code: `def saluer(nom, message = "Bonjour"):
+"""
     Affiche un message de salutation.
-    message est un paramètre optionnel (valeur par défaut).
+    message est un paramètre optionnel(valeur par défaut).
     """
-    return f"{message}, {nom} !"
+return f"{message}, {nom} !"
 
 print(saluer("Alice"))
 print(saluer("Bob", "Salut"))`
@@ -1605,31 +1728,31 @@ print(saluer("Bob", "Salut"))`
                             id: 'args_kwargs',
                             title: 'Args & Kwargs',
                             description: 'Fonctions avec un nombre variable d\'arguments.',
-                            code: `def somme_tout(*args):
+                            code: `def somme_tout(* args):
     # args est un tuple
-    return sum(args)
+return sum(args)
 
 print(somme_tout(1, 2, 3, 4)) # 10
 
-def afficher_infos(**kwargs):
+def afficher_infos(** kwargs):
     # kwargs est un dictionnaire
-    for cle, valeur in kwargs.items():
-        print(f"{cle}: {valeur}")
+for cle, valeur in kwargs.items():
+    print(f"{cle}: {valeur}")
 
-afficher_infos(nom="Alice", age=30, ville="Paris")`
+afficher_infos(nom = "Alice", age = 30, ville = "Paris")`
                         },
                         {
                             id: 'lambda',
                             title: 'Fonctions Lambda',
                             description: 'Fonctions anonymes en une ligne.',
-                            code: `# Syntaxe : lambda arguments : expression
+                            code: `# Syntaxe: lambda arguments: expression
 carre = lambda x: x ** 2
 
 print(carre(5)) # 25
 
 # Souvent utilisé avec map() ou filter()
 nombres = [1, 2, 3, 4]
-pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`
+pairs = list(filter(lambda x: x % 2 == 0, nombres)) #[2, 4]`
                         }
                     ]
                 },
@@ -1646,21 +1769,21 @@ pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`
                             code: `ma_liste = [1, 2, 3]
 
 # Ajout
-ma_liste.append(4) # [1, 2, 3, 4]
+ma_liste.append(4) #[1, 2, 3, 4]
 
-# Slicing (Découpage)
-print(ma_liste[1:3]) # [2, 3] (Indice de début inclus, fin exclu)
+# Slicing(Découpage)
+print(ma_liste[1: 3]) #[2, 3](Indice de début inclus, fin exclu)
 
-# List Comprehension (Puissant !)
-carres = [x**2 for x in range(5)] # [0, 1, 4, 9, 16]`
+# List Comprehension(Puissant!)
+carres = [x ** 2 for x in range(5)] #[0, 1, 4, 9, 16]`
                         },
                         {
                             id: 'dicts',
                             title: 'Dictionnaires (Dict)',
                             description: 'Paires Clé-Valeur.',
-                            code: `mon_dict = {"nom": "Alice", "age": 25}
+                            code: `mon_dict = { "nom": "Alice", "age": 25 }
 
-# Accès sécurisé (évite l'erreur si la clé n'existe pas)
+# Accès sécurisé(évite l'erreur si la clé n'existe pas)
 print(mon_dict.get("ville", "Inconnu"))
 
 # Parcourir
@@ -1672,14 +1795,14 @@ for cle, valeur in mon_dict.items():
                             title: 'Ensembles (Set)',
                             description: 'Collection non-ordonnée d\'éléments UNIQUES.',
                             code: `nombres = [1, 2, 2, 3, 3, 3]
-uniques = set(nombres) # {1, 2, 3}
+uniques = set(nombres) # { 1, 2, 3 }
 
 # Opérations ensemblistes
-a = {1, 2, 3}
-b = {3, 4, 5}
+a = { 1, 2, 3}
+b = { 3, 4, 5}
 
-print(a.intersection(b)) # {3}
-print(a.union(b)) # {1, 2, 3, 4, 5}`
+print(a.intersection(b)) # { 3 }
+print(a.union(b)) # { 1, 2, 3, 4, 5 } `
                         }
                     ]
                 },
@@ -1694,15 +1817,15 @@ print(a.union(b)) # {1, 2, 3, 4, 5}`
                             title: 'Bloc Try / Except',
                             description: 'Gérer les exceptions pour éviter que le programme plante.',
                             code: `try:
-    resultat = 10 / 0
+resultat = 10 / 0
 except ZeroDivisionError:
-    print("Erreur : Division par zéro impossible !")
+print("Erreur : Division par zéro impossible !")
 except Exception as e:
-    print(f"Une autre erreur est survenue : {e}")
+print(f"Une autre erreur est survenue : {e}")
 else:
-    print("Tout s'est bien passé (si pas d'erreur)")
+print("Tout s'est bien passé (si pas d'erreur)")
 finally:
-    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`
+print("S'exécute toujours (utile pour fermer un fichier/connexion)")`
                         }
                     ]
                 },
@@ -1721,10 +1844,10 @@ finally:
 nom = "Alice"
 age = 30
 
-# Avant (vieux)
+# Avant(vieux)
 print("Bonjour " + nom + ", tu as " + str(age) + " ans.")
 
-# Avec f-string (moderne)
+# Avec f - string(moderne)
 print(f"Bonjour {nom}, tu as {age} ans.")`
                         },
                         {
@@ -1738,11 +1861,11 @@ pourcentage = 0.1234
 print(f"Prix : {prix:.2f}€") # 20.00€
 
 # Afficher en pourcentage
-print(f"Taux : {pourcentage:.1%}") # 12.3%
+print(f"Taux : {pourcentage:.1%}") # 12.3 %
 
-# Debug facile (affiche nom_variable = valeur)
+# Debug facile(affiche nom_variable = valeur)
 x = 10
-print(f"{x=}") # x=10`
+print(f"{x=}") # x = 10`
                         }
                     ]
                 },
@@ -1757,17 +1880,17 @@ print(f"{x=}") # x=10`
                             title: 'Docstrings ("""...""")',
                             description: 'Documenter vos fonctions pour les autres (et vous-même).',
                             code: `def calcul_complexe(x, y):
-    """
+"""
     Effectue un calcul complexe entre x et y.
 
     Args:
-        x (int): Le premier nombre.
-        y (int): Le deuxième nombre.
+x(int): Le premier nombre.
+    y(int): Le deuxième nombre.
 
-    Returns:
-        int: Le résultat du calcul.
+        Returns:
+int: Le résultat du calcul.
     """
-    return x * y + 10
+return x * y + 10
 
 # Accéder à la doc
 help(calcul_complexe)`
@@ -1785,12 +1908,12 @@ help(calcul_complexe)`
                             title: 'Unpacking (Déballage)',
                             description: 'Assigner plusieurs variables en une ligne.',
                             code: `coords = (10, 20)
-x, y = coords # x=10, y=20
+x, y = coords # x = 10, y = 20
 
 # Échanger deux variables sans variable temporaire
 a = 5
 b = 10
-a, b = b, a # a=10, b=5`
+a, b = b, a # a = 10, b = 5`
                         },
                         {
                             id: 'enumerate',
@@ -1798,11 +1921,11 @@ a, b = b, a # a=10, b=5`
                             description: 'Avoir l\'index ET la valeur dans une boucle.',
                             code: `fruits = ["pomme", "banane", "cerise"]
 
-# Pas terrible :
+# Pas terrible:
 # for i in range(len(fruits)):
 #     print(i, fruits[i])
 
-# Pythonique :
+# Pythonique:
 for i, fruit in enumerate(fruits):
     print(f"{i}: {fruit}")`
                         },
@@ -1829,21 +1952,21 @@ for nom, age in zip(noms, ages):
                             title: 'Mesurer le temps (%timeit)',
                             description: 'Chronometrer une ligne de code.',
                             code: `# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
-%timeit [x**2 for x in range(1000)]
+    % timeit[x ** 2 for x in range(1000)]
 
-# Pour une cellule entière :
-# %%timeit`
+# Pour une cellule entière:
+# %% timeit`
                         },
                         {
                             id: 'autoreload',
                             title: 'Rechargement Auto (%autoreload)',
                             description: 'Plus besoin de redémarrer le kernel quand on modifie un module externe.',
                             code: `# À mettre au début du notebook
-%load_ext autoreload
-%autoreload 2
+    % load_ext autoreload
+        % autoreload 2
 
 import mon_module_perso
-# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement!`
                         }
                     ]
                 },
@@ -1867,19 +1990,19 @@ zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
 ones = np.ones((2, 4))   # Matrice 2x4 de 1
 
 # Séquences
-range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
+range_arr = np.arange(0, 10, 2) #[0, 2, 4, 6, 8]
 linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`
                         },
                         {
                             id: 'reshape',
                             title: 'Dimensions & Reshape',
                             description: 'Changer la forme des données.',
-                            code: `arr = np.arange(12) # [0..11]
+                            code: `arr = np.arange(12) #[0..11]
 
 # Changer en matrice 3x4
 mat = arr.reshape(3, 4)
 
-# Aplatir (Flatten)
+# Aplatir(Flatten)
 flat = mat.flatten()`
                         }
                     ]
@@ -1897,9 +2020,9 @@ flat = mat.flatten()`
                             code: `a = np.array([1, 2, 3])
 b = np.array([10, 20, 30])
 
-print(a + b) # [11, 22, 33]
-print(a * 2) # [2, 4, 6]
-print(a ** 2) # [1, 4, 9]`
+print(a + b) #[11, 22, 33]
+print(a * 2) #[2, 4, 6]
+print(a ** 2) #[1, 4, 9]`
                         },
                         {
                             id: 'stats_np',
@@ -1908,7 +2031,7 @@ print(a ** 2) # [1, 4, 9]`
                             code: `arr = np.array([1, 2, 3, 4, 5])
 
 print(np.mean(arr))  # Moyenne
-print(np.std(arr))   # Écart-type
+print(np.std(arr))   # Écart - type
 print(np.median(arr)) # Médiane
 print(np.max(arr))    # Maximum`
                         }
@@ -1931,16 +2054,16 @@ print(np.max(arr))    # Maximum`
                             id: 'pl_advantages',
                             title: 'Pourquoi utiliser Polars ?',
                             description: 'Vitesse, Parallélisme et Lazy Evaluation.',
-                            markdown: `🚀 **Pourquoi Polars est plus rapide ?**
+                            markdown: `🚀 ** Pourquoi Polars est plus rapide ?**
 
-1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
-2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
-3. **Apache Arrow** : Format mémoire colonnaire standard (zéro copie).
-4. **Lazy Evaluation** : Optimise la requête AVANT de l'exécuter (comme SQL).
+    1. ** Écrit en Rust ** : Gestion mémoire ultra - efficace et pas de GIL(Global Interpreter Lock).
+2. ** Parallélisation ** : Utilise tous les cœurs de votre CPU par défaut(Pandas est mono - cœur).
+3. ** Apache Arrow ** : Format mémoire colonnaire standard(zéro copie).
+4. ** Lazy Evaluation ** : Optimise la requête AVANT de l'exécuter (comme SQL).
 
-💡 **Mental Model : Polars vs Pandas**
-*   **Pandas (Eager)** : "Fais ça, puis fais ça, puis fais ça..." (Exécution ligne par ligne)
-*   **Polars (Lazy)** : "Voici ce que je veux, trouve le meilleur moyen de le faire." (Optimisation globale)`
+💡 ** Mental Model: Polars vs Pandas **
+*   ** Pandas(Eager) ** : "Fais ça, puis fais ça, puis fais ça..."(Exécution ligne par ligne)
+    *   ** Polars(Lazy) ** : "Voici ce que je veux, trouve le meilleur moyen de le faire."(Optimisation globale)`
                         }
                     ]
                 },
@@ -1955,17 +2078,17 @@ print(np.max(arr))    # Maximum`
                             description: 'La différence fondamentale.',
                             code: `import polars as pl
 
-# 1. Mode Eager (Classique, comme Pandas)
+# 1. Mode Eager(Classique, comme Pandas)
 # Charge TOUT en mémoire immédiatement.
-df = pl.read_csv("data.csv") 
+    df = pl.read_csv("data.csv") 
 
-# 2. Mode Lazy (Recommandé pour gros fichiers)
-# Ne charge RIEN. Crée un plan d'exécution.
+# 2. Mode Lazy(Recommandé pour gros fichiers)
+# Ne charge RIEN.Crée un plan d'exécution.
 # Permet de traiter des fichiers plus gros que la RAM.
-q = pl.scan_csv("data.csv")
+    q = pl.scan_csv("data.csv")
 
-# Pour voir le plan : q.explain()
-# Pour exécuter : q.collect()`
+# Pour voir le plan: q.explain()
+# Pour exécuter: q.collect()`
                         },
                         {
                             id: 'pl_parquet',
@@ -1977,7 +2100,7 @@ q = pl.scan_parquet("data.parquet")
 
 # Écriture
 # Polars est extrêmement rapide pour écrire du Parquet
-df.write_parquet("output.parquet", compression="snappy")`
+df.write_parquet("output.parquet", compression = "snappy")`
                         }
                     ]
                 },
@@ -1990,14 +2113,14 @@ df.write_parquet("output.parquet", compression="snappy")`
                             id: 'pl_glimpse',
                             title: 'Glimpse & Schema',
                             description: 'Aperçu dense des données.',
-                            code: `# Aperçu des premières/dernières lignes
+                            code: `# Aperçu des premières / dernières lignes
 print(df.head())
 print(df.tail())
 
-# Glimpse (Inspiré de R) : Affiche type + premières valeurs de chaque colonne
+# Glimpse(Inspiré de R) : Affiche type + premières valeurs de chaque colonne
 print(df.glimpse())
 
-# Schéma (Types de données)
+# Schéma(Types de données)
 print(df.schema)`
                         },
                         {
@@ -2007,7 +2130,7 @@ print(df.schema)`
                             code: `# Statistiques sommaires
 print(df.describe())
 
-# Compter les valeurs uniques (Value Counts)
+# Compter les valeurs uniques(Value Counts)
 print(df["categorie"].value_counts())`
                         }
                     ]
@@ -2024,7 +2147,7 @@ print(df["categorie"].value_counts())`
                             code: `# Sélection simple
 df.select(["nom", "age"])
 
-# Sélection avec Expressions (Puissant !)
+# Sélection avec Expressions(Puissant!)
 # pl.col("x") est la base de tout en Polars
 df.select([
     pl.col("nom"),
@@ -2043,13 +2166,13 @@ df.select(pl.col(pl.Int64))`
                             code: `# Filtrage simple
 df.filter(pl.col("age") > 18)
 
-# Conditions multiples (& = ET, | = OU)
+# Conditions multiples(& = ET, | = OU)
 df.filter(
-    (pl.col("age") > 18) & 
+    (pl.col("age") > 18) &
     (pl.col("ville") == "Paris")
 )
 
-# Filtrer sur une liste (is_in)
+# Filtrer sur une liste(is_in)
 villes_cibles = ["Paris", "Lyon"]
 df.filter(pl.col("ville").is_in(villes_cibles))`
                         },
@@ -2057,13 +2180,13 @@ df.filter(pl.col("ville").is_in(villes_cibles))`
                             id: 'pl_with_columns',
                             title: 'With Columns (Ajout)',
                             description: 'Ajouter ou modifier des colonnes.',
-                            code: `# Pandas : df['new'] = ...
-# Polars : .with_columns()
+                            code: `# Pandas: df['new'] = ...
+# Polars: .with_columns()
 
 df = df.with_columns([
     (pl.col("prix") * 0.2).alias("tva"),
     (pl.col("prix") * 1.2).alias("prix_ttc"),
-    pl.lit("En stock").alias("statut") # Valeur littérale (constante)
+    pl.lit("En stock").alias("statut") # Valeur littérale(constante)
 ])`
                         }
                     ]
@@ -2077,22 +2200,22 @@ df = df.with_columns([
                             id: 'pl_groupby',
                             title: 'GroupBy & Agg',
                             description: 'Agrégations performantes.',
-                            code: `# Syntaxe : group_by -> agg
+                            code: `# Syntaxe: group_by -> agg
 df.group_by("ville").agg([
     pl.col("salaire").mean().alias("salaire_moyen"),
     pl.col("salaire").max().alias("salaire_max"),
     pl.len().alias("nb_habitants") # pl.len() = count
 ])
 
-# Note : group_by (avec underscore) est la nouvelle syntaxe (vs groupby)`
+# Note: group_by(avec underscore) est la nouvelle syntaxe(vs groupby)`
                         },
                         {
                             id: 'pl_window',
                             title: 'Window Functions (Over)',
                             description: 'Calculs par groupe sans réduire le nombre de lignes.',
                             code: `# Ajouter la moyenne de la ville à chaque habitant
-# Pandas : transform()
-# Polars : .over()
+# Pandas: transform()
+# Polars: .over()
 
 df.with_columns([
     pl.col("salaire").mean().over("ville").alias("moyenne_ville")
@@ -2110,22 +2233,22 @@ df.with_columns([
                             title: 'Join (Jointures)',
                             description: 'Fusionner des DataFrames.',
                             code: `# Join
-# how : 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
-df_merged = df_clients.join(df_commandes, on="client_id", how="left")
+# how: 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
+df_merged = df_clients.join(df_commandes, on = "client_id", how = "left")
 
-# Anti Join (Lignes de A qui ne sont PAS dans B)
+# Anti Join(Lignes de A qui ne sont PAS dans B)
 # Très pratique pour trouver les "non-matchs"
-df_non_trouve = df_clients.join(df_commandes, on="client_id", how="anti")`
+df_non_trouve = df_clients.join(df_commandes, on = "client_id", how = "anti")`
                         },
                         {
                             id: 'pl_concat',
                             title: 'Concat',
                             description: 'Empiler des données.',
-                            code: `# Vertical (Lignes)
-pl.concat([df1, df2], how="vertical")
+                            code: `# Vertical(Lignes)
+pl.concat([df1, df2], how = "vertical")
 
-# Horizontal (Colonnes)
-pl.concat([df1, df2], how="horizontal")`
+# Horizontal(Colonnes)
+pl.concat([df1, df2], how = "horizontal")`
                         }
                     ]
                 },
@@ -2140,10 +2263,10 @@ pl.concat([df1, df2], how="horizontal")`
                             description: 'L\'exemple canonique d\'optimisation.',
                             code: `q = (
     pl.scan_csv("data.csv")
-    .filter(pl.col("date") > "2023-01-01")
-    .group_by("categorie")
-    .agg(pl.col("montant").sum())
-    .sort("montant", descending=True)
+        .filter(pl.col("date") > "2023-01-01")
+        .group_by("categorie")
+        .agg(pl.col("montant").sum())
+        .sort("montant", descending = True)
 )
 
 # Voir le plan optimisé
@@ -2157,12 +2280,12 @@ df_result = q.collect()`
                             title: 'Streaming (Out-of-Core)',
                             description: 'Traiter des données plus grosses que la RAM.',
                             code: `# Si le dataset est trop gros pour la RAM,
-# Polars peut le traiter par morceaux (chunks).
+# Polars peut le traiter par morceaux(chunks).
 
-q = pl.scan_csv("big_data.csv")
+    q = pl.scan_csv("big_data.csv")
 
-# streaming=True active le moteur de streaming
-df_result = q.collect(streaming=True)`
+# streaming = True active le moteur de streaming
+df_result = q.collect(streaming = True)`
                         },
                         {
                             id: 'pl_sql',
@@ -2200,17 +2323,17 @@ print(result.collect())`
                             id: 'skrub_install',
                             title: 'Installation & Contexte',
                             description: 'Skrub facilite le preprocessing pour le Machine Learning.',
-                            markdown: `### 🧼 Skrub (ex-DirtyCat)
+                            markdown: `### 🧼 Skrub(ex - DirtyCat)
 
 Développé par l'équipe de **scikit-learn**, Skrub est conçu pour combler le fossé entre les données brutes (bases de données, CSV sales) et les modèles de Machine Learning.
 
 **💡 Pourquoi l'utiliser ? Quelle est la plus-value ?**
-Contrairement à un preprocessing manuel fastidieux (nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub **automatise** ces tâches ingrates.
-*   **Gain de temps** : Il détecte automatiquement les types de données.
-*   **Performance** : Il transforme les "mauvaises" catégories (fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
-*   **Simplicité** : Il s'intègre directement dans vos Pipelines scikit-learn.
+Contrairement à un preprocessing manuel fastidieux(nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub ** automatise ** ces tâches ingrates.
+*   ** Gain de temps ** : Il détecte automatiquement les types de données.
+*   ** Performance ** : Il transforme les "mauvaises" catégories(fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
+*   ** Simplicité ** : Il s'intègre directement dans vos Pipelines scikit-learn.
 
-\`\`\`bash
+    \`\`\`bash
 pip install skrub
 \`\`\`
 `
