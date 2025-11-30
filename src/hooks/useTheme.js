@@ -1,25 +1,49 @@
 import { useState, useEffect } from 'react';
+import { themes } from '../themes';
 
-export const useTheme = () => {
-    const STORAGE_KEY = 'memocode_theme';
+const STORAGE_KEY = 'memocode_theme';
 
-    const [theme, setTheme] = useState(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            return stored || 'dark';
-        } catch {
-            return 'dark';
-        }
+export function useTheme() {
+    const [currentTheme, setCurrentTheme] = useState(() => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved || 'dark';
     });
 
+    // Apply theme on mount
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, theme);
-        document.documentElement.className = theme;
-    }, [theme]);
+        applyTheme(currentTheme);
+    }, []);
 
-    const toggleTheme = () => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, currentTheme);
+        applyTheme(currentTheme);
+    }, [currentTheme]);
+
+    const applyTheme = (themeName) => {
+        const theme = themes[themeName];
+        if (!theme) {
+            console.warn(`Theme "${themeName}" not found`);
+            return;
+        }
+
+        console.log('Applying theme:', themeName, theme.colors);
+        const root = document.documentElement;
+        Object.entries(theme.colors).forEach(([key, value]) => {
+            root.style.setProperty(`--color-${key}`, value);
+        });
+
+        // Update html class for backward compatibility
+        if (themeName === 'light') {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
     };
 
-    return { theme, toggleTheme };
-};
+    return {
+        currentTheme,
+        setTheme: setCurrentTheme,
+        availableThemes: Object.keys(themes),
+        themes
+    };
+}

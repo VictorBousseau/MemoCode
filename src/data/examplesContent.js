@@ -356,7 +356,7 @@ plt.title('Matrice de Corrélation')
 plt.show()`
                         },
                         {
-                            id: 'preprocessing',
+                            id: 'ds_preprocessing',
                             title: '2. Preprocessing & Feature Engineering',
                             description: 'Encodage, gestion des valeurs manquantes et SMOTE.',
                             level: 'intermediate',

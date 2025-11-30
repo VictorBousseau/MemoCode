@@ -22,19 +22,6 @@ export const nosqlContent = {
 Avant, on utilisait des bases relationnelles (SQL) pour TOUT.
 Mais avec le Web (Facebook, Google), on a eu besoin de :
 1.  **Volume** : Stocker des pétaoctets.
-2.  **Vitesse** : Répondre en millisecondes.
-3.  **Variété** : Stocker des JSON, des graphes, des images...
-
-Le NoSQL sacrifie souvent la cohérence stricte (ACID) pour la performance et la scalabilité.`
-                        },
-                        {
-                            id: 'types',
-                            title: 'Les 4 Familles',
-                            description: 'Document, Clé-Valeur, Colonne, Graphe.',
-                            level: 'beginner',
-                            tags: ['nosql', 'types', 'intro'],
-                            markdown: `### 👨‍👩‍👧‍👦 Les Types de Bases NoSQL
-
 1.  **Document (MongoDB)** : Stocke des JSON. Flexible. Idéal pour le Web.
 2.  **Clé-Valeur (Redis)** : Comme un dictionnaire géant. Ultra rapide (Cache).
 3.  **Colonnes Larges (Cassandra)** : Pour les séries temporelles et l'IoT.

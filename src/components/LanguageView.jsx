@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
-import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star } from 'lucide-react';
+import FilterPanel from './FilterPanel';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star, Filter } from 'lucide-react';
 import { useFavorites } from '../hooks/useFavorites';
 import { useHistory } from '../hooks/useHistory';
 import { useNotes } from '../hooks/useNotes';
@@ -44,6 +45,27 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
     );
     const [activeCategoryId, setActiveCategoryId] = useState(content.themes[0]?.categories[0]?.id);
 
+    // Filter State
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState({
+        levels: [],
+        tags: [],
+        hasNotes: false
+    });
+
+    // Extract all unique tags from content for the filter panel
+    const availableTags = React.useMemo(() => {
+        const tags = new Set();
+        content.themes.forEach(theme => {
+            theme.categories.forEach(category => {
+                category.snippets.forEach(snippet => {
+                    snippet.tags?.forEach(tag => tags.add(tag));
+                });
+            });
+        });
+        return Array.from(tags).sort();
+    }, [content]);
+
     // Get current theme and category objects
     const activeTheme = (activeThemeId === FAVORITES_ID || activeThemeId === HISTORY_ID)
         ? null
@@ -84,8 +106,10 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
 
     // --- Search Logic ---
     const getFilteredSnippets = () => {
-        if (!searchQuery) return [];
-        const query = searchQuery.toLowerCase();
+        const hasActiveFilters = filters.levels.length > 0 || filters.tags.length > 0 || filters.hasNotes;
+        if (!searchQuery && !hasActiveFilters) return [];
+
+        const query = searchQuery ? searchQuery.toLowerCase() : '';
 
         // Extract tags (e.g. "#pandas", "#sql") - supports accents
         const tags = query.match(/#[\w\u00C0-\u00FF]+/g) || [];
@@ -109,14 +133,36 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
 
                     if (!matchesTags) return false;
 
-                    // Filter by text content
-                    const matchesText = searchTerms === '' ||
-                        snippet.title.toLowerCase().includes(searchTerms) ||
-                        snippet.description.toLowerCase().includes(searchTerms) ||
-                        (snippet.code && snippet.code.toLowerCase().includes(searchTerms)) ||
-                        (snippet.markdown && snippet.markdown.toLowerCase().includes(searchTerms));
+                    // Filter by text content (only if there's a search query)
+                    if (searchQuery) {
+                        const matchesText = searchTerms === '' ||
+                            snippet.title.toLowerCase().includes(searchTerms) ||
+                            snippet.description.toLowerCase().includes(searchTerms) ||
+                            (snippet.code && snippet.code.toLowerCase().includes(searchTerms)) ||
+                            (snippet.markdown && snippet.markdown.toLowerCase().includes(searchTerms));
 
-                    return matchesText;
+                        if (!matchesText) return false;
+                    }
+
+                    // Level Filter (OR logic)
+                    if (filters.levels.length > 0 && !filters.levels.includes(snippet.level)) {
+                        return false;
+                    }
+
+                    // Tag Filter (AND logic for selected tags from panel)
+                    if (filters.tags.length > 0) {
+                        const snippetTags = snippet.tags || [];
+                        const hasAllTags = filters.tags.every(tag => snippetTags.includes(tag));
+                        if (!hasAllTags) return false;
+                    }
+
+                    // Notes Filter
+                    if (filters.hasNotes) {
+                        const note = getNote(snippet.id);
+                        if (!note) return false;
+                    }
+
+                    return true;
                 }).map(snippet => ({
                     ...snippet,
                     themeTitle: theme.title,
@@ -134,25 +180,49 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         }
     };
 
-    if (searchQuery) {
+    // Show search results if query exists OR if filters are active
+    const hasActiveFilters = filters.levels.length > 0 || filters.tags.length > 0 || filters.hasNotes;
+
+    if (searchQuery || hasActiveFilters) {
         return (
             <div className="space-y-8">
-                <div className="mb-4">
+                <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-zinc-400">
-                        Résultats pour "{searchQuery}"
+                        {searchQuery ? `Résultats pour "${searchQuery}"` : 'Résultats filtrés'}
                         <span className="ml-2 text-sm font-normal text-zinc-500">
                             ({searchResults.length} trouvé{searchResults.length > 1 ? 's' : ''})
                         </span>
                     </h2>
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${showFilters || (filters.levels.length > 0 || filters.tags.length > 0 || filters.hasNotes)
+                            ? 'bg-blue-600/20 text-blue-400 border-blue-600/30'
+                            : 'bg-zinc-800/50 text-zinc-400 border-zinc-700 hover:bg-zinc-800 hover:text-zinc-300'
+                            }`}
+                    >
+                        <Filter className="w-4 h-4" />
+                        Filtres
+                        {(filters.levels.length > 0 || filters.tags.length > 0 || filters.hasNotes) && (
+                            <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                {filters.levels.length + filters.tags.length + (filters.hasNotes ? 1 : 0)}
+                            </span>
+                        )}
+                    </button>
                 </div>
 
+                {showFilters && (
+                    <FilterPanel
+                        filters={filters}
+                        onChange={setFilters}
+                        availableTags={availableTags}
+                        onClose={() => setShowFilters(false)}
+                    />
+                )}
+
                 {searchResults.length > 0 ? (
-                    <div className="grid gap-8">
-                        {searchResults.map((snippet) => (
-                            <div key={snippet.id} className="relative">
-                                <div className="absolute -top-3 left-0 bg-blue-500/10 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/20">
-                                    {snippet.contextName ? `${snippet.contextName} > ` : ''}{snippet.themeTitle} &gt; {snippet.categoryTitle}
-                                </div>
+                    <div className="grid gap-6 mt-10">
+                        {searchResults.map((snippet, index) => (
+                            <div key={snippet.id} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards" style={{ animationDelay: `${index * 50}ms` }}>
                                 <CodeCard
                                     snippet={snippet}
                                     language={snippet.language || language}
@@ -162,6 +232,9 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                     note={getNote(snippet.id)}
                                     onNoteChange={(text) => setNote(snippet.id, text)}
                                     onTagClick={handleTagClick}
+                                    theme={snippet.themeTitle}
+                                    searchQuery={searchQuery}
+                                    breadcrumb={`${snippet.contextName ? `${snippet.contextName} > ` : ''}${snippet.themeTitle} > ${snippet.categoryTitle}`}
                                 />
                             </div>
                         ))}
@@ -280,8 +353,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                             </div>
 
                             <div className="grid gap-8">
-                                {history.map((item) => (
-                                    <div key={`${item.id}-${item.timestamp}`}>
+                                {history.map((item, index) => (
+                                    <div key={`${item.id}-${item.timestamp}`} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards" style={{ animationDelay: `${index * 50}ms` }}>
                                         <div className="text-xs text-zinc-500 mb-2 flex items-center gap-2">
                                             <span>{item.themeTitle}</span>
                                             <ChevronRight className="w-3 h-3" />
@@ -298,6 +371,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                             onClick={() => addToHistory(item, item.themeTitle, item.categoryTitle)}
                                             note={getNote(item.id)}
                                             onNoteChange={(text) => setNote(item.id, text)}
+                                            theme={item.themeTitle}
                                         />
                                     </div>
                                 ))}
@@ -323,7 +397,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                             </div>
 
                             <div className="grid gap-8">
-                                {favorites.map((fav) => {
+                                {favorites.map((fav, index) => {
                                     // Find the snippet in all themes/categories
                                     let snippet = null;
                                     let themeTitle = '';
@@ -345,7 +419,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                     if (!snippet) return null;
 
                                     return (
-                                        <div key={fav.id}>
+                                        <div key={fav.id} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards" style={{ animationDelay: `${index * 50}ms` }}>
                                             <div className="text-xs text-zinc-500 mb-2 flex items-center gap-2">
                                                 <span>{themeTitle}</span>
                                                 <ChevronRight className="w-3 h-3" />
@@ -359,6 +433,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                                 onClick={() => addToHistory(snippet, themeTitle, categoryTitle)}
                                                 note={getNote(snippet.id)}
                                                 onNoteChange={(text) => setNote(snippet.id, text)}
+                                                theme={themeTitle}
                                             />
                                         </div>
                                     );
@@ -400,15 +475,18 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                                     <div className="h-px flex-1 bg-zinc-800 ml-4"></div>
                                                 </h3>
                                             )}
-                                            <CodeCard
-                                                snippet={snippet}
-                                                language={snippet.language || language}
-                                                isFavorite={isFavorite(snippet.id)}
-                                                onToggleFavorite={() => toggleFavorite(snippet)}
-                                                onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
-                                                note={getNote(snippet.id)}
-                                                onNoteChange={(text) => setNote(snippet.id, text)}
-                                            />
+                                            <div className="animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards" style={{ animationDelay: `${index * 50}ms` }}>
+                                                <CodeCard
+                                                    snippet={snippet}
+                                                    language={snippet.language || language}
+                                                    isFavorite={isFavorite(snippet.id)}
+                                                    onToggleFavorite={() => toggleFavorite(snippet)}
+                                                    onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
+                                                    note={getNote(snippet.id)}
+                                                    onNoteChange={(text) => setNote(snippet.id, text)}
+                                                    theme={activeTheme.title}
+                                                />
+                                            </div>
                                         </React.Fragment>
                                     );
                                 })}

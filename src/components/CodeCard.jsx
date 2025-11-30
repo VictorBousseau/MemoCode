@@ -10,20 +10,38 @@ import 'katex/dist/katex.min.css';
 import MermaidDiagram from './MermaidDiagram';
 import DifficultyBadge from './DifficultyBadge';
 
-export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick }) {
+import { useStats } from '../hooks/useStats';
+
+export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb }) {
     const [copied, setCopied] = useState(false);
     const [showNote, setShowNote] = useState(false);
+    const { logView } = useStats();
+
+    // Helper for highlighting text
+    const highlightText = (text, query) => {
+        if (!query || !text) return text;
+        const parts = text.split(new RegExp(`(${query})`, 'gi'));
+        return parts.map((part, i) =>
+            part.toLowerCase() === query.toLowerCase() ?
+                <mark key={i} className="bg-yellow-500/30 text-yellow-200 rounded-sm px-0.5">{part}</mark> :
+                part
+        );
+    };
 
     const handleCopy = (e) => {
         e.stopPropagation();
         navigator.clipboard.writeText(snippet.code);
         setCopied(true);
+        logView(snippet.id, theme || 'Unknown'); // Log interaction
         setTimeout(() => setCopied(false), 2000);
     };
 
     const handleToggleFavorite = (e) => {
         e.stopPropagation();
-        if (onToggleFavorite) onToggleFavorite();
+        if (onToggleFavorite) {
+            onToggleFavorite();
+            if (!isFavorite) logView(snippet.id, theme || 'Unknown'); // Log interaction
+        }
     };
 
     const handleToggleNote = (e) => {
@@ -43,13 +61,20 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
     return (
         <div
             onClick={onClick}
-            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer"
+            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-4"
         >
+            {breadcrumb && (
+                <div className="bg-blue-500/10 text-blue-400 text-xs px-4 py-2 border-b border-blue-500/20">
+                    {breadcrumb}
+                </div>
+            )}
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
                 <div className="flex justify-between items-start">
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="text-lg font-semibold text-zinc-100">{snippet.title}</h3>
+                            <h3 className="text-lg font-semibold text-zinc-100">
+                                {highlightText(snippet.title, searchQuery)}
+                            </h3>
                             {snippet.level && <DifficultyBadge level={snippet.level} />}
                             {snippet.tags && snippet.tags.map(tag => (
                                 <span
@@ -61,7 +86,9 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                 </span>
                             ))}
                         </div>
-                        <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
+                        <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line text-left">
+                            {highlightText(snippet.description, searchQuery)}
+                        </p>
 
                         {/* Note Display (Preview) */}
                         {note && !showNote && (

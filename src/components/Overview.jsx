@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileCode2, Database, GitBranch, Zap, TrendingUp, BarChart3, Table, ArrowRight } from 'lucide-react';
+import { FileCode2, Database, GitBranch, Zap, TrendingUp, BarChart3, Table, ArrowRight, Flame } from 'lucide-react';
 import { pythonContent } from '../data/pythonContent';
 import { sqlContent } from '../data/sqlContent';
 import { gitContent } from '../data/gitContent';
@@ -7,6 +7,8 @@ import { pysparkContent } from '../data/pysparkContent';
 import { daxContent } from '../data/daxContent';
 import { mContent } from '../data/mContent';
 import { rContent } from '../data/rContent';
+
+import { useStats } from '../hooks/useStats';
 
 const languages = [
     {
@@ -84,15 +86,72 @@ const languages = [
 ];
 
 export default function Overview({ onNavigate }) {
+    const { getWeeklyViews, getTopThemes, getStreak } = useStats();
+    const weeklyViews = getWeeklyViews();
+    const topThemes = getTopThemes();
+    const streak = getStreak();
+
     return (
         <div className="space-y-12 animate-in fade-in duration-500 max-w-5xl mx-auto">
             <div className="text-center mb-16">
                 <h2 className="text-4xl font-bold text-white mb-6">
                     Vue d'ensemble
                 </h2>
-                <p className="text-zinc-400 text-xl max-w-2xl mx-auto">
+                <p className="text-zinc-400 text-xl max-w-2xl mx-auto mb-8">
                     Une bibliothèque complète de snippets et de guides pour accompagner chaque étape de vos projets Data.
                 </p>
+
+                {/* Stats Section */}
+                {(weeklyViews > 0 || topThemes.length > 0) && (
+                    <div className="flex justify-center gap-6 flex-wrap animate-in fade-in slide-in-from-top-4 duration-700">
+                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-6 py-4 flex items-center gap-4">
+                            <div className="p-3 bg-blue-500/10 rounded-lg">
+                                <TrendingUp className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <div className="text-left">
+                                <div className="text-2xl font-bold text-white">{weeklyViews}</div>
+                                <div className="text-sm text-zinc-400">Snippets vus cette semaine</div>
+                            </div>
+                        </div>
+
+                        {topThemes.length > 0 && (
+                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-6 py-4 flex items-center gap-4">
+                                <div className="p-3 bg-purple-500/10 rounded-lg">
+                                    <Zap className="w-6 h-6 text-purple-400" />
+                                </div>
+                                <div className="text-left">
+                                    <div className="text-sm text-zinc-400 mb-1">Top Thèmes</div>
+                                    <div className="flex gap-2">
+                                        {topThemes.map((t, i) => (
+                                            <span key={i} className="text-xs font-medium px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                                                {t.theme}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Streak Badge */}
+                        {streak.current > 0 && (
+                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-6 py-4 flex items-center gap-4">
+                                <div className="p-3 bg-orange-500/10 rounded-lg">
+                                    <Flame className="w-6 h-6 text-orange-400" />
+                                </div>
+                                <div className="text-left">
+                                    <div className="text-2xl font-bold text-white flex items-center gap-2">
+                                        {streak.current}
+                                        {streak.current >= 7 && <span className="text-xl">🔥</span>}
+                                    </div>
+                                    <div className="text-sm text-zinc-400">Jours d'affilée</div>
+                                    {streak.longest > streak.current && (
+                                        <div className="text-xs text-zinc-500 mt-1">Record : {streak.longest}</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="space-y-6">

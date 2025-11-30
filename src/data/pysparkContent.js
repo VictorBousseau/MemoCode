@@ -28,7 +28,7 @@ spark = SparkSession.builder \\
 print(spark.version)`
                         },
                         {
-                            id: 'read_csv',
+                            id: 'pyspark_read_csv',
                             title: 'Lire un CSV',
                             description: 'Charger un fichier avec inférence de schéma.',
                             level: 'beginner',
@@ -60,7 +60,7 @@ df.printSchema()`
                     description: 'Select, Filter, WithColumn.',
                     snippets: [
                         {
-                            id: 'select_filter',
+                            id: 'pyspark_select_filter',
                             title: 'Sélectionner et Filtrer',
                             description: 'Les bases du DataFrame API.',
                             level: 'beginner',
@@ -128,7 +128,7 @@ df.groupBy("department") \\
     .show()`
                         },
                         {
-                            id: 'joins',
+                            id: 'pyspark_joins',
                             title: 'Jointures',
                             description: 'Combiner deux DataFrames.',
                             level: 'intermediate',
