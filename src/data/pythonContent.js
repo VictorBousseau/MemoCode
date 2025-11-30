@@ -2362,15 +2362,15 @@ print(result.collect())`
                             id: 'skrub_install',
                             title: 'Installation & Contexte',
                             description: 'Skrub facilite le preprocessing pour le Machine Learning.',
-                            markdown: `### 🧼 Skrub(ex - DirtyCat)
+                            markdown: `### 🧼 Skrub (ex - DirtyCat)
 
 Développé par l'équipe de **scikit-learn**, Skrub est conçu pour combler le fossé entre les données brutes (bases de données, CSV sales) et les modèles de Machine Learning.
 
 **💡 Pourquoi l'utiliser ? Quelle est la plus-value ?**
-Contrairement à un preprocessing manuel fastidieux(nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub ** automatise ** ces tâches ingrates.
-*   ** Gain de temps ** : Il détecte automatiquement les types de données.
-*   ** Performance ** : Il transforme les "mauvaises" catégories(fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
-*   ** Simplicité ** : Il s'intègre directement dans vos Pipelines scikit-learn.
+Contrairement à un preprocessing manuel fastidieux (nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub **automatise** ces tâches ingrates.
+*   **Gain de temps** : Il détecte automatiquement les types de données.
+*   **Performance** : Il transforme les "mauvaises" catégories (fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
+*   **Simplicité** : Il s'intègre directement dans vos Pipelines scikit-learn.
 
     \`\`\`bash
 pip install skrub
