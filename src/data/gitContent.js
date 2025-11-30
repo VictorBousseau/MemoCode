@@ -16,6 +16,8 @@ export const gitContent = {
                             id: 'git_config',
                             title: 'Configuration de l\'identité',
                             description: 'Indispensable pour que vos commits vous soient attribués.',
+                            level: 'beginner',
+                            tags: ['git', 'config', 'setup'],
                             code: `# Définir votre nom (apparaîtra dans l'historique)
 git config --global user.name "Votre Prénom Nom"
 
@@ -29,6 +31,8 @@ git config --list`
                             id: 'git_init',
                             title: 'Démarrer un projet (Init)',
                             description: 'Transformer un dossier classique en dépôt Git.',
+                            level: 'beginner',
+                            tags: ['git', 'init', 'setup'],
                             code: `# 1. Se placer dans le dossier du projet
 cd mon_projet
 
@@ -41,6 +45,8 @@ git init
                             id: 'git_clone',
                             title: 'Cloner un projet existant',
                             description: 'Récupérer un projet depuis GitHub sur votre machine.',
+                            level: 'beginner',
+                            tags: ['git', 'clone', 'setup'],
                             code: `# Cloner via HTTPS (le plus simple)
 git clone https://github.com/utilisateur/nom-du-projet.git
 
@@ -58,6 +64,8 @@ cd nom-du-projet`
                             id: 'git_status',
                             title: 'Vérifier l\'état (Status)',
                             description: 'A utiliser tout le temps ! Pour savoir ce qui a changé.',
+                            level: 'beginner',
+                            tags: ['git', 'status', 'workflow'],
                             code: `git status
 
 # Rouge : Fichiers modifiés mais pas encore prêts à être commités (Working Directory)
@@ -67,6 +75,8 @@ cd nom-du-projet`
                             id: 'git_add',
                             title: 'Préparer les fichiers (Add)',
                             description: 'Passer du "Rouge" au "Vert" (Staging).',
+                            level: 'beginner',
+                            tags: ['git', 'add', 'workflow'],
                             code: `# Ajouter un fichier spécifique
 git add mon_fichier.py
 
@@ -77,6 +87,8 @@ git add .`
                             id: 'git_commit',
                             title: 'Enregistrer les changements (Commit)',
                             description: 'Créer un point de sauvegarde avec un message.',
+                            level: 'beginner',
+                            tags: ['git', 'commit', 'workflow'],
                             code: `# Créer un commit avec un message clair
 git commit -m "Ajout de la fonction de nettoyage des données"
 
@@ -88,6 +100,8 @@ git commit -m "Ajout de la fonction de nettoyage des données"
                             id: 'git_log',
                             title: 'Voir l\'historique (Log)',
                             description: 'Qui a fait quoi et quand ?',
+                            level: 'advanced',
+                            tags: ['git', 'log', 'history'],
                             code: `# Historique simple
 git log
 
@@ -105,6 +119,8 @@ git log --oneline --graph --all`
                             id: 'create_switch',
                             title: 'Créer et Changer de branche',
                             description: 'Ne travaillez jamais directement sur "main" ou "master" !',
+                            level: 'intermediate',
+                            tags: ['git', 'branch', 'workflow'],
                             code: `# Créer une nouvelle branche et basculer dessus (recommandé)
 git checkout -b feature/nouvelle-analyse
 
@@ -119,6 +135,8 @@ git checkout main`
                             id: 'git_merge',
                             title: 'Fusionner (Merge)',
                             description: 'Ramener les changements d\'une branche vers le main.',
+                            level: 'intermediate',
+                            tags: ['git', 'merge', 'workflow'],
                             code: `# 1. Se placer sur la branche qui REÇOIT (souvent main)
 git checkout main
 
@@ -139,6 +157,8 @@ git merge feature/nouvelle-analyse`
                             id: 'remote_add',
                             title: 'Lier à GitHub (Remote)',
                             description: 'Si vous avez fait "git init" en local, il faut le lier à un repo GitHub vide.',
+                            level: 'beginner',
+                            tags: ['git', 'remote', 'setup'],
                             code: `# Ajouter l'adresse du dépôt distant (appelé "origin")
 git remote add origin https://github.com/votre-user/votre-projet.git
 
@@ -150,6 +170,8 @@ git remote -v`
                             title: 'Authentification (Token vs Password)',
                             description: 'Depuis 2021, les mots de passe ne fonctionnent plus pour le Push !',
                             subCategory: 'Sécurité & Accès',
+                            level: 'intermediate',
+                            tags: ['git', 'auth', 'security'],
                             code: `# Option 1 : Personal Access Token (PAT) - Le plus courant
 # 1. Allez sur GitHub -> Settings -> Developer settings -> Personal access tokens -> Tokens (classic)
 # 2. Générez un token (cochez 'repo' pour un accès complet au code)
@@ -163,6 +185,8 @@ git remote -v`
                             title: 'Envoyer vers GitHub (Push)',
                             description: 'Mettre à jour le dépôt distant.',
                             subCategory: 'Synchronisation',
+                            level: 'beginner',
+                            tags: ['git', 'push', 'workflow'],
                             code: `# Premier push (pour lier la branche locale à la distante)
 git push -u origin main
 
@@ -174,6 +198,8 @@ git push`
                             title: 'Récupérer les changements (Pull)',
                             description: 'Mettre à jour votre local depuis GitHub.',
                             subCategory: 'Synchronisation',
+                            level: 'beginner',
+                            tags: ['git', 'pull', 'workflow'],
                             code: `# Récupérer et fusionner les changements
 git pull origin main
 
@@ -197,6 +223,8 @@ git pull origin main
                             id: 'rebase_vs_merge',
                             title: 'Rebase vs Merge',
                             description: 'Garder un historique linéaire.',
+                            level: 'advanced',
+                            tags: ['git', 'rebase', 'merge', 'history'],
                             markdown: `### 🌿 Merge vs Rebase
 **Merge** : Crée un commit de fusion ("Merge branch..."). Préserve la réalité historique mais peut polluer le graphe.
 **Rebase** : Réécrit l'histoire. Place vos commits **à la suite** de la branche cible.
@@ -214,6 +242,8 @@ git rebase main
                             id: 'cherry_pick',
                             title: 'Cherry-Pick',
                             description: 'Picorer un commit spécifique.',
+                            level: 'advanced',
+                            tags: ['git', 'cherry-pick', 'advanced'],
                             code: `# Vous voulez juste le commit "Fix bug" de la branche "dev" sur votre branche "main"
 # sans tout fusionner.
 
@@ -230,6 +260,8 @@ git cherry-pick <hash_du_commit>`
                             id: 'gitignore_guide',
                             title: 'Guide : Créer son .gitignore',
                             description: 'Pas à pas pour exclure les fichiers indésirables.',
+                            level: 'intermediate',
+                            tags: ['git', 'gitignore', 'setup'],
                             markdown: `### 📝 La Procédure
 1.  Créez un fichier nommé exactement \`.gitignore\` à la racine du projet.
 2.  Listez les fichiers/dossiers à ignorer (un par ligne).
@@ -279,6 +311,8 @@ build/`
                             id: 'git_stash',
                             title: 'Git Stash',
                             description: 'Très utile quand on doit changer de branche en urgence.',
+                            level: 'advanced',
+                            tags: ['git', 'stash', 'save'],
                             code: `# Mettre de côté les modifications en cours
 git stash
 
@@ -299,6 +333,8 @@ git stash list`
                             id: 'git_reset',
                             title: 'Git Reset (Attention !)',
                             description: 'Revenir en arrière dans l\'historique.',
+                            level: 'advanced',
+                            tags: ['git', 'reset', 'undo'],
                             code: `# Soft Reset : Annule le commit mais GARDE les fichiers modifiés (Staging)
 git reset --soft HEAD~1
 
@@ -309,6 +345,8 @@ git reset --hard HEAD~1`
                             id: 'git_revert',
                             title: 'Git Revert (Safe)',
                             description: 'Annuler un commit en créant un commit inverse.',
+                            level: 'advanced',
+                            tags: ['git', 'revert', 'undo'],
                             code: `# Crée un nouveau commit qui annule les changements du commit spécifié
 git revert <commit_hash>
 

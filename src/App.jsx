@@ -85,6 +85,7 @@ export default function App() {
           searchQuery={searchQuery}
           languageName={selectedLanguage}
           onNavigate={setSelectedLanguage}
+          onSearch={setSearchQuery}
         />
       )}
     </Layout>

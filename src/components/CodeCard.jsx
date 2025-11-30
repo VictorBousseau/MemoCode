@@ -10,7 +10,7 @@ import 'katex/dist/katex.min.css';
 import MermaidDiagram from './MermaidDiagram';
 import DifficultyBadge from './DifficultyBadge';
 
-export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange }) {
+export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick }) {
     const [copied, setCopied] = useState(false);
     const [showNote, setShowNote] = useState(false);
 
@@ -35,6 +35,11 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
         e.stopPropagation();
     };
 
+    const handleTagClick = (e, tag) => {
+        e.stopPropagation();
+        if (onTagClick) onTagClick(tag);
+    };
+
     return (
         <div
             onClick={onClick}
@@ -43,9 +48,18 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
                 <div className="flex justify-between items-start">
                     <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="text-lg font-semibold text-zinc-100">{snippet.title}</h3>
                             {snippet.level && <DifficultyBadge level={snippet.level} />}
+                            {snippet.tags && snippet.tags.map(tag => (
+                                <span
+                                    key={tag}
+                                    onClick={(e) => handleTagClick(e, tag)}
+                                    className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-400 border border-blue-900/50 hover:bg-blue-900/50 hover:border-blue-400/50 transition-colors cursor-pointer"
+                                >
+                                    #{tag}
+                                </span>
+                            ))}
                         </div>
                         <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
 
@@ -70,7 +84,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                             </div>
                         )}
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 ml-4 items-start">
                         {onNoteChange && (
                             <button
                                 onClick={handleToggleNote}
@@ -90,13 +104,20 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                             </button>
                         )}
                         {snippet.code && (
-                            <button
-                                onClick={handleCopy}
-                                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
-                                title="Copy code"
-                            >
-                                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={handleCopy}
+                                    className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+                                    title="Copy code"
+                                >
+                                    {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                </button>
+                                {copied && (
+                                    <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-zinc-800 text-white text-xs rounded shadow-lg whitespace-nowrap border border-zinc-700 z-10 animate-in fade-in zoom-in duration-200">
+                                        Copié !
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

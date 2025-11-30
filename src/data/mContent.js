@@ -14,6 +14,8 @@ export const mContent = {
                             id: 'conditional_col',
                             title: 'Colonne Conditionnelle',
                             description: 'Créer une colonne basée sur des règles (If/Else).',
+                            level: 'beginner',
+                            tags: ['m', 'ui', 'column'],
                             markdown: `### 📝 Marche à suivre
 1. Allez dans l'onglet **Ajouter une colonne**.
 2. Cliquez sur **Colonne conditionnelle**.
@@ -27,6 +29,8 @@ export const mContent = {
                             id: 'unpivot',
                             title: 'Dépivoter (Unpivot)',
                             description: 'Passer de colonnes larges (Jan, Fév, Mars) à des lignes.',
+                            level: 'intermediate',
+                            tags: ['m', 'ui', 'unpivot'],
                             markdown: `### 🔄 Transformer des colonnes en lignes
 Souvent utile quand vous avez une colonne par mois/année.
 
@@ -39,6 +43,8 @@ Souvent utile quand vous avez une colonne par mois/année.
                             id: 'split_col',
                             title: 'Fractionner une colonne',
                             description: 'Séparer du texte (ex: Nom Prénom).',
+                            level: 'beginner',
+                            tags: ['m', 'ui', 'split'],
                             markdown: `### ✂️ Découper du texte
 1. Sélectionnez la colonne à couper.
 2. Onglet **Accueil** > **Fractionner la colonne**.
@@ -57,6 +63,8 @@ Souvent utile quand vous avez une colonne par mois/année.
                             id: 'merge_queries',
                             title: 'Fusionner (Merge / VLOOKUP)',
                             description: 'Joindre deux tables via une clé commune.',
+                            level: 'intermediate',
+                            tags: ['m', 'ui', 'merge'],
                             markdown: `### 🔗 Fusionner des requêtes
 1. Onglet **Accueil** > **Fusionner des requêtes**.
 2. Sélectionnez la première table (en haut) et la deuxième (en bas).
@@ -75,6 +83,8 @@ Souvent utile quand vous avez une colonne par mois/année.
                             id: 'groupby_ui',
                             title: 'Regrouper par (Group By)',
                             description: 'Agréger les données (Somme, Compte, Max...).',
+                            level: 'intermediate',
+                            tags: ['m', 'ui', 'group-by'],
                             markdown: `### 📊 Agréger des lignes
 1. Sélectionnez la colonne de regroupement (ex: "Pays").
 2. Onglet **Accueil** > **Regrouper par**.
@@ -85,6 +95,8 @@ Souvent utile quand vous avez une colonne par mois/année.
                             id: 'pivot_ui',
                             title: 'Pivoter (Pivot Column)',
                             description: 'Passer de lignes à colonnes (Inverse de Unpivot).',
+                            level: 'intermediate',
+                            tags: ['m', 'ui', 'pivot'],
                             markdown: `### 🔄 Transformer des lignes en colonnes
 Utile pour créer des tableaux croisés.
 
@@ -97,6 +109,8 @@ Utile pour créer des tableaux croisés.
                             id: 'combine_files',
                             title: 'Combiner des fichiers',
                             description: 'Traiter tout un dossier d\'un coup.',
+                            level: 'intermediate',
+                            tags: ['m', 'ui', 'combine-files'],
                             markdown: `### 📁 Importer un dossier
 1. **Obtenir les données** > **Dossier**.
 2. Sélectionnez le chemin.
@@ -121,6 +135,8 @@ Utile pour créer des tableaux croisés.
                             id: 'let_in',
                             title: 'Bloc let ... in',
                             description: 'La structure fondamentale d\'une requête.',
+                            level: 'beginner',
+                            tags: ['m', 'let', 'in', 'syntax'],
                             code: `let
     // "let" contient la liste des étapes
     Source = Excel.Workbook(File.Contents("data.xlsx")),
@@ -138,6 +154,8 @@ in
                             id: 'step_reference',
                             title: 'Référencer une étape',
                             description: 'Pourquoi voit-on des #"..." partout ?',
+                            level: 'beginner',
+                            tags: ['m', 'syntax', 'reference'],
                             markdown: `### 🏷️ Les noms d'étapes
 En M, chaque ligne est une variable.
 - Si le nom est simple : \`Source\`
@@ -160,6 +178,8 @@ C'est pour cela que vous voyez souvent :
                             id: 'lists_records',
                             title: 'Listes {} et Records []',
                             description: 'Les briques de base du M.',
+                            level: 'beginner',
+                            tags: ['m', 'list', 'record', 'syntax'],
                             code: `// Une Liste (List) : Entre accolades {}
 MaListe = {1, 2, 3, "A", "B"}
 
@@ -175,6 +195,8 @@ Nom = MonRecord[Nom]    // -> "Dupont"`
                             id: 'each_keyword',
                             title: 'Le mot-clé "each"',
                             description: 'Comprendre les fonctions simplifiées.',
+                            level: 'intermediate',
+                            tags: ['m', 'each', 'function'],
                             markdown: `### 🔄 Que veut dire \`each\` ?
 C'est un raccourci syntaxique pour créer une fonction qui prend un paramètre (la ligne en cours).
 
@@ -202,6 +224,8 @@ Table.AddColumn(Source, "Double", each [Valeur] * 2)
                             id: 'date_funcs',
                             title: 'Dates',
                             description: 'Manipuler le temps.',
+                            level: 'intermediate',
+                            tags: ['m', 'date', 'function'],
                             code: `// Obtenir la date du jour
 Date.From(DateTime.LocalNow())
 
@@ -217,6 +241,8 @@ Duration.Days(Date.From(DateTime.LocalNow()) - [DateNaissance])`
                             id: 'text_funcs',
                             title: 'Texte',
                             description: 'Nettoyer et modifier.',
+                            level: 'intermediate',
+                            tags: ['m', 'text', 'function'],
                             code: `// Majuscule / Minuscule
 Text.Upper("bonjour")
 Text.Lower("BONJOUR")
@@ -241,6 +267,8 @@ Text.Contains("Hello World", "World")`
                             id: 'try_otherwise',
                             title: 'Try ... Otherwise',
                             description: 'Gérer les erreurs sans planter la requête.',
+                            level: 'advanced',
+                            tags: ['m', 'error', 'try'],
                             code: `// Si [Montant] / [Quantité] échoue (ex: div par 0), renvoie 0
 try [Montant] / [Quantité] otherwise 0`
                         },
@@ -248,6 +276,8 @@ try [Montant] / [Quantité] otherwise 0`
                             id: 'error_record',
                             title: 'Inspecter l\'erreur (Record)',
                             description: 'Récupérer le détail de l\'erreur.',
+                            level: 'advanced',
+                            tags: ['m', 'error', 'debug'],
                             code: `// "try" seul renvoie un Record complet [HasError, Error, Value]
 Resultat = try [Montant] / [Quantité]
 
@@ -258,6 +288,8 @@ if Resultat[HasError] then "Erreur : " & Resultat[Error][Message] else Resultat[
                             id: 'replace_errors',
                             title: 'Remplacer les erreurs',
                             description: 'Nettoyer une table entière.',
+                            level: 'advanced',
+                            tags: ['m', 'error', 'replace'],
                             code: `// Équivalent du "Remplacer les erreurs" de l'interface
 // Remplace les erreurs de la colonne "Montant" par 0
 Table.ReplaceErrorValues(Source, {{"Montant", 0}})`
@@ -266,6 +298,8 @@ Table.ReplaceErrorValues(Source, {{"Montant", 0}})`
                             id: 'preventive_filtering',
                             title: 'Filtrage Préventif',
                             description: 'Exclure les lignes en erreur AVANT conversion.',
+                            level: 'advanced',
+                            tags: ['m', 'error', 'filter'],
                             markdown: `### 🛡️ Mieux vaut prévenir que guérir
 Au lieu de gérer l'erreur après coup, filtrez les lignes qui vont planter.
 
@@ -295,6 +329,8 @@ Cela évite de casser toute la requête pour quelques lignes mal formées.`
                             id: 'create_function',
                             title: 'Créer une Fonction (UI & Code)',
                             description: 'Comment définir une fonction réutilisable.',
+                            level: 'advanced',
+                            tags: ['m', 'function', 'creation'],
                             markdown: `### 🛠️ Créer une fonction
 1. **Clic droit** dans le panneau de gauche > **Nouvelle requête** > **Autres sources** > **Requête vide**.
 2. Ouvrez l'**Éditeur Avancé**.
@@ -314,6 +350,8 @@ in
                             id: 'invoke_function',
                             title: 'Appeler la Fonction',
                             description: 'Utiliser votre fonction dans une colonne.',
+                            level: 'advanced',
+                            tags: ['m', 'function', 'invoke'],
                             code: `// Méthode 1 : Via l'interface
 // Onglet "Ajouter une colonne" > "Invoquer une fonction personnalisée"
 // Sélectionnez "CalculTVA" et mappez le paramètre "PrixHT" à votre colonne [Montant].
@@ -325,6 +363,8 @@ Table.AddColumn(Source, "Montant TTC", each CalculTVA([Montant]))`
                             id: 'parameters',
                             title: 'Utiliser des Paramètres',
                             description: 'Filtrer dynamiquement (Année, Chemin fichier...).',
+                            level: 'advanced',
+                            tags: ['m', 'parameter', 'dynamic'],
                             markdown: `### 🎛️ Les Paramètres
 Utile pour changer une valeur partout sans modifier le code.
 
@@ -350,6 +390,8 @@ Si vous changez la valeur du paramètre, toutes les requêtes qui l'utilisent se
                             id: 'query_folding',
                             title: 'Query Folding (Pliage)',
                             description: 'Laisser la base de données travailler.',
+                            level: 'advanced',
+                            tags: ['m', 'performance', 'query-folding'],
                             markdown: `### 🚀 Le Query Folding
 C'est la capacité de Power Query à traduire vos étapes M en SQL natif.
 
@@ -366,6 +408,8 @@ C'est la capacité de Power Query à traduire vos étapes M en SQL natif.
                             id: 'table_buffer',
                             title: 'Table.Buffer (Optimisation)',
                             description: 'Accélérer les jointures (Merges).',
+                            level: 'advanced',
+                            tags: ['m', 'performance', 'buffer'],
                             markdown: `### ⚡ Booster vos Fusions (Merges)
 **Le Problème :**
 Vous avez une grosse table de faits (Ventes, 1M lignes) et vous fusionnez avec une petite table de dimension (Produits, 100 lignes).
@@ -394,6 +438,8 @@ in
                             id: 'best_practices',
                             title: 'Bonnes & Mauvaises Pratiques',
                             description: 'Ce qui tue la performance sur les gros volumes.',
+                            level: 'advanced',
+                            tags: ['m', 'performance', 'best-practice'],
                             markdown: `### 🛑 À NE PAS FAIRE (Performance Killers)
 1.  **Fusionner deux grosses tables (Fact-to-Fact)** : C'est très coûteux en mémoire. Essayez de le faire en SQL ou modélisez en étoile (Star Schema) dans Power BI.
 2.  **Trier (Sort) des millions de lignes** : Inutile si c'est pour un rapport agrégé. Ne triez qu'à la toute fin si nécessaire.
@@ -408,6 +454,8 @@ in
                             id: 'volume_optimization',
                             title: 'Optimisation du Volume',
                             description: 'Réduire la taille du modèle (Cardinalité).',
+                            level: 'advanced',
+                            tags: ['m', 'performance', 'optimization'],
                             markdown: `### 📉 Réduire la taille du fichier
 La taille d'un modèle Power BI dépend surtout de la **Cardinalité** (nombre de valeurs uniques dans une colonne).
 
@@ -434,6 +482,8 @@ La taille d'un modèle Power BI dépend surtout de la **Cardinalité** (nombre d
                             id: 'relationships_best_practices',
                             title: 'Bonnes Pratiques Relationnelles',
                             description: '1-à-Plusieurs vs Plusieurs-à-Plusieurs.',
+                            level: 'advanced',
+                            tags: ['m', 'modeling', 'relationship'],
                             markdown: `### 🌟 Le Modèle en Étoile (Star Schema)
 C'est la structure idéale pour Power BI.
 

@@ -29,7 +29,7 @@ const themeIcons = {
 
 import Breadcrumbs from './Breadcrumbs';
 
-export default function LanguageView({ content, searchQuery, languageName, onNavigate }) {
+export default function LanguageView({ content, searchQuery, languageName, onNavigate, onSearch }) {
     const { favorites, isFavorite, toggleFavorite } = useFavorites();
     const { history, addToHistory } = useHistory();
     const { getNote, setNote } = useNotes();
@@ -94,20 +94,21 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         // Flatten all snippets from all themes and categories
         return content.themes.flatMap(theme =>
             theme.categories.flatMap(category => {
-                // Check if theme or category matches any tag
-                const themeMatchesTags = tags.length === 0 || tags.some(tag => {
-                    const cleanTag = tag.slice(1).toLowerCase();
-                    return (
-                        theme.id.toLowerCase().includes(cleanTag) ||
-                        theme.title.toLowerCase().includes(cleanTag) ||
-                        category.id.toLowerCase().includes(cleanTag) ||
-                        category.title.toLowerCase().includes(cleanTag)
-                    );
-                });
-
-                if (!themeMatchesTags) return [];
-
                 return category.snippets.filter(snippet => {
+                    // Check if snippet matches ALL tags
+                    const matchesTags = tags.length === 0 || tags.every(tag => {
+                        const cleanTag = tag.slice(1).toLowerCase();
+                        return (
+                            theme.id.toLowerCase().includes(cleanTag) ||
+                            theme.title.toLowerCase().includes(cleanTag) ||
+                            category.id.toLowerCase().includes(cleanTag) ||
+                            category.title.toLowerCase().includes(cleanTag) ||
+                            (snippet.tags && snippet.tags.some(t => t.toLowerCase().includes(cleanTag)))
+                        );
+                    });
+
+                    if (!matchesTags) return false;
+
                     // Filter by text content
                     const matchesText = searchTerms === '' ||
                         snippet.title.toLowerCase().includes(searchTerms) ||
@@ -126,6 +127,12 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
     };
 
     const searchResults = getFilteredSnippets();
+
+    const handleTagClick = (tag) => {
+        if (onSearch) {
+            onSearch(`#${tag}`);
+        }
+    };
 
     if (searchQuery) {
         return (
@@ -154,6 +161,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                     onClick={() => addToHistory(snippet, snippet.themeTitle, snippet.categoryTitle)}
                                     note={getNote(snippet.id)}
                                     onNoteChange={(text) => setNote(snippet.id, text)}
+                                    onTagClick={handleTagClick}
                                 />
                             </div>
                         ))}

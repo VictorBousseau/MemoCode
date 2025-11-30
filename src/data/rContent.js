@@ -14,6 +14,8 @@ export const rContent = {
                             id: 'select_filter',
                             title: 'Select & Filter',
                             description: 'Choisir colonnes et lignes.',
+                            level: 'beginner',
+                            tags: ['r', 'dplyr', 'filter', 'select'],
                             code: `library(dplyr)
 
 # Sélectionner des colonnes
@@ -26,6 +28,8 @@ df %>% filter(age > 21)`
                             id: 'mutate',
                             title: 'Mutate',
                             description: 'Créer ou modifier des colonnes.',
+                            level: 'beginner',
+                            tags: ['r', 'dplyr', 'mutate'],
                             code: `# Créer une nouvelle colonne
 df %>% mutate(age_double = age * 2)`
                         },
@@ -33,6 +37,8 @@ df %>% mutate(age_double = age * 2)`
                             id: 'groupby_summarize',
                             title: 'GroupBy & Summarize',
                             description: 'Agréger des données.',
+                            level: 'intermediate',
+                            tags: ['r', 'dplyr', 'group-by', 'summarise'],
                             code: `# Moyenne d'âge par ville
 df %>% 
   group_by(ville) %>% 

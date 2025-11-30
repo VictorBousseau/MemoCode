@@ -17,6 +17,8 @@ export const examplesContent = {
                             id: 'euler',
                             title: 'Méthode d\'Euler (Ordre 1)',
                             description: 'La méthode la plus simple et intuitive.',
+                            level: 'beginner',
+                            tags: ['math', 'ode', 'euler', 'python'],
                             code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -51,6 +53,8 @@ def euler_method(f, y0, t0, tf, h):
                             id: 'rk2',
                             title: 'Runge-Kutta 2 (RK2 / Point Milieu)',
                             description: 'Plus précis qu\'Euler, moins coûteux que RK4.',
+                            level: 'intermediate',
+                            tags: ['math', 'ode', 'rk2', 'python'],
                             code: `def runge_kutta_2(f, y0, t0, tf, h):
     """
     Résout y' = f(t, y) avec la méthode RK2 (Point Milieu).
@@ -92,6 +96,7 @@ def euler_method(f, y0, t0, tf, h):
                             title: 'Runge-Kutta 4 (RK4)',
                             description: 'Méthode standard pour résoudre les équations différentielles.',
                             level: 'advanced',
+                            tags: ['math', 'ode', 'rk4', 'python'],
                             code: `import numpy as np
 import matplotlib.pyplot as plt
 
@@ -184,6 +189,8 @@ plt.legend(); plt.show()`
                             id: 'knapsack',
                             title: 'Problème du Sac à Dos (Knapsack)',
                             description: 'Maximiser la valeur des objets dans un sac de capacité limitée.',
+                            level: 'advanced',
+                            tags: ['optimization', 'gurobi', 'knapsack', 'python'],
                             code: `import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
@@ -227,6 +234,8 @@ solve_knapsack_model(*data)`
                             id: 'lot_sizing',
                             title: 'Lot Sizing (Planification de Production)',
                             description: 'Minimiser les coûts de production, stock et setup.',
+                            level: 'advanced',
+                            tags: ['optimization', 'gurobi', 'production', 'python'],
                             code: `import json
 import gurobipy as gp
 from gurobipy import GRB
@@ -321,6 +330,8 @@ with gp.Env() as env, gp.Model(name, env=env) as model:
                             id: 'eda',
                             title: '1. Exploration des Données (EDA)',
                             description: 'Chargement, analyse de la target et corrélations. [Télécharger le dataset](/MemoCode/data/online_shoppers_intention.csv)',
+                            level: 'intermediate',
+                            tags: ['data-science', 'eda', 'pandas', 'seaborn'],
                             code: `import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -348,6 +359,8 @@ plt.show()`
                             id: 'preprocessing',
                             title: '2. Preprocessing & Feature Engineering',
                             description: 'Encodage, gestion des valeurs manquantes et SMOTE.',
+                            level: 'intermediate',
+                            tags: ['data-science', 'preprocessing', 'sklearn', 'python'],
                             code: `from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from imblearn.over_sampling import SMOTE
@@ -384,6 +397,8 @@ print(f"Taille originale : {X.shape}, Taille après SMOTE : {X_resampled.shape}"
                             id: 'modeling',
                             title: '3. Modélisation & Évaluation',
                             description: 'Entraînement d\'un modèle et analyse des performances.',
+                            level: 'intermediate',
+                            tags: ['data-science', 'modeling', 'sklearn', 'python'],
                             code: `from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
@@ -420,6 +435,8 @@ plt.show()`
                             id: 'rfm_segmentation',
                             title: 'Segmentation RFM',
                             description: 'Segmenter les clients par Récence, Fréquence et Montant.',
+                            level: 'intermediate',
+                            tags: ['marketing', 'rfm', 'segmentation', 'python'],
                             markdown: `### 🎯 Objectif de la Segmentation RFM
 
 La segmentation **RFM** (Recency, Frequency, Monetary) est une méthode éprouvée du marketing pour identifier et classer vos clients en fonction de leur comportement d'achat.
@@ -517,6 +534,8 @@ print(rfm['Segment_Label'].value_counts())`
                             id: 'sklearn_custom_pipeline',
                             title: 'Pipeline Sklearn Custom',
                             description: 'Créer un Transformer personnalisé pour nettoyer et enrichir les données.',
+                            level: 'advanced',
+                            tags: ['mlops', 'sklearn', 'pipeline', 'python'],
                             markdown: `### 🔧 Objectif : Pipeline de Preprocessing Robuste
 
 Un **Pipeline Scikit-Learn** permet d'enchaîner plusieurs étapes de transformation de données de manière **automatique**, **reproductible** et **déployable** en production.
@@ -662,6 +681,8 @@ print(df_transformed)
                             id: 'french_calendar',
                             title: 'Calendrier Français (Fériés & Ponts)',
                             description: 'Détecter les jours fériés, les ponts et les retours de vacances.',
+                            level: 'intermediate',
+                            tags: ['python', 'dates', 'holidays', 'pandas'],
                             code: `import pandas as pd
 import holidays
 from datetime import timedelta
@@ -716,6 +737,8 @@ print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_
                             id: 'school_holidays',
                             title: 'Vacances Scolaires (Avancé)',
                             description: 'Récupération API, gestion des zones et déduplication robuste.',
+                            level: 'advanced',
+                            tags: ['python', 'dates', 'api', 'pandas'],
                             code: `import pandas as pd
 import numpy as np
 

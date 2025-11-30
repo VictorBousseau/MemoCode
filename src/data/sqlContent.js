@@ -16,6 +16,8 @@ export const sqlContent = {
                             id: 'select_basics',
                             title: 'SELECT, FROM, LIMIT',
                             description: 'La base de toute requête.',
+                            level: 'beginner',
+                            tags: ['sql', 'select', 'basics'],
                             code: `-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
@@ -32,6 +34,8 @@ FROM users;`
                             id: 'filtering',
                             title: 'Filtrage (WHERE)',
                             description: 'Filtrer les lignes avec des conditions.',
+                            level: 'beginner',
+                            tags: ['sql', 'where', 'filter'],
                             code: `SELECT * 
 FROM orders 
 WHERE status = 'completed' 
@@ -47,6 +51,8 @@ WHERE country IN ('France', 'Belgium', 'Switzerland');`
                             id: 'null_handling',
                             title: 'Gestion des NULL',
                             description: 'Attention : NULL n\'est pas égal à 0 ou vide.',
+                            level: 'beginner',
+                            tags: ['sql', 'null', 'basics'],
                             code: `-- ❌ NE PAS FAIRE : status = NULL (ne marche jamais)
 -- ✅ FAIRE : IS NULL ou IS NOT NULL
 
@@ -62,6 +68,8 @@ WHERE status IS NOT NULL; -- Commandes avec un statut défini`
                             id: 'sorting_dedup',
                             title: 'Trier et Dédoublonner',
                             description: 'ORDER BY et DISTINCT.',
+                            level: 'beginner',
+                            tags: ['sql', 'order-by', 'distinct'],
                             code: `-- Trier les résultats
 SELECT * 
 FROM orders 
@@ -75,6 +83,8 @@ FROM users; -- Liste unique des pays`
                             id: 'execution_order',
                             title: 'Ordre d\'Exécution SQL',
                             description: 'Comprendre comment le moteur lit votre requête.',
+                            level: 'beginner',
+                            tags: ['sql', 'concept', 'basics'],
                             code: `-- L'ordre dans lequel vous ÉCRIVEZ :
 -- SELECT -> FROM -> WHERE -> GROUP BY -> HAVING -> ORDER BY -> LIMIT
 
@@ -100,6 +110,8 @@ FROM users; -- Liste unique des pays`
                             id: 'agg_functions',
                             title: 'Fonctions d\'agrégation',
                             description: 'Compter, Sommer, Moyenne.',
+                            level: 'beginner',
+                            tags: ['sql', 'aggregation', 'count', 'sum'],
                             code: `SELECT 
     COUNT(*) AS total_orders,       -- Compte toutes les lignes
     COUNT(user_id) AS active_users, -- Compte les valeurs non-NULL
@@ -111,6 +123,8 @@ FROM orders;`
                             id: 'group_by',
                             title: 'GROUP BY',
                             description: 'La règle d\'or : Tout ce qui n\'est pas agrégé doit être groupé.',
+                            level: 'beginner',
+                            tags: ['sql', 'group-by', 'aggregation'],
                             code: `SELECT 
     country,                -- Colonne de groupement
     COUNT(id) AS user_count -- Fonction d'agrégation
@@ -123,6 +137,8 @@ GROUP BY country; -- OBLIGATOIRE si on sélectionne 'country'
                             id: 'having',
                             title: 'Filtrer après agrégation (HAVING)',
                             description: 'WHERE filtre les lignes, HAVING filtre les groupes.',
+                            level: 'beginner',
+                            tags: ['sql', 'having', 'filter'],
                             code: `SELECT 
     user_id, 
     COUNT(id) AS order_count 
@@ -143,6 +159,8 @@ HAVING COUNT(id) > 5; -- Garder uniquement les gros acheteurs
                             id: 'left_join',
                             title: 'LEFT JOIN (Standard)',
                             description: 'Garder tout ce qui est à gauche (table principale).',
+                            level: 'intermediate',
+                            tags: ['sql', 'join', 'left-join'],
                             code: `-- Objectif : Avoir tous les utilisateurs, et leurs commandes s'ils en ont
 SELECT 
     u.name, 
@@ -158,6 +176,8 @@ LEFT JOIN orders o        -- Table de droite (Match ou NULL)
                             id: 'inner_join',
                             title: 'INNER JOIN',
                             description: 'Garder uniquement l\'intersection.',
+                            level: 'intermediate',
+                            tags: ['sql', 'join', 'inner-join'],
                             code: `-- Objectif : Avoir uniquement les utilisateurs QUI ONT commandé
 SELECT 
     u.name, 
@@ -179,6 +199,8 @@ INNER JOIN orders o
                             id: 'cte_cleaning',
                             title: '1. Nettoyage préalable',
                             description: 'Préparer les données avant l\'analyse.',
+                            level: 'intermediate',
+                            tags: ['sql', 'cte', 'with', 'cleaning'],
                             code: `WITH clean_orders AS (
     -- Étape 1 : On filtre et on nettoie d'abord
     SELECT * 
@@ -198,6 +220,8 @@ GROUP BY user_id;`
                             id: 'cte_chaining',
                             title: '2. Chaînage de CTE',
                             description: 'Décomposer un problème complexe.',
+                            level: 'intermediate',
+                            tags: ['sql', 'cte', 'advanced'],
                             code: `WITH active_users AS (
     SELECT id, name FROM users WHERE country = 'France'
 ),
@@ -218,6 +242,8 @@ INNER JOIN high_value_orders o
                             id: 'cte_agg_join',
                             title: '3. Agrégation avant Jointure',
                             description: 'Best Practice : Éviter de dupliquer les lignes.',
+                            level: 'intermediate',
+                            tags: ['sql', 'cte', 'join', 'aggregation'],
                             code: `WITH user_sales AS (
     -- On calcule d'abord le total par user (1 ligne par user)
     SELECT 
@@ -249,6 +275,8 @@ LEFT JOIN user_sales s
                             id: 'dates',
                             title: 'Manipulation de Dates',
                             description: 'Grouper par mois/année.',
+                            level: 'advanced',
+                            tags: ['sql', 'date', 'time'],
                             code: `-- DATE_TRUNC (PostgreSQL/BigQuery)
 -- Ramène la date au premier jour du mois/année
 SELECT 
@@ -262,6 +290,8 @@ ORDER BY 1;`
                             id: 'case_when',
                             title: 'Logique Conditionnelle (CASE)',
                             description: 'Le "IF/ELSE" du SQL.',
+                            level: 'advanced',
+                            tags: ['sql', 'case', 'logic'],
                             code: `SELECT 
     id, 
     amount,
@@ -274,14 +304,18 @@ FROM orders;`
                         },
                         {
                             id: 'window_functions',
-                            title: 'Window Functions (ROW_NUMBER)',
+                            title: 'Window Functions (ROW_NUMBER & RANK)',
                             description: 'Calculer sans écraser les lignes.',
+                            level: 'advanced',
+                            tags: ['sql', 'window-function', 'row-number', 'rank'],
                             code: `-- Objectif : Trouver la DERNIÈRE commande de chaque user
 WITH ranked_orders AS (
     SELECT 
         *,
-        -- Numérote les commandes par user, de la plus récente (1) à la plus ancienne
-        ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY created_at DESC) as rn 
+        -- ROW_NUMBER: 1, 2, 3, 4 (Unique même si égalité)
+        ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY created_at DESC) as rn,
+        -- RANK: 1, 1, 3, 4 (Saut de rang si égalité)
+        RANK() OVER(PARTITION BY user_id ORDER BY amount DESC) as rk
     FROM orders
 )
 
@@ -293,6 +327,8 @@ WHERE rn = 1; -- On ne garde que la plus récente`
                             id: 'lag_lead',
                             title: 'LAG & LEAD',
                             description: 'Comparer avec la ligne précédente/suivante.',
+                            level: 'advanced',
+                            tags: ['sql', 'window-function', 'lag', 'lead'],
                             code: `SELECT 
     month,
     revenue,
@@ -307,6 +343,8 @@ FROM monthly_sales;`
                             id: 'regex',
                             title: 'Expressions Régulières (REGEXP)',
                             description: 'Filtrage de texte avancé.',
+                            level: 'advanced',
+                            tags: ['sql', 'regex', 'text'],
                             code: `-- Trouver les emails gmail ou hotmail
 SELECT * 
 FROM users 
@@ -334,6 +372,8 @@ WHERE email ~* '@(gmail|hotmail)\\.com'; -- ~* = Regex insensible à la casse (P
                             id: 'concat_substring',
                             title: 'Concaténer et Extraire',
                             description: 'CONCAT, ||, SUBSTRING.',
+                            level: 'advanced',
+                            tags: ['sql', 'text', 'string'],
                             code: `-- Concaténation (Standard SQL: ||)
 SELECT first_name || ' ' || last_name as full_name
 FROM users;
@@ -348,6 +388,8 @@ SELECT SUBSTRING('2023-01-01', 1, 4); -- Commence à 1, longueur 4`
                             id: 'trim_coalesce',
                             title: 'Nettoyer et Gérer les NULL',
                             description: 'TRIM et COALESCE.',
+                            level: 'advanced',
+                            tags: ['sql', 'text', 'null', 'coalesce'],
                             code: `-- TRIM : Enlever les espaces inutiles
 SELECT TRIM(email) FROM users;
 
@@ -370,6 +412,8 @@ FROM products;`
                             id: 'json_extract',
                             title: 'Lire du JSON (PostgreSQL/BigQuery)',
                             description: 'Accéder aux clés d\'un objet JSON stocké en texte.',
+                            level: 'advanced',
+                            tags: ['sql', 'json', 'postgres', 'bigquery'],
                             code: `-- Supposons une colonne 'metadata' : {"browser": "Chrome", "clicks": 12}
 
 -- PostgreSQL
@@ -394,6 +438,8 @@ FROM events;`
                             id: 'explain_analyze',
                             title: 'Comprendre le Plan (EXPLAIN)',
                             description: 'Voir comment le moteur exécute la requête.',
+                            level: 'advanced',
+                            tags: ['sql', 'performance', 'explain'],
                             code: `-- Ajoutez EXPLAIN devant votre requête pour voir le plan
 EXPLAIN SELECT * FROM orders WHERE user_id = 123;
 
@@ -402,9 +448,30 @@ EXPLAIN SELECT * FROM orders WHERE user_id = 123;
 -- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`
                         },
                         {
+                            id: 'exists_vs_in',
+                            title: 'EXISTS vs IN',
+                            description: 'Optimisation de sous-requêtes.',
+                            level: 'advanced',
+                            tags: ['sql', 'performance', 'optimization'],
+                            code: `-- ❌ IN : Souvent moins performant si la sous-requête est grosse
+-- Le moteur peut charger toute la liste en mémoire.
+SELECT * FROM orders 
+WHERE user_id IN (SELECT id FROM users WHERE country = 'FR');
+
+-- ✅ EXISTS : S'arrête dès qu'il trouve une correspondance
+-- Souvent plus rapide sur les gros volumes.
+SELECT * FROM orders o
+WHERE EXISTS (
+    SELECT 1 FROM users u 
+    WHERE u.id = o.user_id AND u.country = 'FR'
+);`
+                        },
+                        {
                             id: 'indexes',
                             title: 'Les Index',
                             description: 'Le sommaire du livre.',
+                            level: 'advanced',
+                            tags: ['sql', 'performance', 'index'],
                             markdown: `🚀 **Le concept**
 Sans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".
 Avec un index, elle va à la fin, trouve "H", et va directement à la page.
@@ -423,6 +490,8 @@ Sur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: \`user
                             id: 'sql_pivot',
                             title: 'Pivot (Lignes -> Colonnes)',
                             description: 'Créer un tableau croisé avec CASE WHEN.',
+                            level: 'advanced',
+                            tags: ['sql', 'pivot', 'transform'],
                             code: `-- Objectif : Une colonne par année
 SELECT 
     product_id,
@@ -435,6 +504,8 @@ GROUP BY product_id;`
                             id: 'sql_unpivot',
                             title: 'Unpivot (Colonnes -> Lignes)',
                             description: 'Aplatir un tableau avec UNION ALL.',
+                            level: 'advanced',
+                            tags: ['sql', 'unpivot', 'transform'],
                             code: `-- Objectif : Transformer sales_2022 et sales_2023 en une colonne 'year'
 SELECT product_id, 2022 as year, sales_2022 as amount FROM sales
 UNION ALL
