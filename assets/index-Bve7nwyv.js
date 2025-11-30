@@ -374,7 +374,10 @@ df['prix'] = pd.to_numeric(df['prix'], errors='coerce')
 df['date'] = pd.to_datetime(df['date'])
 
 # Vers catégorie (optimisation mémoire)
-df['statut'] = df['statut'].astype('category')`},{id:"missing",title:"Valeurs Manquantes",description:"Gestion des NaN.",code:`# Voir les manquants
+df['statut'] = df['statut'].astype('category')
+
+# Vers texte (string/object)
+df['nom'] = df['nom'].astype(str)`},{id:"missing",title:"Valeurs Manquantes",description:"Gestion des NaN.",code:`# Voir les manquants
 print(df.isna().sum())
 
 # Supprimer les lignes avec manquants
