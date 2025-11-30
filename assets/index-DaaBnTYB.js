@@ -2950,8 +2950,29 @@ def is_return_from_public_holiday(idx, df):
 
 df['jour_ouvre_lendemain_ferie'] = [is_return_from_public_holiday(i, df) for i in range(len(df))]
 
+# 7. Ponts (Faire le pont)
+# Logique :
+# - Lundi est un pont si Mardi est férié
+# - Vendredi est un pont si Jeudi est férié
+is_lundi = df['date'].dt.dayofweek == 0
+is_vendredi = df['date'].dt.dayofweek == 4
+
+# On regarde demain (shift -1) pour le Lundi
+demain_ferie = df['jour_ferie'].shift(-1).fillna(False)
+# On regarde hier (shift 1) pour le Vendredi
+hier_ferie = df['jour_ferie'].shift(1).fillna(False)
+
+df['pont'] = (is_lundi & demain_ferie) | (is_vendredi & hier_ferie)
+
+# 8. Semaine avec jour férié
+# Utile pour l'analyse de saisonnalité (ex: baisse de productivité prévue)
+# On groupe par année/semaine et on regarde s'il y a au moins un jour férié
+df['year'] = df['date'].dt.isocalendar().year
+df['week'] = df['date'].dt.isocalendar().week
+df['semaine_avec_ferie'] = df.groupby(['year', 'week'])['jour_ferie'].transform('any')
+
 # Aperçu
-print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_ferie']].head(15))`},{id:"school_holidays",title:"Vacances Scolaires (Zones A, B, C)",description:"Récupérer les vacances officielles depuis l'API du gouvernement.",code:`import pandas as pd
+print(df[['date', 'jour_nom', 'jour_ferie', 'pont', 'semaine_avec_ferie']].head(15))`},{id:"school_holidays",title:"Vacances Scolaires (Zones A, B, C)",description:"Récupérer les vacances officielles depuis l'API du gouvernement.",code:`import pandas as pd
 import requests
 import io
 
@@ -2965,7 +2986,7 @@ df_holidays = pd.read_csv(url, sep=';')
 
 # 2. Nettoyage et Préparation
 # On garde les colonnes utiles
-cols = ['Description', 'Zones', 'Date de début', 'Date de fin', 'Annee_scolaire']
+cols = ['Description', 'Zones', 'Date de début', 'Date de fin']
 df_holidays = df_holidays[cols].copy()
 
 # Conversion en datetime (UTC pour éviter les soucis de timezone)
