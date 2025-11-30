@@ -1,5 +1,80 @@
 @import "tailwindcss";
 
+/* Light theme colors */
+html.light {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+}
+
+html.light {
+    background-color: #f9fafb;
+    color: #1f2937;
+}
+
+html.light .bg-black {
+    background-color: #f9fafb;
+}
+
+html.light .bg-zinc-900 {
+    background-color: #ffffff;
+    color: #1f2937;
+}
+
+html.light .bg-zinc-900\/50 {
+    background-color: #f5f5f5;
+}
+
+html.light .bg-zinc-800 {
+    background-color: #e5e7eb;
+}
+
+html.light .bg-zinc-800\/50 {
+    background-color: #f3f4f6;
+}
+
+html.light .text-zinc-100 {
+    color: #1f2937;
+}
+
+html.light .text-zinc-300 {
+    color: #4b5563;
+}
+
+html.light .text-zinc-400 {
+    color: #6b7280;
+}
+
+html.light .text-zinc-500 {
+    color: #9ca3af;
+}
+
+html.light .text-white {
+    color: #111827;
+}
+
+html.light .border-zinc-800 {
+    border-color: #e5e7eb;
+}
+
+html.light .border-zinc-700 {
+    border-color: #d1d5db;
+}
+
+html.light .hover\:bg-zinc-800:hover {
+    background-color: #e5e7eb;
+}
+
+html.light .hover\:bg-zinc-800\/50:hover {
+    background-color: #f3f4f6;
+}
+
+html.light .focus\:bg-zinc-950:focus {
+    background-color: #f9f afb;
+}
+
 html,
 body,
 #root {

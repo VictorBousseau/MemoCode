@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Star } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css'; // Import CSS for math styling
 import MermaidDiagram from './MermaidDiagram';
+import DifficultyBadge from './DifficultyBadge';
 
-export default function CodeCard({ snippet, language = 'python' }) {
+export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite }) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -20,20 +21,36 @@ export default function CodeCard({ snippet, language = 'python' }) {
 
     return (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors">
-            <div className="p-4 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-start">
-                <div>
-                    <h3 className="text-lg font-semibold text-zinc-100">{snippet.title}</h3>
-                    <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
+            <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
+                <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold text-zinc-100">{snippet.title}</h3>
+                            {snippet.level && <DifficultyBadge level={snippet.level} />}
+                        </div>
+                        <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
+                    </div>
+                    <div className="flex gap-2 ml-4">
+                        {onToggleFavorite && (
+                            <button
+                                onClick={onToggleFavorite}
+                                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-yellow-400"
+                                title={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
+                            >
+                                <Star className={`w-4 h-4 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                            </button>
+                        )}
+                        {snippet.code && (
+                            <button
+                                onClick={handleCopy}
+                                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
+                                title="Copy code"
+                            >
+                                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                            </button>
+                        )}
+                    </div>
                 </div>
-                {snippet.code && (
-                    <button
-                        onClick={handleCopy}
-                        className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-white"
-                        title="Copy code"
-                    >
-                        {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                    </button>
-                )}
             </div>
 
             {/* Theoretical Visual Image */}
