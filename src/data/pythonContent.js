@@ -2093,16 +2093,16 @@ print(np.max(arr))    # Maximum`
                             id: 'pl_advantages',
                             title: 'Pourquoi utiliser Polars ?',
                             description: 'Vitesse, Parallélisme et Lazy Evaluation.',
-                            markdown: `🚀 ** Pourquoi Polars est plus rapide ?**
+                            markdown: `🚀 **Pourquoi Polars est plus rapide ?**
 
-    1. ** Écrit en Rust ** : Gestion mémoire ultra - efficace et pas de GIL(Global Interpreter Lock).
-2. ** Parallélisation ** : Utilise tous les cœurs de votre CPU par défaut(Pandas est mono - cœur).
-3. ** Apache Arrow ** : Format mémoire colonnaire standard(zéro copie).
-4. ** Lazy Evaluation ** : Optimise la requête AVANT de l'exécuter (comme SQL).
+1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
+2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
+3. **Apache Arrow** : Format mémoire colonnaire standard (zéro copie).
+4. **Lazy Evaluation** : Optimise la requête AVANT de l'exécuter (comme SQL).
 
-💡 ** Mental Model: Polars vs Pandas **
-*   ** Pandas(Eager) ** : "Fais ça, puis fais ça, puis fais ça..."(Exécution ligne par ligne)
-    *   ** Polars(Lazy) ** : "Voici ce que je veux, trouve le meilleur moyen de le faire."(Optimisation globale)`
+💡 **Mental Model: Polars vs Pandas**
+*   **Pandas (Eager)** : "Fais ça, puis fais ça, puis fais ça..." (Exécution ligne par ligne)
+*   **Polars (Lazy)** : "Voici ce que je veux, trouve le meilleur moyen de le faire." (Optimisation globale)`
                         }
                     ]
                 },
