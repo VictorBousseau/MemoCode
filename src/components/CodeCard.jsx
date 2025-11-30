@@ -1,26 +1,45 @@
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check, Star } from 'lucide-react';
+import { Copy, Check, Star, Pencil } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css'; // Import CSS for math styling
+import 'katex/dist/katex.min.css';
 import MermaidDiagram from './MermaidDiagram';
 import DifficultyBadge from './DifficultyBadge';
 
-export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite }) {
+export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange }) {
     const [copied, setCopied] = useState(false);
+    const [showNote, setShowNote] = useState(false);
 
-    const handleCopy = () => {
+    const handleCopy = (e) => {
+        e.stopPropagation();
         navigator.clipboard.writeText(snippet.code);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleToggleFavorite = (e) => {
+        e.stopPropagation();
+        if (onToggleFavorite) onToggleFavorite();
+    };
+
+    const handleToggleNote = (e) => {
+        e.stopPropagation();
+        setShowNote(!showNote);
+    };
+
+    const handleNoteClick = (e) => {
+        e.stopPropagation();
+    };
+
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors">
+        <div
+            onClick={onClick}
+            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-colors cursor-pointer"
+        >
             <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
                 <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -29,11 +48,41 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                             {snippet.level && <DifficultyBadge level={snippet.level} />}
                         </div>
                         <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line">{snippet.description}</p>
+
+                        {/* Note Display (Preview) */}
+                        {note && !showNote && (
+                            <div className="mt-3 text-sm text-yellow-500/80 italic flex items-center gap-2">
+                                <Pencil className="w-3 h-3" />
+                                <span className="truncate max-w-md">{note}</span>
+                            </div>
+                        )}
+
+                        {/* Note Editor */}
+                        {showNote && (
+                            <div className="mt-3" onClick={handleNoteClick}>
+                                <textarea
+                                    value={note || ''}
+                                    onChange={(e) => onNoteChange(e.target.value)}
+                                    placeholder="Ajouter une note personnelle..."
+                                    className="w-full bg-black/30 border border-zinc-700 rounded-lg p-2 text-sm text-zinc-200 focus:outline-none focus:border-blue-500 min-h-[80px]"
+                                    autoFocus
+                                />
+                            </div>
+                        )}
                     </div>
                     <div className="flex gap-2 ml-4">
+                        {onNoteChange && (
+                            <button
+                                onClick={handleToggleNote}
+                                className={`p-2 hover:bg-zinc-800 rounded-lg transition-colors ${note ? 'text-yellow-500' : 'text-zinc-400 hover:text-white'}`}
+                                title="Ajouter une note"
+                            >
+                                <Pencil className={`w-4 h-4 ${note ? 'fill-yellow-500/20' : ''}`} />
+                            </button>
+                        )}
                         {onToggleFavorite && (
                             <button
-                                onClick={onToggleFavorite}
+                                onClick={handleToggleFavorite}
                                 className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-zinc-400 hover:text-yellow-400"
                                 title={isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
                             >

@@ -211,6 +211,7 @@ df = df.drop(columns=['id_interne', 'temp'])`
                             id: 'query',
                             title: 'Filtrage avec .query()',
                             description: 'Syntaxe lisible pour filtrer.',
+                            level: 'intermediate',
                             code: `# Filtrage simple
 df_adultes = df.query("age >= 18")
 
@@ -226,6 +227,7 @@ df_top = df.query("score >= @min_score")`
                             id: 'loc',
                             title: 'Filtrage classique (.loc)',
                             description: 'Filtrage par masque booléen.',
+                            level: 'intermediate',
                             code: `# Masque booléen
 mask = (df['age'] > 25) & (df['ville'] == 'Paris')
 df_filtered = df.loc[mask]`
@@ -297,6 +299,7 @@ val = df.iloc[0, 2]`
                             id: 'apply',
                             title: 'Apply & Map',
                             description: 'Appliquer des fonctions personnalisées.',
+                            level: 'intermediate',
                             code: `# Appliquer une fonction sur une colonne
 df['nom_long'] = df['nom'].apply(len)
 
@@ -326,6 +329,7 @@ df.groupby('ville').agg({
                             id: 'pivot',
                             title: 'Pivot Table',
                             description: 'Tableaux croisés dynamiques.',
+                            level: 'intermediate',
                             code: `pivot = df.pivot_table(
     values='ventes',
     index='date',
@@ -336,20 +340,15 @@ df.groupby('ville').agg({
                         },
                         {
                             id: 'sorting',
-                            title: 'Tri (Sort Values/Index)',
-                            description: 'Ordonner les données.',
-                            code: `# Trier par valeurs (Croissant)
-df = df.sort_values(by='age')
-
-# Trier par valeurs (Décroissant)
-df = df.sort_values(by='salaire', ascending=False)
-
-# Trier par plusieurs colonnes
+                            title: 'Tri (Sort)',
+                            description: 'Trier les données.',
+                            level: 'beginner',
+                            code: `# Trier par plusieurs colonnes
 # D'abord par Ville (A-Z), puis par Age (Décroissant)
-df = df.sort_values(by=['ville', 'age'], ascending=[True, False])
+df = df.sort_values(by = ['ville', 'age'], ascending = [True, False])
 
-# Trier par Index (remettre les lignes dans l'ordre original)
-df = df.sort_index()`
+# Trier par Index(remettre les lignes dans l'ordre original)
+                                df = df.sort_index()`
                         },
                         {
                             id: 'reset_index',
@@ -357,128 +356,28 @@ df = df.sort_index()`
                             description: 'Réinitialiser l\'index (souvent après un filtre ou un tri).',
                             code: `# Cas d'usage classique :
 # Après un filtrage, les index sont "troués" (ex: 1, 5, 8...).
-# reset_index() recrée un index propre (0, 1, 2...).
+# reset_index() recrée un index propre(0, 1, 2...).
 
-# drop=True : Ne garde pas l'ancien index comme colonne (le supprime).
-# inplace=True : Modifie le DataFrame directement (pas besoin de df = ...)
-df.reset_index(drop=True, inplace=True)
+# drop = True : Ne garde pas l'ancien index comme colonne (le supprime).
+# inplace = True : Modifie le DataFrame directement(pas besoin de df = ...)
+df.reset_index(drop = True, inplace = True)
 
-# Sans drop=True, l'ancien index devient une colonne nommée "index".`
+# Sans drop = True, l'ancien index devient une colonne nommée "index".`
                         }
                     ]
                 },
                 {
-                    id: 'combine',
-                    title: '6. Combinaison',
-                    description: 'Merge et Concat',
-                    snippets: [
-                        {
-                            id: 'merge',
-                            title: 'Jointures (Merge)',
-                            description: 'Fusionner deux DataFrames (comme SQL JOIN).',
-                            markdown: `### 🧩 Comprendre les Jointures
-
-Imaginez deux tables : **A (Gauche)** et **B (Droite)**.
-
-| Type | SQL Equivalent | Description | Résultat |
-| :--- | :--- | :--- | :--- |
-| **Inner** | \`INNER JOIN\` | Garde uniquement les clés présentes dans **les deux** tables. | Intersection (A ∩ B) |
-| **Left** | \`LEFT JOIN\` | Garde **tout A**, et ajoute B là où ça matche. (NaN sinon) | Tout A + B correspondants |
-| **Right** | \`RIGHT JOIN\` | Garde **tout B**, et ajoute A là où ça matche. | Tout B + A correspondants |
-| **Outer** | \`FULL OUTER JOIN\` | Garde **tout**, remplit les trous avec NaN. | Union (A ∪ B) |
-
-**Exemple Visuel :**
-\`\`\`text
-   adf (A)      bdf (B)
-  x1  x2       x1  x3
-  A   1        A   T
-  B   2        B   F
-  C   3        D   T
-\`\`\`
-`,
-                            code: `import pandas as pd
-
-# Inner Join (Défaut : intersection)
-# Résultat : A (1, T), B (2, F) -> C et D sont exclus
-df_inner = pd.merge(adf, bdf, on='x1', how='inner')
-
-# Left Join (Tout A)
-# Résultat : A, B, C (avec NaN pour C en x3)
-df_left = pd.merge(adf, bdf, on='x1', how='left')
-
-# Right Join (Tout B)
-# Résultat : A, B, D (avec NaN pour D en x2)
-df_right = pd.merge(adf, bdf, on='x1', how='right')
-
-# Outer Join (Tout le monde)
-# Résultat : A, B, C, D (avec des NaN partout où ça manque)
-df_outer = pd.merge(adf, bdf, on='x1', how='outer')`
-                        },
-                        {
-                            id: 'concat',
-                            title: 'Concaténation',
-                            description: 'Empiler des DataFrames.',
-                            code: `# Empiler verticalement (ajout de lignes)
-df_total = pd.concat([df_janvier, df_fevrier], axis=0)
-
-# Empiler horizontalement (ajout de colonnes)
-df_large = pd.concat([df_infos, df_metrics], axis=1)`
-                        }
-                    ]
-                },
-                {
-                    id: 'time_series',
-                    title: '7. Séries Temporelles',
-                    description: 'Manipulation de dates et fréquences.',
-                    snippets: [
-                        {
-                            id: 'date_range',
-                            title: 'Générer une plage de dates',
-                            description: 'Créer une séquence de dates.',
-                            code: `import pandas as pd
-
-# Jours
-dates_d = pd.date_range(start='2023-01-01', periods=5, freq='D')
-print("Jours :")
-print(dates_d)
-
-# Mois
-dates_m = pd.date_range(start='2023-01-01', periods=5, freq='M')
-print("\\nMois :")
-print(dates_m)`
-                        },
-                        {
-                            id: 'resampling',
-                            title: 'Rééchantillonnage (Resample)',
-                            description: 'Changer la fréquence des données (ex: jour -> mois).',
-                            code: `import pandas as pd
-import numpy as np
-
-# Données journalières
-rng = pd.date_range('2023-01-01', periods=100, freq='D')
-ts = pd.Series(np.random.randn(len(rng)), index=rng)
-
-# Moyenne mensuelle
-monthly_mean = ts.resample('M').mean()
-print(monthly_mean)`
-                        }
-                    ]
-                },
-                {
-                    id: 'ml_dates',
-                    title: '8. Dates & Machine Learning',
-                    description: 'Préparer les dates pour les modèles prédictifs.',
+                    id: 'time_series_advanced',
+                    title: 'Feature Engineering Temporel',
+                    description: 'Techniques avancées pour les dates.',
                     snippets: [
                         {
                             id: 'date_feature_engineering_advanced',
-                            title: 'Feature Engineering Complet',
-                            description: 'Cyclique, Lags, Rolling et Time Deltas.',
-                            markdown: `### 🧠 Pourquoi transformer les dates ?
-
-Les algorithmes de ML (Random Forest, XGBoost, Réseaux de Neurones) ne comprennent pas le format "date" brut. Il faut extraire des signaux numériques exploitables.
-
-#### 1. La Continuité Temporelle (Encodage Cyclique)
-Le mois 12 (Décembre) est très proche du mois 1 (Janvier). Si on laisse les chiffres 1 et 12, le modèle pense qu'ils sont éloignés.
+                            title: 'Feature Engineering Temporel Avancé',
+                            description: 'Créer des features puissantes pour le Machine Learning.',
+                            level: 'advanced',
+                            markdown: `### 1. La Cyclicité (Sin/Cos)
+**Problème** : Pour un modèle, Décembre (12) est loin de Janvier (1).
 **Solution** : On projette le temps sur un cercle avec Sinus et Cosinus.
 
 #### 2. La Mémoire (Lags & Rolling)
@@ -493,17 +392,17 @@ import numpy as np
 
 # --- 1. Création d'un Dataset Exemple (Série Temporelle) ---
 # On simule 1 an de ventes quotidiennes
-dates = pd.date_range(start='2024-01-01', periods=365, freq='D')
+dates = pd.date_range(start = '2024-01-01', periods = 365, freq = 'D')
 df = pd.DataFrame({
-    'date': dates,
-    'ventes': np.random.randint(50, 200, size=365) # Ventes aléatoires
-})
+            'date': dates,
+            'ventes': np.random.randint(50, 200, size = 365) # Ventes aléatoires
+        })
 
 print("--- Données Brutes ---")
 print(df.head())
 
-# --- 2. Encodage Cyclique (Sin/Cos) ---
-# Indispensable pour capturer la saisonnalité (Hiver -> Printemps -> ...)
+# --- 2. Encodage Cyclique(Sin/ Cos) ---
+# Indispensable pour capturer la saisonnalité(Hiver -> Printemps -> ...)
 df['month'] = df['date'].dt.month
 df['day_of_week'] = df['date'].dt.dayofweek
 
@@ -513,36 +412,36 @@ def encode_cyclical(df, col, max_val):
     df[col + '_cos'] = np.cos(2 * np.pi * df[col] / max_val)
     return df
 
-# Mois : Cycle de 12
+# Mois: Cycle de 12
 df = encode_cyclical(df, 'month', 12)
-# Jour de la semaine : Cycle de 7 (0=Lundi, 6=Dimanche)
+# Jour de la semaine: Cycle de 7(0 = Lundi, 6 = Dimanche)
 df = encode_cyclical(df, 'day_of_week', 7)
 
-# --- 3. Lags (Décalages Temporels) ---
+# -- - 3. Lags(Décalages Temporels)-- -
 # "La valeur d'hier aide à prédire aujourd'hui"
-# Attention : Cela crée des NaN au début (qu'il faudra gérer)
-df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille (J-1)
-df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière (J-7)
+# Attention: Cela crée des NaN au début(qu'il faudra gérer)
+df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille(J - 1)
+df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière(J - 7)
 
-# --- 4. Fenêtres Glissantes (Rolling Windows) ---
-# Capter la tendance locale (lisser le bruit)
+# -- - 4. Fenêtres Glissantes(Rolling Windows)-- -
+# Capter la tendance locale(lisser le bruit)
 # Moyenne mobile sur 7 jours
-df['ventes_rolling_mean_7'] = df['ventes'].rolling(window=7).mean()
-# Écart-type sur 7 jours (Volatilité)
-df['ventes_rolling_std_7'] = df['ventes'].rolling(window=7).std()
+df['ventes_rolling_mean_7'] = df['ventes'].rolling(window = 7).mean()
+# Écart - type sur 7 jours(Volatilité)
+df['ventes_rolling_std_7'] = df['ventes'].rolling(window = 7).std()
 
-# --- 5. Temps Écoulé (Time Deltas) ---
+# -- - 5. Temps Écoulé(Time Deltas)-- -
 # Utile pour modéliser l'usure, l'ancienneté, ou l'effet "depuis le dernier événement"
 # Ex: Jours depuis le début de l'année (Tendance globale)
 ref_date = pd.Timestamp('2024-01-01')
 df['jours_depuis_debut'] = (df['date'] - ref_date).dt.days
 
-# --- 6. Nettoyage Final ---
+# -- - 6. Nettoyage Final-- -
 # Les Lags et Rolling créent des NaN au début.
-# Option A : Supprimer les lignes (on perd les 7 premiers jours)
+# Option A : Supprimer les lignes(on perd les 7 premiers jours)
 df_clean = df.dropna()
 
-# Option B : Remplir (ex: avec 0 ou la moyenne), mais attention au Data Leakage !
+# Option B : Remplir(ex: avec 0 ou la moyenne), mais attention au Data Leakage!
 # df_clean = df.fillna(0)
 
 print("\\n--- Dataset Enrichi (Feature Engineering) ---")
@@ -573,10 +472,10 @@ print(df_clean[cols_to_show].tail())`
                             code: `import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Histogramme avec courbe de densité (KDE)
-# kde=True : ajoute la courbe de densité lissée
-# bins=30 : définit le nombre de barres
-sns.histplot(data=df, x='colonne_numerique', kde=True, bins=30)
+# Histogramme avec courbe de densité(KDE)
+# kde = True : ajoute la courbe de densité lissée
+# bins = 30 : définit le nombre de barres
+sns.histplot(data = df, x = 'colonne_numerique', kde = True, bins = 30)
 plt.title('Distribution de la variable numérique')
 plt.show()`
                         },
@@ -586,10 +485,10 @@ plt.show()`
                             description: 'Détection d\'outliers et quartiles.',
                             level: 'intermediate',
                             image: '/MemoCode/images/boxplot.png',
-                            code: `# Boîte à moustaches (Boxplot)
-# Permet de voir la médiane, les quartiles et les outliers (points)
-# x : la variable numérique à analyser
-sns.boxplot(data=df, x='colonne_numerique')
+                            code: `# Boîte à moustaches(Boxplot)
+# Permet de voir la médiane, les quartiles et les outliers(points)
+# x: la variable numérique à analyser
+sns.boxplot(data = df, x = 'colonne_numerique')
 plt.title('Détection des outliers')
 plt.show()`
                         },
@@ -597,15 +496,16 @@ plt.show()`
                             id: 'countplot',
                             title: 'Countplot',
                             description: 'Fréquence des catégories.',
+                            level: 'beginner',
                             image: '/MemoCode/images/countplot.png',
                             code: `# Diagramme en barres pour variables catégorielles
 # Compte automatiquement le nombre d'occurrences de chaque catégorie
-# order : permet de trier les barres (ici par fréquence décroissante)
+# order: permet de trier les barres(ici par fréquence décroissante)
 sns.countplot(
-    data=df, 
-    x='colonne_categorie', 
-    order=df['colonne_categorie'].value_counts().index
-)
+                                data = df,
+                                x = 'colonne_categorie',
+                                order = df['colonne_categorie'].value_counts().index
+                            )
 plt.title('Fréquence par catégorie')
 plt.show()`
                         }
@@ -620,11 +520,12 @@ plt.show()`
                             id: 'boxplot_bivariate',
                             title: 'Boxplot Bivarié',
                             description: 'Distribution d\'une variable numérique par catégorie.',
+                            level: 'intermediate',
                             image: '/MemoCode/images/boxplot.png',
                             code: `# Boxplot Bivarié
-# x : Variable Catégorielle (Groupes)
-# y : Variable Numérique (Mesure)
-sns.boxplot(data=df, x='categorie', y='montant')
+# x: Variable Catégorielle(Groupes)
+# y: Variable Numérique(Mesure)
+sns.boxplot(data = df, x = 'categorie', y = 'montant')
 plt.title('Distribution du Montant par Catégorie')
 plt.show()`
                         },
@@ -634,17 +535,17 @@ plt.show()`
                             description: 'Relation numérique vs numérique.',
                             level: 'intermediate',
                             image: '/MemoCode/images/scatterplot.png',
-                            code: `# Nuage de points (Scatter Plot)
+                            code: `# Nuage de points(Scatter Plot)
 # Idéal pour voir la corrélation entre deux variables numériques
-# hue : colore les points selon une variable catégorielle
-# alpha : transparence des points (utile si beaucoup de données)
+# hue: colore les points selon une variable catégorielle
+# alpha: transparence des points(utile si beaucoup de données)
 sns.scatterplot(
-    data=df, 
-    x='col_num_1', 
-    y='col_num_2', 
-    hue='categorie',
-    alpha=0.7
-)
+                                data = df,
+                                x = 'col_num_1',
+                                y = 'col_num_2',
+                                hue = 'categorie',
+                                alpha = 0.7
+                            )
 plt.title('Relation entre deux variables numériques')
 plt.show()`
                         },
@@ -652,11 +553,12 @@ plt.show()`
                             id: 'lineplot',
                             title: 'Line Plot',
                             description: 'Séries temporelles.',
+                            level: 'beginner',
                             image: '/MemoCode/images/lineplot.png',
-                            code: `# Graphique linéaire (Line Plot)
+                            code: `# Graphique linéaire(Line Plot)
 # Parfait pour les séries temporelles ou l'évolution continue
-# ci=None : désactive l'intervalle de confiance (zone ombrée) pour alléger
-sns.lineplot(data=df, x='date', y='valeur', ci=None)
+# ci = None : désactive l'intervalle de confiance (zone ombrée) pour alléger
+sns.lineplot(data = df, x = 'date', y = 'valeur', ci = None)
 plt.title('Évolution temporelle')
 plt.show()`
                         },
@@ -664,11 +566,12 @@ plt.show()`
                             id: 'barplot',
                             title: 'Bar Plot',
                             description: 'Comparaison numérique par catégorie.',
+                            level: 'beginner',
                             image: '/MemoCode/images/barplot.png',
-                            code: `# Bar Plot (Comparaison de moyennes)
-# Affiche la moyenne (par défaut) d'une variable numérique par catégorie
+                            code: `# Bar Plot(Comparaison de moyennes)
+# Affiche la moyenne(par défaut) d'une variable numérique par catégorie
 # La petite barre noire au sommet est l'intervalle de confiance (erreur)
-sns.barplot(data=df, x='categorie', y='valeur_numerique')
+sns.barplot(data = df, x = 'categorie', y = 'valeur_numerique')
 plt.title('Moyenne par catégorie')
 plt.show()`
                         }
@@ -690,11 +593,11 @@ plt.show()`
 corr = df.corr()
 
 # 2. Afficher la heatmap
-# annot=True : affiche les valeurs dans les cases
-# cmap='coolwarm' : dégradé bleu (négatif) -> rouge (positif)
-# fmt='.2f' : formatage à 2 décimales
-plt.figure(figsize=(10, 8))
-sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f')
+# annot = True : affiche les valeurs dans les cases
+# cmap = 'coolwarm' : dégradé bleu(négatif) -> rouge(positif)
+# fmt = '.2f' : formatage à 2 décimales
+plt.figure(figsize = (10, 8))
+sns.heatmap(corr, annot = True, cmap = 'coolwarm', fmt = '.2f')
 plt.title('Matrice de Corrélation')
 plt.show()`
                         },
@@ -703,11 +606,11 @@ plt.show()`
                             title: 'Pairplot',
                             description: 'Vue d\'ensemble des relations.',
                             level: 'advanced',
-                            code: `# Pairplot (Grille de graphiques)
+                            code: `# Pairplot(Grille de graphiques)
 # Affiche les relations bivariées pour toutes les paires de variables
-# Diagonale : distribution univariée (histogramme/KDE)
-# hue : sépare les groupes par couleur
-sns.pairplot(df, hue='target_variable')
+# Diagonale: distribution univariée(histogramme / KDE)
+# hue: sépare les groupes par couleur
+sns.pairplot(df, hue = 'target_variable')
 plt.show()`
                         }
                     ]
@@ -734,7 +637,7 @@ plt.show()`
                             title: 'Barplot des Manquants',
                             description: 'Quantité de manquants par colonne.',
                             code: `# Barplot des données présentes
-# Affiche le nombre de valeurs non-nulles par colonne
+# Affiche le nombre de valeurs non - nulles par colonne
 # Permet d'identifier rapidement les colonnes très vides
 msno.bar(df)
 plt.show()`
@@ -758,14 +661,14 @@ plt.show()`
                             id: 'pipeline_concept',
                             title: 'Comprendre les Pipelines',
                             description: 'Pourquoi utiliser un Pipeline ?',
-                            markdown: `### ⛓️ Le Pipeline Scikit-Learn
+                            markdown: `### ⛓️ Le Pipeline Scikit - Learn
 
 Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traitement des données jusqu'au modèle final.
 
-**Pourquoi est-ce indispensable ?**
-1.  **Zéro Fuite de Données (Data Leakage)** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises *uniquement* sur le train set et appliquées aveuglément sur le test set.
-2.  **Reproductibilité** : Tout le processus est contenu dans un seul objet.
-3.  **Simplicité** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
+** Pourquoi est - ce indispensable ?**
+                    1. ** Zéro Fuite de Données(Data Leakage) ** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises * uniquement * sur le train set et appliquées aveuglément sur le test set.
+2. ** Reproductibilité ** : Tout le processus est contenu dans un seul objet.
+3. ** Simplicité ** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
 
 \`\`\`mermaid
 graph LR
@@ -798,6 +701,7 @@ graph LR
                             id: 'make_pipeline',
                             title: 'Créer un Pipeline',
                             description: 'Exemple simple avec make_pipeline.',
+                            level: 'advanced',
                             code: `from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -833,6 +737,7 @@ y_pred = pipe.predict(X_test)`
                             id: 'train_test_split',
                             title: 'Séparation Train / Test',
                             description: 'Diviser les données pour évaluer le modèle.',
+                            level: 'intermediate',
                             code: `import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -859,6 +764,7 @@ X_train, X_test, y_train, y_test = train_test_split(
                             id: 'encoding',
                             title: 'Encodage Catégoriel',
                             description: 'Transformer le texte en nombres.',
+                            level: 'intermediate',
                             code: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
@@ -880,6 +786,7 @@ X_encoded_array = encoder.fit_transform(X[['categorie']])`
                             id: 'scaling',
                             title: 'Mise à l\'échelle (Scaling)',
                             description: 'Standardiser les variables numériques.',
+                            level: 'intermediate',
                             code: `from sklearn.preprocessing import StandardScaler
 
 # --- Exemple Avant / Après ---
@@ -906,6 +813,7 @@ X_test_scaled = scaler.transform(X_test)`
                             id: 'lda_qda_logistic',
                             title: 'Discriminante & Logistique',
                             description: 'Approches probabilistes.',
+                            level: 'intermediate',
                             markdown: `### 📐 Formules & Concepts
 
 **1. Régression Logistique**
@@ -945,6 +853,7 @@ qda.fit(X_train, y_train)`
                             id: 'decision_tree',
                             title: 'Arbre de Décision',
                             description: 'Diviser pour mieux régner.',
+                            level: 'intermediate',
                             markdown: `### 🌳 Critères de Split
 
 L'arbre cherche la question qui sépare le mieux les données en minimisant l'impureté.
@@ -973,7 +882,24 @@ tree.fit(X_train, y_train)`
                             id: 'svm',
                             title: 'SVM (Séparateur à Vaste Marge)',
                             description: 'Maximiser la marge entre les classes.',
-                            markdown: `### 🛣️ Le Concept
+                            level: 'advanced',
+                            markdown: `### ⚔️ L'Hyperplan
+Le SVM cherche la ligne (ou plan) qui sépare le mieux les classes avec la plus grande marge.
+\`\`\`mermaid
+graph LR
+    subgraph Classe A
+    A1((A))
+    A2((A))
+    end
+    subgraph Classe B
+    B1((B))
+    B2((B))
+    end
+    A2 --- Marge --- B1
+    style Marge stroke-dasharray: 5 5
+\`\`\`
+
+### 🛣️ Le Concept
 
 Le SVM cherche l'hyperplan qui sépare les classes avec la plus grande **marge** possible (la "rue" la plus large).
 
@@ -999,6 +925,7 @@ svm.fit(X_train_scaled, y_train) # SCALING OBLIGATOIRE !`
                             id: 'perceptron',
                             title: 'Perceptron',
                             description: 'L\'ancêtre des réseaux de neurones.',
+                            level: 'intermediate',
                             markdown: `### 🧠 Neurone Artificiel Simple
 
 Le Perceptron est un classifieur linéaire simple.
@@ -1027,6 +954,7 @@ perc.fit(X_train_scaled, y_train)`
                             id: 'distances',
                             title: '📏 Les Distances',
                             description: 'Fondamental pour le Clustering.',
+                            level: 'intermediate',
                             markdown: `### 📐 Formules des Distances
 
 La notion de "proximité" dépend de la distance choisie. Soit deux points $A(x_1, ..., x_n)$ et $B(y_1, ..., y_n)$.
@@ -1055,6 +983,7 @@ $$ d(A, B) = 1 - \\frac{A \\cdot B}{||A|| \\times ||B||} $$`
                             id: 'kmeans_clouds',
                             title: 'K-Moyennes & Nuées Dynamiques',
                             description: 'Partitionnement itératif.',
+                            level: 'advanced',
                             markdown: `### 🎯 K-Means
 
 L'algorithme cherche à minimiser l'**Inertie Intra-Classe** (Variance au sein des clusters).
@@ -1086,8 +1015,23 @@ centres = kmeans.cluster_centers_`
                             id: 'cah',
                             title: 'Classification Hiérarchique (CAH)',
                             description: 'Arbre de regroupement (Dendrogramme).',
+                            level: 'advanced',
                             image: '/MemoCode/images/dendrogram.png',
-                            markdown: `### 🌳 Agglomerative Clustering
+                            markdown: `### 🌳 Le Dendrogramme
+Visualisation de la hiérarchie des clusters.
+\`\`\`mermaid
+graph TD
+    A[Données] --> B[Cluster 1]
+    A --> C[Cluster 2]
+    B --> D[Point 1]
+    B --> E[Point 2]
+    C --> F[Point 3]
+    C --> G[Cluster 3]
+    G --> H[Point 4]
+    G --> I[Point 5]
+\`\`\`
+
+### 🌳 Agglomerative Clustering
 
 On part de N clusters (chaque point est seul) et on fusionne les plus proches itérativement.
 
@@ -1118,6 +1062,7 @@ labels = cah.fit_predict(X_scaled)`
                             id: 'kohonen',
                             title: 'Réseau de Kohonen (SOM)',
                             description: 'Carte Auto-Organisatrice.',
+                            level: 'advanced',
                             markdown: `### 🗺️ Self-Organizing Map (SOM)
 
 Un réseau de neurones non supervisé qui projette des données de haute dimension sur une carte 2D (grille de neurones), en préservant la **topologie** (les voisins restent voisins).
@@ -1150,6 +1095,7 @@ som.train_random(X_scaled, 100) # 100 itérations`
                             id: 'variable_types',
                             title: 'Types de Variables',
                             description: 'Quali vs Quanti, Discret vs Continu.',
+                            level: 'beginner',
                             markdown: `### 📊 Classification des Variables
 
 #### 1. Quantitative (Numérique)
@@ -1166,6 +1112,7 @@ Décrit une caractéristique. Pas de calcul mathématique direct.
                             id: 'gini_entropy_calc',
                             title: 'Gini vs Entropie',
                             description: 'Calcul détaillé sur un exemple simple.',
+                            level: 'advanced',
                             markdown: `### 🧮 Exemple Concret
 
 Imaginons un noeud de l'arbre contenant **5 billes** :
@@ -1201,6 +1148,7 @@ $$
                             id: 'distance_calc',
                             title: 'Calcul de Distances',
                             description: 'Euclidienne vs Manhattan.',
+                            level: 'intermediate',
                             markdown: `### 📏 Exemple Concret
 
 Soit deux points dans un plan 2D :
@@ -1229,6 +1177,7 @@ $$`
                             id: 'normalization_standardization',
                             title: 'Normalisation vs Standardisation',
                             description: 'Mise à l\'échelle des données.',
+                            level: 'intermediate',
                             markdown: `### 📏 Pourquoi mettre à l'échelle ?
 
 Certains algorithmes (SVM, K-Means, KNN) sont sensibles aux ordres de grandeur.
@@ -1249,6 +1198,7 @@ $$ Z = \\frac{X - \\mu}{\\sigma} $$
                             id: 'classification_metrics',
                             title: 'Métriques de Classification',
                             description: 'Précision, Rappel & F1-Score.',
+                            level: 'intermediate',
                             markdown: `### 🎯 Au-delà de l'Accuracy
 
 Dans un problème déséquilibré (ex: 99% de non-malades), l'accuracy ne suffit pas.
@@ -1272,6 +1222,7 @@ $$ F1 = 2 \\times \\frac{Précision \\times Rappel}{Précision + Rappel} $$
                             id: 'gradient_descent',
                             title: 'Descente de Gradient',
                             description: 'Le moteur de l\'apprentissage.',
+                            level: 'advanced',
                             markdown: `### 📉 L'Algorithme d'Optimisation
 
 Imaginez descendre une montagne dans le brouillard pour trouver la vallée la plus basse.
@@ -1289,6 +1240,7 @@ $$ w_{nouveau} = w_{ancien} - \\eta \\cdot \\nabla J(w) $$
                             id: 'bayes_theorem',
                             title: 'Théorème de Bayes',
                             description: 'Probabilités Conditionnelles.',
+                            level: 'advanced',
                             markdown: `### 🎲 La Base du Naive Bayes
 
 Comment mettre à jour nos croyances avec de nouvelles preuves ?
@@ -1312,6 +1264,7 @@ $$ P(A|B) = \\frac{P(B|A) \\cdot P(A)}{P(B)} $$
                             id: 'metrics',
                             title: 'Métriques de Base',
                             description: 'Classification Report et Erreurs.',
+                            level: 'advanced',
                             code: `from sklearn.metrics import classification_report, mean_squared_error, r2_score
 
 # --- Pour la Classification ---
@@ -1330,6 +1283,7 @@ print(f"R2: {r2}")     # Qualité de l'ajustement (proche de 1 = parfait)`
                             title: 'Matrice de Confusion',
                             description: `Type : Classification
                             Visuel : Diagonale foncée = Bonnes prédictions.`,
+                            level: 'advanced',
                             code: `from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
@@ -1344,6 +1298,7 @@ plt.show()`
                             title: 'Courbe ROC & AUC',
                             description: `Type : Classification Binaire
                             Visuel : Courbe qui doit bomber vers le coin haut-gauche.`,
+                            level: 'advanced',
                             code: `from sklearn.metrics import RocCurveDisplay
 
 # Affiche la courbe ROC
@@ -1356,6 +1311,7 @@ plt.show()`
                         {
                             id: 'feature_importance',
                             title: 'Importance des Variables',
+                            level: 'advanced',
                             description: `Type : Arbres (Random Forest, XGBoost...)
                             Visuel : Quelles variables pèsent le plus ?`,
                             code: `import seaborn as sns
@@ -1387,6 +1343,7 @@ plt.show()`
                             id: 'ols_formula',
                             title: 'OLS (Formule)',
                             description: 'Syntaxe style R (plus simple).',
+                            level: 'intermediate',
                             code: `import statsmodels.api as sm
 import statsmodels.formula.api as smf
 
@@ -1400,6 +1357,7 @@ print(model.summary())`
                             id: 'ols_arrays',
                             title: 'OLS (Arrays)',
                             description: 'Avec X et y (comme Scikit-Learn).',
+                            level: 'intermediate',
                             code: `# Il faut ajouter une constante (intercept) manuellement !
 X = sm.add_constant(X)
 
@@ -1418,6 +1376,7 @@ print(model.summary())`
                             title: 'Deep Learning vs ML Classique',
                             subCategory: '5.1 Concepts & Tenseurs',
                             description: 'Quand utiliser le Deep Learning ?',
+                            level: 'advanced',
                             markdown: `🧠 **Deep Learning (Réseaux de Neurones)**
 Contrairement au Machine Learning classique (Random Forest, XGBoost) qui sature avec beaucoup de données, le Deep Learning excelle sur les **données non structurées** (Images, Texte, Son) et les très gros volumes de données.
 
@@ -1429,7 +1388,8 @@ Le réseau apprend ses propres "features" (caractéristiques) couche par couche,
                             title: 'Les Tenseurs',
                             subCategory: '5.1 Concepts & Tenseurs',
                             description: 'La brique de base de TensorFlow.',
-                            markdown: `📦 **Qu'est-ce qu'un Tenseur ?**
+                            level: 'advanced',
+                            markdown: `📦 **Qu'est-ce un Tenseur ?**
 C'est une généralisation des matrices à N dimensions.
 *   **Scalaire** (0D) : Un nombre seul (ex: \`5\`)
 *   **Vecteur** (1D) : Une liste (ex: \`[1, 2, 3]\`)
@@ -1444,6 +1404,7 @@ En TensorFlow, les données circulent sous forme de tenseurs entre les couches d
                             title: 'L\'Architecture (Sequential)',
                             subCategory: '5.2 Workflow Keras',
                             description: 'Empiler des couches comme des Lego.',
+                            level: 'advanced',
                             code: `import tensorflow as tf
 from tensorflow.keras import layers, models
 
@@ -1461,6 +1422,7 @@ model.add(layers.Dense(1, activation='linear')) # Sortie (1 valeur pour une rég
                             title: 'Fonctions d\'Activation',
                             subCategory: '5.2 Workflow Keras',
                             description: 'Donner de la non-linéarité au modèle.',
+                            level: 'advanced',
                             markdown: `⚡ **Pourquoi une fonction d'activation ?**
 Sans elles, un réseau de neurones ne serait qu'une grosse régression linéaire. Elles permettent d'apprendre des motifs complexes.
 
@@ -1474,6 +1436,7 @@ Sans elles, un réseau de neurones ne serait qu'une grosse régression linéaire
                             title: 'Compilation',
                             subCategory: '5.2 Workflow Keras',
                             description: 'Définir comment le modèle apprend.',
+                            level: 'advanced',
                             code: `model.compile(
     optimizer='adam',      # L'algorithme d'optimisation (Adam est le standard actuel)
     loss='mse',            # La fonction de perte (MSE pour régression, Crossentropy pour classification)
@@ -1485,6 +1448,7 @@ Sans elles, un réseau de neurones ne serait qu'une grosse régression linéaire
                             title: 'Entraîner le modèle (Fit)',
                             subCategory: '5.3 Entraînement',
                             description: 'Epochs et Batch Size.',
+                            level: 'advanced',
                             code: `history = model.fit(
     X_train, y_train,
     epochs=50,             # Nombre de fois que le modèle voit TOUTES les données
@@ -1498,6 +1462,7 @@ Sans elles, un réseau de neurones ne serait qu'une grosse régression linéaire
                             title: 'Éviter le Sur-apprentissage',
                             subCategory: '5.3 Entraînement',
                             description: 'Early Stopping et Dropout.',
+                            level: 'advanced',
                             code: `from tensorflow.keras.callbacks import EarlyStopping
 
 # Arrêter si la validation ne s'améliore plus après 5 epochs
@@ -1514,6 +1479,7 @@ model.fit(
                             title: 'Régression (Prix Immo)',
                             subCategory: '5.4 Exemple Complet',
                             description: 'Prédire une valeur continue.',
+                            level: 'advanced',
                             code: `import tensorflow as tf
 from tensorflow.keras import layers, models
 
@@ -1552,6 +1518,7 @@ predictions = model.predict(X_test)`
                             id: 'math_lib',
                             title: 'Mathématiques (math)',
                             description: 'Fonctions mathématiques de base.',
+                            level: 'beginner',
                             code: `import math
 
 # Constantes
@@ -1568,6 +1535,7 @@ print(math.factorial(5)) # 120 (5!)`
                             id: 'random_lib',
                             title: 'Aléatoire (random)',
                             description: 'Générer des nombres et choix aléatoires.',
+                            level: 'beginner',
                             code: `import random
 
 # Fixer la graine (pour la reproductibilité)
@@ -1591,6 +1559,7 @@ print(random.sample(range(100), 5))`
                             id: 'datetime_lib',
                             title: 'Dates & Heures (datetime)',
                             description: 'Manipuler le temps.',
+                            level: 'beginner',
                             code: `from datetime import datetime, date, timedelta
 
 # 1. Création
@@ -1619,6 +1588,7 @@ print(f"Jours de différence : {diff.days}")`
                             id: 'dateutil_lib',
                             title: 'Calculs Avancés (dateutil)',
                             description: 'Gérer les mois et années (relativedelta).',
+                            level: 'intermediate',
                             markdown: `### 🚀 Pourquoi dateutil ?
 \`timedelta\` ne gère pas les **mois** ni les **années** car leur durée varie (28-31 jours, 365-366 jours).
 Pour cela, on utilise \`dateutil.relativedelta\`.
@@ -1648,6 +1618,7 @@ print(f"Âge : {age.years} ans, {age.months} mois et {age.days} jours")`
                             id: 'os_sys_lib',
                             title: 'Système (os, sys)',
                             description: 'Interagir avec l\'OS et le système de fichiers.',
+                            level: 'beginner',
                             code: `import os
 import sys
 
@@ -1679,6 +1650,7 @@ if os.path.exists("data.csv"):
                             id: 'collections_lib',
                             title: 'Collections Utiles',
                             description: 'Counter et defaultdict.',
+                            level: 'intermediate',
                             code: `from collections import Counter, defaultdict
 
 # --- Counter-- -
@@ -1707,6 +1679,7 @@ print(d['z']) # 0(créé automatiquement)`
                             id: 'loops',
                             title: 'Boucles For & While',
                             description: 'Itérer sur des séquences ou tant qu\'une condition est vraie.',
+                            level: 'beginner',
                             code: `import math
 import random
 import datetime
@@ -1732,6 +1705,7 @@ while compteur < 5:
                             id: 'conditions',
                             title: 'Conditions (If/Elif/Else)',
                             description: 'Exécuter du code selon des critères.',
+                            level: 'beginner',
                             code: `age = 20
 
 if age < 18:
@@ -1748,6 +1722,7 @@ statut = "Majeur" if age >= 18 else "Mineur"`
                             id: 'break_continue',
                             title: 'Break & Continue',
                             description: 'Contrôler l\'exécution dans les boucles.',
+                            level: 'intermediate',
                             code: `for i in range(10):
     if i == 3:
         continue # Passe à l'itération suivante (saute 3)
@@ -1767,6 +1742,7 @@ print(i)`
                             id: 'def_function',
                             title: 'Définition (def)',
                             description: 'Créer une fonction simple avec paramètres.',
+                            level: 'beginner',
                             code: `def saluer(nom, message = "Bonjour"):
 """
     Affiche un message de salutation.
@@ -1781,6 +1757,7 @@ print(saluer("Bob", "Salut"))`
                             id: 'args_kwargs',
                             title: 'Args & Kwargs',
                             description: 'Fonctions avec un nombre variable d\'arguments.',
+                            level: 'intermediate',
                             code: `def somme_tout(* args):
     # args est un tuple
 return sum(args)
@@ -1798,6 +1775,7 @@ afficher_infos(nom = "Alice", age = 30, ville = "Paris")`
                             id: 'lambda',
                             title: 'Fonctions Lambda',
                             description: 'Fonctions anonymes en une ligne.',
+                            level: 'intermediate',
                             code: `# Syntaxe: lambda arguments: expression
 carre = lambda x: x ** 2
 
@@ -1819,6 +1797,7 @@ pairs = list(filter(lambda x: x % 2 == 0, nombres)) #[2, 4]`
                             id: 'lists',
                             title: 'Listes (List)',
                             description: 'Collection ordonnée et modifiable.',
+                            level: 'beginner',
                             code: `ma_liste = [1, 2, 3]
 
 # Ajout
@@ -1834,6 +1813,7 @@ carres = [x ** 2 for x in range(5)] #[0, 1, 4, 9, 16]`
                             id: 'dicts',
                             title: 'Dictionnaires (Dict)',
                             description: 'Paires Clé-Valeur.',
+                            level: 'beginner',
                             code: `mon_dict = { "nom": "Alice", "age": 25 }
 
 # Accès sécurisé(évite l'erreur si la clé n'existe pas)
@@ -1847,6 +1827,7 @@ for cle, valeur in mon_dict.items():
                             id: 'sets',
                             title: 'Ensembles (Set)',
                             description: 'Collection non-ordonnée d\'éléments UNIQUES.',
+                            level: 'intermediate',
                             code: `nombres = [1, 2, 2, 3, 3, 3]
 uniques = set(nombres) # { 1, 2, 3 }
 
@@ -1869,6 +1850,7 @@ print(a.union(b)) # { 1, 2, 3, 4, 5 } `
                             id: 'try_except',
                             title: 'Bloc Try / Except',
                             description: 'Gérer les exceptions pour éviter que le programme plante.',
+                            level: 'beginner',
                             code: `try:
 resultat = 10 / 0
 except ZeroDivisionError:
@@ -1892,6 +1874,7 @@ print("S'exécute toujours (utile pour fermer un fichier/connexion)")`
                             id: 'f_strings_basic',
                             title: 'Bases des f-strings',
                             description: 'Insérer des variables directement dans les chaînes.',
+                            level: 'beginner',
                             code: `from pprint import pprint
 
 nom = "Alice"
@@ -1907,6 +1890,7 @@ print(f"Bonjour {nom}, tu as {age} ans.")`
                             id: 'f_strings_advanced',
                             title: 'Formatage Avancé',
                             description: 'Arrondis, dates, alignement.',
+                            level: 'intermediate',
                             code: `prix = 19.9999
 pourcentage = 0.1234
 
@@ -1932,6 +1916,7 @@ print(f"{x=}") # x = 10`
                             id: 'docstrings',
                             title: 'Docstrings ("""...""")',
                             description: 'Documenter vos fonctions pour les autres (et vous-même).',
+                            level: 'beginner',
                             code: `def calcul_complexe(x, y):
 """
     Effectue un calcul complexe entre x et y.
@@ -1960,6 +1945,7 @@ help(calcul_complexe)`
                             id: 'unpacking',
                             title: 'Unpacking (Déballage)',
                             description: 'Assigner plusieurs variables en une ligne.',
+                            level: 'beginner',
                             code: `coords = (10, 20)
 x, y = coords # x = 10, y = 20
 
@@ -1972,6 +1958,7 @@ a, b = b, a # a = 10, b = 5`
                             id: 'enumerate',
                             title: 'Enumerate',
                             description: 'Avoir l\'index ET la valeur dans une boucle.',
+                            level: 'beginner',
                             code: `fruits = ["pomme", "banane", "cerise"]
 
 # Pas terrible:
@@ -1986,6 +1973,7 @@ for i, fruit in enumerate(fruits):
                             id: 'zip',
                             title: 'Zip',
                             description: 'Boucler sur deux listes en parallèle.',
+                            level: 'beginner',
                             code: `noms = ["Alice", "Bob"]
 ages = [25, 30]
 
@@ -2004,6 +1992,7 @@ for nom, age in zip(noms, ages):
                             id: 'timeit',
                             title: 'Mesurer le temps (%timeit)',
                             description: 'Chronometrer une ligne de code.',
+                            level: 'intermediate',
                             code: `# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
     % timeit[x ** 2 for x in range(1000)]
 
@@ -2014,6 +2003,7 @@ for nom, age in zip(noms, ages):
                             id: 'autoreload',
                             title: 'Rechargement Auto (%autoreload)',
                             description: 'Plus besoin de redémarrer le kernel quand on modifie un module externe.',
+                            level: 'intermediate',
                             code: `# À mettre au début du notebook
     % load_ext autoreload
         % autoreload 2
@@ -2033,6 +2023,7 @@ import mon_module_perso
                             id: 'create_array',
                             title: 'Création',
                             description: 'Différentes façons de créer des arrays.',
+                            level: 'beginner',
                             code: `import numpy as np
 
 # À partir d'une liste
@@ -2050,6 +2041,7 @@ linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`
                             id: 'reshape',
                             title: 'Dimensions & Reshape',
                             description: 'Changer la forme des données.',
+                            level: 'beginner',
                             code: `arr = np.arange(12) #[0..11]
 
 # Changer en matrice 3x4
@@ -2070,6 +2062,7 @@ flat = mat.flatten()`
                             id: 'basic_math',
                             title: 'Calculs de base',
                             description: 'Opérations élément par élément.',
+                            level: 'beginner',
                             code: `a = np.array([1, 2, 3])
 b = np.array([10, 20, 30])
 
@@ -2081,6 +2074,7 @@ print(a ** 2) #[1, 4, 9]`
                             id: 'stats_np',
                             title: 'Statistiques',
                             description: 'Moyenne, écart-type, etc.',
+                            level: 'beginner',
                             code: `arr = np.array([1, 2, 3, 4, 5])
 
 print(np.mean(arr))  # Moyenne
@@ -2107,6 +2101,7 @@ print(np.max(arr))    # Maximum`
                             id: 'pl_advantages',
                             title: 'Pourquoi utiliser Polars ?',
                             description: 'Vitesse, Parallélisme et Lazy Evaluation.',
+                            level: 'intermediate',
                             markdown: `🚀 **Pourquoi Polars est plus rapide ?**
 
 1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
@@ -2129,6 +2124,7 @@ print(np.max(arr))    # Maximum`
                             id: 'pl_read_scan',
                             title: 'Read vs Scan (Lazy)',
                             description: 'La différence fondamentale.',
+                            level: 'intermediate',
                             code: `import polars as pl
 
 # 1. Mode Eager(Classique, comme Pandas)
@@ -2147,6 +2143,7 @@ print(np.max(arr))    # Maximum`
                             id: 'pl_parquet',
                             title: 'Parquet (Format Roi)',
                             description: 'Le format natif idéal pour Polars.',
+                            level: 'intermediate',
                             code: `# Lecture
 df = pl.read_parquet("data.parquet")
 q = pl.scan_parquet("data.parquet")
@@ -2166,6 +2163,7 @@ df.write_parquet("output.parquet", compression = "snappy")`
                             id: 'pl_glimpse',
                             title: 'Glimpse & Schema',
                             description: 'Aperçu dense des données.',
+                            level: 'intermediate',
                             code: `# Aperçu des premières / dernières lignes
 print(df.head())
 print(df.tail())
@@ -2180,6 +2178,7 @@ print(df.schema)`
                             id: 'pl_describe',
                             title: 'Describe',
                             description: 'Statistiques descriptives.',
+                            level: 'intermediate',
                             code: `# Statistiques sommaires
 print(df.describe())
 
@@ -2197,6 +2196,7 @@ print(df["categorie"].value_counts())`
                             id: 'pl_select',
                             title: 'Select (Colonnes)',
                             description: 'Choisir et transformer des colonnes.',
+                            level: 'intermediate',
                             code: `# Sélection simple
 df.select(["nom", "age"])
 
@@ -2216,6 +2216,7 @@ df.select(pl.col(pl.Int64))`
                             id: 'pl_filter',
                             title: 'Filter (Lignes)',
                             description: 'Filtrer les données.',
+                            level: 'intermediate',
                             code: `# Filtrage simple
 df.filter(pl.col("age") > 18)
 
@@ -2233,6 +2234,7 @@ df.filter(pl.col("ville").is_in(villes_cibles))`
                             id: 'pl_with_columns',
                             title: 'With Columns (Ajout)',
                             description: 'Ajouter ou modifier des colonnes.',
+                            level: 'intermediate',
                             code: `# Pandas: df['new'] = ...
 # Polars: .with_columns()
 
@@ -2253,6 +2255,7 @@ df = df.with_columns([
                             id: 'pl_groupby',
                             title: 'GroupBy & Agg',
                             description: 'Agrégations performantes.',
+                            level: 'intermediate',
                             code: `# Syntaxe: group_by -> agg
 df.group_by("ville").agg([
     pl.col("salaire").mean().alias("salaire_moyen"),
@@ -2266,6 +2269,7 @@ df.group_by("ville").agg([
                             id: 'pl_window',
                             title: 'Window Functions (Over)',
                             description: 'Calculs par groupe sans réduire le nombre de lignes.',
+                            level: 'intermediate',
                             code: `# Ajouter la moyenne de la ville à chaque habitant
 # Pandas: transform()
 # Polars: .over()
@@ -2285,6 +2289,7 @@ df.with_columns([
                             id: 'pl_join',
                             title: 'Join (Jointures)',
                             description: 'Fusionner des DataFrames.',
+                            level: 'intermediate',
                             code: `# Join
 # how: 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
 df_merged = df_clients.join(df_commandes, on = "client_id", how = "left")
@@ -2297,6 +2302,7 @@ df_non_trouve = df_clients.join(df_commandes, on = "client_id", how = "anti")`
                             id: 'pl_concat',
                             title: 'Concat',
                             description: 'Empiler des données.',
+                            level: 'intermediate',
                             code: `# Vertical(Lignes)
 pl.concat([df1, df2], how = "vertical")
 
@@ -2314,6 +2320,7 @@ pl.concat([df1, df2], how = "horizontal")`
                             id: 'pl_lazy_flow',
                             title: 'Le Flux Lazy Complet',
                             description: 'L\'exemple canonique d\'optimisation.',
+                            level: 'advanced',
                             code: `q = (
     pl.scan_csv("data.csv")
         .filter(pl.col("date") > "2023-01-01")
@@ -2332,6 +2339,7 @@ df_result = q.collect()`
                             id: 'pl_streaming',
                             title: 'Streaming (Out-of-Core)',
                             description: 'Traiter des données plus grosses que la RAM.',
+                            level: 'advanced',
                             code: `# Si le dataset est trop gros pour la RAM,
 # Polars peut le traiter par morceaux(chunks).
 
@@ -2344,6 +2352,7 @@ df_result = q.collect(streaming = True)`
                             id: 'pl_sql',
                             title: 'SQL Context',
                             description: 'Utiliser du SQL sur des DataFrames Polars.',
+                            level: 'advanced',
                             code: `ctx = pl.SQLContext()
 ctx.register("clients", df_clients)
 ctx.register("ventes", df_ventes)
@@ -2376,6 +2385,7 @@ print(result.collect())`
                             id: 'skrub_install',
                             title: 'Installation & Contexte',
                             description: 'Skrub facilite le preprocessing pour le Machine Learning.',
+                            level: 'intermediate',
                             markdown: `### 🧼 Skrub (ex - DirtyCat)
 
 Développé par l'équipe de **scikit-learn**, Skrub est conçu pour combler le fossé entre les données brutes (bases de données, CSV sales) et les modèles de Machine Learning.
@@ -2402,6 +2412,7 @@ pip install skrub
                             id: 'table_report',
                             title: 'TableReport',
                             description: 'Génère un rapport HTML interactif complet.',
+                            level: 'intermediate',
                             code: `from skrub import TableReport
 import pandas as pd
 
@@ -2422,6 +2433,7 @@ TableReport(df)`
                             id: 'table_vectorizer',
                             title: 'TableVectorizer',
                             description: 'Transforme tout un DataFrame en nombres pour le ML.',
+                            level: 'intermediate',
                             code: `from skrub import TableVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.ensemble import RandomForestClassifier
@@ -2450,6 +2462,7 @@ pipeline.fit(X_train, y_train)`
                             id: 'minhash_encoder',
                             title: 'MinHashEncoder',
                             description: 'Pour les catégories avec beaucoup de valeurs uniques ou des fautes.',
+                            level: 'advanced',
                             code: `from skrub import MinHashEncoder
 
 # Idéal pour : Noms, Adresses, Descriptions courtes
@@ -2463,6 +2476,7 @@ X_encoded = encoder.fit_transform(X[['ville']])`
                             id: 'gap_encoder',
                             title: 'GapEncoder',
                             description: 'Topic Modeling pour colonnes textuelles.',
+                            level: 'advanced',
                             code: `from skrub import GapEncoder
 
 # Trouve des "sujets" latents dans le texte.
@@ -2483,6 +2497,7 @@ X_topics = encoder.fit_transform(X[['description']])`
                             id: 'joiner',
                             title: 'Joiner (Fuzzy Join)',
                             description: 'Joindre deux tables même si les clés ne correspondent pas exactement.',
+                            level: 'advanced',
                             code: `from skrub import Joiner
 
 # Jointure floue (basée sur la similarité de texte)
@@ -2500,6 +2515,7 @@ df_enrichi = joiner.fit_transform(df_main)`
                             id: 'aggregator',
                             title: 'Aggregator',
                             description: 'Agréger une table secondaire avant jointure.',
+                            level: 'advanced',
                             code: `from skrub import Aggregator
 
 # Résume une table liée (ex: commandes) pour la joindre à la table principale (ex: clients)
@@ -2522,6 +2538,7 @@ df_resumed = agg.fit_transform(df_commandes)`
                             id: 'skrub_cheat_sheet',
                             title: 'Cheat Sheet',
                             description: 'Tableau récapitulatif des fonctions.',
+                            level: 'intermediate',
                             markdown: `### 🛠️ Fonctions Clés de Skrub
 
 | Fonction | Usage Principal | Réel Avantage 🚀 | Scikit-Learn Equivalent |
@@ -2552,6 +2569,7 @@ df_resumed = agg.fit_transform(df_commandes)`
                             id: 'venv',
                             title: 'Venv (Standard)',
                             description: 'Créer et activer un environnement virtuel.',
+                            level: 'intermediate',
                             code: `import pytest
 
 # 1. Créer l'environnement (dans le dossier du projet)
@@ -2580,6 +2598,7 @@ pip freeze > requirements.txt`
                             id: 'pytest_basic',
                             title: 'Premier Test avec Pytest',
                             description: 'Simple, lisible et puissant.',
+                            level: 'intermediate',
                             code: `# fichier: test_calcul.py
 
 def addition(a, b):
@@ -2596,6 +2615,7 @@ def test_addition():
                             id: 'pytest_fixtures',
                             title: 'Fixtures (Setup/Teardown)',
                             description: 'Préparer des données avant chaque test.',
+                            level: 'intermediate',
                             code: `import pytest
 
 @pytest.fixture
@@ -2612,6 +2632,7 @@ def test_data_name(sample_data):
                             id: 'pytest_parametrize',
                             title: 'Parametrize (Le Super-Pouvoir)',
                             description: 'Tester 10 cas sans copier-coller 10 fois le code.',
+                            level: 'intermediate',
                             markdown: `### 💡 Pourquoi Parametrize ?
 Sans parametrize, pour tester une fonction qui classe les âges, vous feriez :
 \`\`\`python
@@ -2650,6 +2671,7 @@ def test_classer_age(age_input, expected_label):
                             id: 'logging_vs_print',
                             title: 'Avant/Après : Print vs Log',
                             description: 'Comparaison directe.',
+                            level: 'intermediate',
                             markdown: `### ❌ AVANT (Print)
 \`\`\`python
 print("Début du traitement") 
@@ -2671,6 +2693,7 @@ logging.info("Début du traitement")
                             id: 'logging_practice',
                             title: 'Mise en place Complète',
                             description: 'Le code prêt à l\'emploi.',
+                            level: 'intermediate',
                             code: `import logging
 
 # 1. Configuration (À faire une seule fois au début)
@@ -2705,6 +2728,7 @@ division(5, 0)  # Écrira ERROR dans le fichier`
                             id: 'vectorization',
                             title: 'Vectorisation vs Boucles',
                             description: 'Pourquoi il ne faut JAMAIS boucler sur un DataFrame.',
+                            level: 'intermediate',
                             code: `import pandas as pd
 import numpy as np
 
@@ -2732,6 +2756,7 @@ df['c'] = df['a'].values + df['b'].values`
                             id: 'requests_session',
                             title: 'Requests Session (Le Navigateur)',
                             description: 'Garder la connexion et les cookies.',
+                            level: 'intermediate',
                             markdown: `### 🧠 L'Analogie du Navigateur
 *   **Requests.get()** simple : C'est comme ouvrir une fenêtre de **Navigation Privée**, aller sur un site, et fermer la fenêtre immédiatement. Vous perdez tout (cookies, connexion).
 *   **Session()** : C'est comme ouvrir **Chrome**. Vous vous connectez une fois, et le navigateur retient qui vous êtes pour les pages suivantes.`,
@@ -2789,6 +2814,7 @@ print(data)
                             id: 'fastapi_basic',
                             title: 'API avec FastAPI',
                             description: 'Créer une API moderne et rapide.',
+                            level: 'intermediate',
                             code: `from fastapi import FastAPI
 
 app = FastAPI()
@@ -2815,6 +2841,7 @@ def read_item(item_id: int, q: str = None):
                             id: 'why_pydantic',
                             title: 'Pourquoi Pydantic ?',
                             description: 'Comparaison : Code manuel vs Pydantic.',
+                            level: 'intermediate',
                             markdown: `### ❌ Sans Pydantic (Validation Manuelle)
 C'est verbeux, fragile et difficile à maintenir.
 \`\`\`python
@@ -2842,6 +2869,7 @@ class User(BaseModel):
                             id: 'pydantic_io',
                             title: 'Entrée / Sortie (La Douane)',
                             description: 'Nettoyage automatique des données sales.',
+                            level: 'intermediate',
                             markdown: `### 🧼 Le Concept
 Pydantic agit comme un **douanier** à l'entrée de votre code.
 1.  **Entrée** : Données en vrac (JSON, API, Excel) souvent mal typées (tout est string).

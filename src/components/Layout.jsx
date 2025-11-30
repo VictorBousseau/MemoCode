@@ -11,7 +11,7 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
             <Sidebar selectedLanguage={selectedLanguage} onSelectLanguage={onSelectLanguage} />
             <main className="flex-1 overflow-y-auto h-full">
                 <div className="p-8">
-                    <div className="flex items-center justify-between mb-8 border-b border-zinc-800 pb-4">
+                    <div className="flex items-center justify-between mb-12 border-b border-zinc-800 pb-4">
                         <h1 className="text-4xl font-bold text-white">
                             {selectedLanguage}
                         </h1>

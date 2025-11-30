@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import mermaid from 'mermaid';
 
 export default function MermaidDiagram({ chart }) {
     const [svg, setSvg] = useState('');
@@ -9,13 +10,8 @@ export default function MermaidDiagram({ chart }) {
             if (!chart) return;
 
             try {
-                // Check if mermaid is loaded
-                if (!window.mermaid) {
-                    throw new Error('Mermaid library not loaded');
-                }
-
-                // Initialize if needed (idempotent)
-                window.mermaid.initialize({
+                // Initialize
+                mermaid.initialize({
                     startOnLoad: false,
                     theme: 'dark',
                     securityLevel: 'loose',
@@ -25,7 +21,7 @@ export default function MermaidDiagram({ chart }) {
                 // Generate a unique ID for this render
                 const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
                 // Render the SVG
-                const { svg } = await window.mermaid.render(id, chart);
+                const { svg } = await mermaid.render(id, chart);
                 setSvg(svg);
                 setError(null);
             } catch (err) {
@@ -34,18 +30,7 @@ export default function MermaidDiagram({ chart }) {
             }
         };
 
-        // Retry a few times if mermaid isn't loaded yet (race condition with script tag)
-        const attemptRender = (attempts = 0) => {
-            if (window.mermaid) {
-                renderDiagram();
-            } else if (attempts < 10) {
-                setTimeout(() => attemptRender(attempts + 1), 100);
-            } else {
-                setError('Erreur: La librairie Mermaid ne s\'est pas chargée.');
-            }
-        };
-
-        attemptRender();
+        renderDiagram();
     }, [chart]);
 
     if (error) {

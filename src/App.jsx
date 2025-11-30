@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Layout from './components/Layout';
 import LanguageView from './components/LanguageView';
 import { pythonContent } from './data/pythonContent';
@@ -16,10 +16,37 @@ export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const allContent = useMemo(() => {
+    const addLang = (content, lang, contextName) => ({
+      ...content,
+      themes: content.themes.map(t => ({
+        ...t,
+        categories: t.categories.map(c => ({
+          ...c,
+          snippets: c.snippets.map(s => ({ ...s, language: lang, contextName }))
+        }))
+      }))
+    });
+
+    return {
+      themes: [
+        ...addLang(pythonContent, 'python', 'Python').themes,
+        ...addLang(sqlContent, 'sql', 'SQL').themes,
+        ...addLang(gitContent, 'bash', 'Git').themes,
+        ...addLang(pysparkContent, 'python', 'PySpark').themes,
+        ...addLang(daxContent, 'dax', 'DAX').themes,
+        ...addLang(mContent, 'powerquery', 'Power Query (M)').themes,
+        ...addLang(nosqlContent, 'javascript', 'NoSQL').themes, // NoSQL often uses JS/JSON
+        ...addLang(rContent, 'r', 'R').themes,
+        ...addLang(examplesContent, 'python', 'Exemples').themes // Examples are mostly Python
+      ]
+    };
+  }, []);
+
   const getContent = () => {
     switch (selectedLanguage) {
       case 'Overview':
-        return null; // Special case handled in render
+        return allContent;
       case 'Python':
         return pythonContent;
       case 'SQL':
@@ -50,10 +77,15 @@ export default function App() {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     >
-      {selectedLanguage === 'Overview' ? (
+      {selectedLanguage === 'Overview' && !searchQuery ? (
         <Overview onNavigate={setSelectedLanguage} />
       ) : (
-        <LanguageView content={getContent()} searchQuery={searchQuery} />
+        <LanguageView
+          content={getContent()}
+          searchQuery={searchQuery}
+          languageName={selectedLanguage}
+          onNavigate={setSelectedLanguage}
+        />
       )}
     </Layout>
   );

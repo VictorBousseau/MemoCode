@@ -1,5 +1,6 @@
-import React from 'react';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings } from 'lucide-react';
+import DataSettings from './DataSettings';
 
 const languages = [
     { name: 'Python', icon: FileCode2 },
@@ -14,6 +15,8 @@ const languages = [
 ];
 
 export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
     return (
         <aside className="w-64 bg-zinc-900 text-white flex flex-col border-r border-zinc-800 h-full overflow-y-auto">
             <div className="p-6 border-b border-zinc-800">
@@ -51,6 +54,14 @@ export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
                 ))}
             </nav>
             <div className="p-4 border-t border-zinc-800 space-y-4">
+                <button
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-800/30 hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white group"
+                >
+                    <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                    <span className="text-sm font-medium">Gérer les données</span>
+                </button>
+
                 <a
                     href="https://github.com/VictorBousseau"
                     target="_blank"
@@ -70,6 +81,7 @@ export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
                     v1.0.0 • Built with ❤️
                 </div>
             </div>
+            <DataSettings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         </aside>
     );
 }
