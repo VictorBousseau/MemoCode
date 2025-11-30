@@ -616,88 +616,170 @@ print(f"Il y a 2h30 : {past}")`
                     description: 'Exemples concrets et avancés.',
                     snippets: [
                         {
+                            id: 'french_calendar',
+                            title: 'Calendrier Français (Fériés & Ponts)',
+                            description: 'Détecter les jours fériés, les ponts et les retours de vacances.',
+                            code: `import pandas as pd
+import holidays
+from datetime import timedelta
+
+# 1. Création d'un jeu de données exemple
+dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
+df = pd.DataFrame({'date': dates})
+
+# 2. Ajout du nom du jour (en français)
+days_fr = {
+    0: 'Lundi', 1: 'Mardi', 2: 'Mercredi', 3: 'Jeudi', 
+    4: 'Vendredi', 5: 'Samedi', 6: 'Dimanche'
+}
+df['jour_nom'] = df['date'].dt.dayofweek.map(days_fr)
+
+# 3. Jours Fériés (France)
+# Nécessite : pip install holidays
+fr_holidays = holidays.France(years=[2025])
+df['jour_ferie'] = df['date'].apply(lambda x: x in fr_holidays)
+
+# 4. Veille et Lendemain de jour férié
+# Shift(-1) -> La valeur de demain vient ici (donc si demain est férié, ici c'est veille)
+df['veille_jour_ferie'] = df['jour_ferie'].shift(-1).fillna(False)
+df['lendemain_jour_ferie'] = df['jour_ferie'].shift(1).fillna(False)
+
+# 5. Jour Ouvré (Lundi-Vendredi ET Pas férié)
+df['jour_ouvre'] = (df['date'].dt.dayofweek < 5) & (~df['jour_ferie'])
+
+# 6. Jour Ouvré Lendemain de Férié (Retour au travail)
+# Logique : C'est un jour ouvré, et le jour précédent (ou la séquence de jours précédents) était férié/weekend.
+def is_return_from_holiday(idx, df):
+    if not df.loc[idx, 'jour_ouvre']:
+        return False
+    
+    # On regarde en arrière
+    prev_idx = idx - 1
+    while prev_idx >= 0:
+        if df.loc[prev_idx, 'jour_ouvre']:
+            return False # On a trouvé un jour ouvré avant, donc ce n'est pas un retour de vacances
+        if df.loc[prev_idx, 'jour_ferie']:
+            return True # On a trouvé un férié sans croiser de jour ouvré -> C'est un retour !
+        prev_idx -= 1
+        
+    return False
+
+df['jour_ouvre_lendemain_ferie'] = [is_return_from_holiday(i, df) for i in range(len(df))]
+
+# Aperçu
+print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_ferie']].head(15))`
+                        },
+                        {
                             id: 'school_holidays',
                             title: 'Vacances Scolaires (Avancé)',
-                            description: 'Récupérer les données officielles, gérer les zones et croiser avec une liste de dates.',
+                            description: 'Récupération API, gestion des zones et déduplication robuste.',
                             code: `import pandas as pd
-import requests
-import io
-from datetime import datetime, timedelta
+import numpy as np
 
-# --- 1. Récupération des Données Officielles ---
-# API de l'Éducation Nationale (Calendrier Scolaire)
-url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv"
-print(f"Téléchargement des données depuis {url}...")
+# --- 1. CONFIGURATION & DONNÉES ---
+URL_API = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
 
-try:
-    df_holidays = pd.read_csv(url, sep=';')
-    print("Données téléchargées avec succès !")
-except Exception as e:
-    print(f"Erreur lors du téléchargement : {e}")
-    # Fallback si pas d'internet pour l'exemple
-    data = """Description;Zones;Date de début;Date de fin
-Vacances de Noël;Zone A;2023-12-23;2024-01-08
-Vacances de Noël;Zone B;2023-12-23;2024-01-08
-Vacances de Noël;Zone C;2023-12-23;2024-01-08
-Vacances d'Hiver;Zone C;2024-02-10;2024-02-26
-Vacances d'Hiver;Zone A;2024-02-17;2024-03-04
-Vacances d'Hiver;Zone B;2024-02-24;2024-03-11"""
-    df_holidays = pd.read_csv(io.StringIO(data), sep=';')
+DEPARTMENTS_ZONES = {
+    # Zone A
+    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A', '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A', '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A', '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A', '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A', '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
+    # Zone B
+    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B', '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B', '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B', '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B', '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B', '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B', '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B', '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B', '88': 'Zone B',
+    # Zone C
+    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C', '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C', '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C', '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C', '95': 'Zone C',
+    # DOM
+    '971': 'Guadeloupe', '972': 'Martinique', '973': 'Guyane', '974': 'La Réunion', '976': 'Mayotte'
+}
 
-# --- 2. Nettoyage et Préparation ---
-# On ne garde que les vacances (pas les jours fériés isolés qui sont souvent dans une autre colonne ou dataset)
-# Ici on filtre sur les zones A, B, C
-zones_valid = ['Zone A', 'Zone B', 'Zone C']
-df_holidays = df_holidays[df_holidays['Zones'].isin(zones_valid)].copy()
+def preparer_calendrier_vacances():
+    print("Téléchargement et préparation des vacances...")
+    try:
+        df = pd.read_csv(URL_API, sep=';')
+    except Exception as e:
+        print(f"Erreur API ({e}), utilisation de données factices pour l'exemple.")
+        # Fallback pour l'exemple si pas d'internet
+        data = {'Description': ['Noël', 'Noël'], 'Zones': ['Zone A', 'Zone C'], 
+                'Date de début': ['2023-12-23', '2023-12-23'], 'Date de fin': ['2024-01-08', '2024-01-08']}
+        df = pd.DataFrame(data)
 
-# Conversion des dates
-df_holidays['start'] = pd.to_datetime(df_holidays['Date de début']).dt.date
-df_holidays['end'] = pd.to_datetime(df_holidays['Date de fin']).dt.date
+    # Nettoyage de base
+    df = df[['Description', 'Zones', 'Date de début', 'Date de fin']].copy()
+    df['start'] = pd.to_datetime(df['Date de début'], utc=True).dt.date
+    df['end'] = pd.to_datetime(df['Date de fin'], utc=True).dt.date
+    
+    # Filtrage des zones
+    df = df[df['Zones'].isin(['Zone A', 'Zone B', 'Zone C'])]
+    
+    # Étape 1 : On explose les périodes en jours individuels
+    holiday_days = []
+    for _, row in df.iterrows():
+        # end est exclusif dans date_range, mais inclusif dans les données éducation ? 
+        # Vérification standard : souvent [start, end[. Si end est le jour de reprise, il faut faire -1 jour.
+        dates_in_holiday = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1))
+        
+        for d in dates_in_holiday:
+            holiday_days.append({
+                'date_ref': d.date(),
+                'zone': row['Zones'],
+                'vacances_nom': row['Description']
+            })
+            
+    df_flat = pd.DataFrame(holiday_days)
+    
+    # --- FIX ANTI-DOUBLONS ---
+    # C'est ici que la magie opère.
+    # On regroupe par [date, zone]. Si doublon, on garde le nom unique ou on concatène.
+    # Ex: Si on a "Vacances Hiver" et "Vacances Hiver" -> on garde une seule fois.
+    df_flat = df_flat.groupby(['date_ref', 'zone'], as_index=False).agg({
+        'vacances_nom': lambda x: ' / '.join(sorted(set(str(v) for v in x if pd.notna(v))))
+    })
+    
+    return df_flat
 
-# --- 3. "Explosion" des Périodes (Une ligne par jour de vacances) ---
-# C'est la technique clé pour faire des jointures faciles ensuite.
-holiday_dates = []
-for _, row in df_holidays.iterrows():
-    # On génère tous les jours entre début et fin (fin exclue dans range, mais incluse dans les vacances ?)
-    # Attention : Souvent 'Date de fin' est le jour de reprise, donc exclu.
-    # Vérifions la convention : Si Fin = Lundi matin, alors Dimanche soir est vacances.
-    dates = pd.date_range(start=row['start'], end=row['end'] - timedelta(days=1), freq='D')
-    for d in dates:
-        holiday_dates.append({
-            'date': d.date(), 
-            'Zones': row['Zones'], 
-            'vacances_nom': row['Description']
-        })
+# --- 2. EXÉCUTION ---
 
-df_exploded = pd.DataFrame(holiday_dates)
+# A. Préparation du référentiel (unique par jour/zone)
+df_calendrier_flat = preparer_calendrier_vacances()
 
-# --- 4. Cas Pratique : Est-ce que mes clients sont en vacances ? ---
-# Imaginons une liste de clients avec leur département et une date d'achat
-user_data = {
+# B. Génération de Données Exemple
+print("Génération de données test...")
+# df_user = pd.read_excel(r'C:\\Users\\bouss\\Downloads\\Test.xlsx', sheet_name='Feuil1')
+# Pour l'exemple reproductible, on crée un DataFrame à la volée :
+df_user = pd.DataFrame({
     'date': ['2024-02-12', '2024-02-12', '2024-02-20'],
     'departement': ['75', '33', '33'] # 75=Paris(C), 33=Gironde(A)
-}
-df_users = pd.DataFrame(user_data)
-df_users['date'] = pd.to_datetime(df_users['date']).dt.date
+})
 
-# Mapping Départements -> Zones
-DEPARTMENTS_ZONES = {
-    '75': 'Zone C',
-    '33': 'Zone A',
-    # ... à compléter pour toute la France
-}
-df_users['Zones'] = df_users['departement'].map(DEPARTMENTS_ZONES)
+# Sauvegarde du nombre de lignes pour vérification
+nb_lignes_avant = len(df_user)
 
-# Jointure (Left Join)
-# On garde tous les users, et on ajoute les infos vacances si ça matche (Date + Zone)
-df_merged = pd.merge(df_users, df_exploded, on=['date', 'Zones'], how='left')
+# C. Préparation Utilisateur
+df_user['date_ref'] = pd.to_datetime(df_user['date']).dt.date
+# Nettoyage département (string, 2 chiffres)
+df_user['departement'] = pd.to_numeric(df_user['departement'], errors='coerce').astype('Int64').astype(str).str.zfill(2)
+df_user['zone'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Hors Zone')
 
-# Remplissage des Non-Vacances
-df_merged['en_vacances'] = df_merged['vacances_nom'].notna()
-df_merged['vacances_nom'] = df_merged['vacances_nom'].fillna('Non')
+# D. Fusion (Left Join)
+df_final = pd.merge(
+    df_user,
+    df_calendrier_flat,
+    on=['date_ref', 'zone'],
+    how='left'
+)
 
-print("\\n--- Résultat Final ---")
-print(df_merged[['date', 'departement', 'Zones', 'en_vacances', 'vacances_nom']])`
+# E. Finalisation
+df_final['en_vacances'] = df_final['vacances_nom'].notna()
+df_final['vacances_nom'] = df_final['vacances_nom'].fillna('Non')
+df_final = df_final.drop(columns=['date_ref'])
+
+# VÉRIFICATION FINALE
+nb_lignes_apres = len(df_final)
+print("-" * 30)
+if nb_lignes_avant == nb_lignes_apres:
+    print(f"SUCCÈS : Le fichier contient bien {nb_lignes_apres} lignes (pas de doublons).")
+else:
+    print(f"ATTENTION : Le fichier est passé de {nb_lignes_avant} à {nb_lignes_apres} lignes !")
+
+print(df_final.head())`
                         }
                     ]
                 }
