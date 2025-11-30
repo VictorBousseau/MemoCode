@@ -1762,7 +1762,79 @@ try:
 
 except ValidationError as e:
     print("Douane : Données refusées !")
-    print(e)`}]}]}]},$O={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+    print(e)`}]}]},{id:"language_tools",title:"Langage & Outils",description:"Modules standard et syntaxe Python.",categories:[{id:"standard_modules",title:"Modules Standard",description:"Les indispensables (datetime, math, os...).",snippets:[{id:"datetime_basics",title:"Dates & Heures (datetime)",description:"Manipuler le temps.",code:`from datetime import datetime, date, timedelta
+
+# 1. Maintenant
+now = datetime.now()
+print(f"Maintenant : {now}")
+
+# 2. Aujourd'hui (Date seulement)
+today = date.today()
+print(f"Aujourd'hui : {today}")
+
+# 3. Créer une date spécifique
+# Année, Mois, Jour, Heure, Minute, Seconde
+specific_date = datetime(2023, 12, 25, 10, 30, 0)
+print(f"Noël : {specific_date}")
+
+# 4. Accéder aux éléments
+print(f"Année : {now.year}")
+print(f"Mois : {now.month}")
+print(f"Jour : {now.day}")`},{id:"timedelta",title:"Calculs de Dates (timedelta)",description:"Ajouter ou soustraire du temps.",code:`from datetime import datetime, timedelta
+
+now = datetime.now()
+
+# 1. Ajouter du temps
+# On peut ajouter : weeks, days, hours, minutes, seconds, microseconds
+tomorrow = now + timedelta(days=1)
+next_week = now + timedelta(weeks=1)
+in_2_hours = now + timedelta(hours=2)
+
+print(f"Demain : {tomorrow}")
+
+# 2. Différence entre deux dates
+date1 = datetime(2024, 1, 1)
+date2 = datetime(2023, 1, 1)
+
+diff = date1 - date2
+print(f"Différence : {diff}") # 365 days, 0:00:00
+print(f"Jours : {diff.days}")
+print(f"Secondes totales : {diff.total_seconds()}")`},{id:"formatting",title:"Formatage (strftime/strptime)",description:"Convertir Date <-> Texte.",code:`from datetime import datetime
+
+now = datetime.now()
+
+# 1. Date vers Texte (strftime = String Format Time)
+# %Y : Année (4 chiffres)
+# %m : Mois (01-12)
+# %d : Jour (01-31)
+# %H : Heure (00-23)
+# %M : Minute (00-59)
+text_date = now.strftime("%Y-%m-%d %H:%M")
+print(f"Formaté : {text_date}") # Ex: 2023-10-27 14:30
+
+# 2. Texte vers Date (strptime = String Parse Time)
+date_string = "25/12/2023"
+parsed_date = datetime.strptime(date_string, "%d/%m/%Y")
+print(f"Parsé : {parsed_date}")`},{id:"dateutil",title:"Calculs Avancés (dateutil)",description:"Gérer les mois et années (relativedelta).",markdown:"### 🚀 Pourquoi dateutil ?\n`timedelta` ne gère pas les **mois** ni les **années** car leur durée varie (28-31 jours, 365-366 jours).\nPour cela, on utilise `dateutil.relativedelta`.\n\n```bash\npip install python-dateutil\n```",code:`from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+now = datetime.now()
+
+# 1. Ajouter des mois ou des années
+next_month = now + relativedelta(months = 1)
+next_year = now + relativedelta(years = 1)
+
+print(f"Mois prochain : {next_month}")
+
+# 2. Aller au dernier jour du mois
+end_of_month = now + relativedelta(day = 31)
+# Note : relativedelta gère intelligemment les mois de 30 jours ou février !
+print(f"Fin du mois : {end_of_month}")
+
+# 3. Calculer l'âge précis
+birth_date = datetime(1990, 5, 15)
+age = relativedelta(now, birth_date)
+print(f"Âge : {age.years} ans, {age.months} mois et {age.days} jours")`}]}]}]},$O={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
