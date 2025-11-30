@@ -91,6 +91,7 @@ def euler_method(f, y0, t0, tf, h):
                             id: 'rk4',
                             title: 'Runge-Kutta 4 (RK4)',
                             description: 'Méthode standard pour résoudre les équations différentielles.',
+                            level: 'advanced',
                             code: `import numpy as np
 import matplotlib.pyplot as plt
 

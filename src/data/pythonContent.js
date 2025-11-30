@@ -65,6 +65,7 @@ df.to_pickle('data.pkl')`
                             id: 'overview',
                             title: 'Aperçu Global',
                             description: 'Premières commandes à lancer.',
+                            level: 'beginner',
                             code: `# Début et fin
 df.head()  # 5 premières lignes
 df.tail()  # 5 dernières lignes
@@ -303,6 +304,7 @@ df['genre_label'] = df['genre'].map(mapping)`
                             id: 'groupby',
                             title: 'Agrégation (GroupBy)',
                             description: 'Calculs par groupes.',
+                            level: 'intermediate',
                             code: `# Moyenne par groupe
 df.groupby('ville')['salaire'].mean()
 
