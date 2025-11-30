@@ -1466,16 +1466,16 @@ print(a ** 2) #[1, 4, 9]`},{id:"stats_np",title:"Statistiques",description:"Moye
 print(np.mean(arr))  # Moyenne
 print(np.std(arr))   # Écart - type
 print(np.median(arr)) # Médiane
-print(np.max(arr))    # Maximum`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 ** Pourquoi Polars est plus rapide ?**
+print(np.max(arr))    # Maximum`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 **Pourquoi Polars est plus rapide ?**
 
-    1. ** Écrit en Rust ** : Gestion mémoire ultra - efficace et pas de GIL(Global Interpreter Lock).
-2. ** Parallélisation ** : Utilise tous les cœurs de votre CPU par défaut(Pandas est mono - cœur).
-3. ** Apache Arrow ** : Format mémoire colonnaire standard(zéro copie).
-4. ** Lazy Evaluation ** : Optimise la requête AVANT de l'exécuter (comme SQL).
+1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
+2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
+3. **Apache Arrow** : Format mémoire colonnaire standard (zéro copie).
+4. **Lazy Evaluation** : Optimise la requête AVANT de l'exécuter (comme SQL).
 
-💡 ** Mental Model: Polars vs Pandas **
-*   ** Pandas(Eager) ** : "Fais ça, puis fais ça, puis fais ça..."(Exécution ligne par ligne)
-    *   ** Polars(Lazy) ** : "Voici ce que je veux, trouve le meilleur moyen de le faire."(Optimisation globale)`}]},{id:"polars_io",title:"2. Chargement & Export (I/O)",description:"Lecture optimisée (scan vs read).",snippets:[{id:"pl_read_scan",title:"Read vs Scan (Lazy)",description:"La différence fondamentale.",code:`import polars as pl
+💡 **Mental Model: Polars vs Pandas**
+*   **Pandas (Eager)** : "Fais ça, puis fais ça, puis fais ça..." (Exécution ligne par ligne)
+*   **Polars (Lazy)** : "Voici ce que je veux, trouve le meilleur moyen de le faire." (Optimisation globale)`}]},{id:"polars_io",title:"2. Chargement & Export (I/O)",description:"Lecture optimisée (scan vs read).",snippets:[{id:"pl_read_scan",title:"Read vs Scan (Lazy)",description:"La différence fondamentale.",code:`import polars as pl
 
 # 1. Mode Eager(Classique, comme Pandas)
 # Charge TOUT en mémoire immédiatement.
