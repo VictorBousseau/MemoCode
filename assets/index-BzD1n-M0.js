@@ -2995,7 +2995,45 @@ df['week'] = df['date'].dt.isocalendar().week
 df['semaine_avec_ferie'] = df.groupby(['year', 'week'])['jour_ferie'].transform('any')
 
 # Aperçu
-print(df[['date', 'jour_nom', 'jour_ferie', 'pont', 'semaine_avec_ferie']].head(15))`},{id:"school_holidays",title:"Vacances Scolaires (Zones A, B, C)",description:"Récupérer les vacances officielles depuis l'API du gouvernement.",code:`import pandas as pd
+print(df[['date', 'jour_nom', 'jour_ferie', 'pont', 'semaine_avec_ferie']].head(15))`},{id:"date_feature_engineering",title:"Feature Engineering (Dates)",description:"Transformations avancées pour le Machine Learning (Cyclique, Lags, Rolling).",code:`import pandas as pd
+import numpy as np
+
+# 1. Données Exemple (Série Temporelle)
+dates = pd.date_range(start='2024-01-01', periods=100, freq='D')
+df = pd.DataFrame({
+    'date': dates,
+    'ventes': np.random.randint(50, 200, size=100) # Ventes aléatoires
+})
+
+# 2. Encodage Cyclique (Sin/Cos)
+# Problème : Le modèle ne sait pas que Décembre (12) est proche de Janvier (1).
+# Solution : Projeter sur un cercle (Sinus/Cosinus).
+df['month'] = df['date'].dt.month
+df['day_of_week'] = df['date'].dt.dayofweek
+
+def encode_cyclical(df, col, max_val):
+    df[col + '_sin'] = np.sin(2 * np.pi * df[col] / max_val)
+    df[col + '_cos'] = np.cos(2 * np.pi * df[col] / max_val)
+    return df
+
+df = encode_cyclical(df, 'month', 12)
+df = encode_cyclical(df, 'day_of_week', 7)
+
+# 3. Lags (Décalages)
+# Indispensable pour les séries temporelles : "La valeur d'hier aide à prédire aujourd'hui"
+df['ventes_lag_1'] = df['ventes'].shift(1) # Ventes de la veille
+df['ventes_lag_7'] = df['ventes'].shift(7) # Ventes de la semaine dernière
+
+# 4. Fenêtres Glissantes (Rolling Windows)
+# Capter la tendance locale
+df['ventes_rolling_mean_7'] = df['ventes'].rolling(window=7).mean() # Moyenne sur 7 jours
+
+# 5. Temps Écoulé (Time Deltas)
+# Utile pour modéliser l'usure, l'ancienneté, ou l'effet "depuis le dernier événement"
+ref_date = pd.Timestamp('2024-01-01')
+df['jours_depuis_debut'] = (df['date'] - ref_date).dt.days
+
+print(df[['date', 'month_sin', 'month_cos', 'ventes', 'ventes_lag_1', 'ventes_rolling_mean_7']].tail())`},{id:"school_holidays",title:"Vacances Scolaires (Zones A, B, C)",description:"Récupérer les vacances officielles depuis l'API du gouvernement.",code:`import pandas as pd
 import numpy as np
 
 # --- 1. CONFIGURATION & DONNÉES ---
