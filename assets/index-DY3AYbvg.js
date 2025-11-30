@@ -3065,6 +3065,51 @@ def est_en_vacances(date_ref, holidays_df):
     mask = (holidays_df['start'] <= date_ref) & (holidays_df['end'] >= date_ref)
     return mask.any()
 
+# 5. Cas Pratique : Vérifier une liste (Date, Département)
+# Si vous avez un DataFrame avec des dates et des départements, le plus efficace
+# est de faire une jointure (merge) plutôt qu'une boucle.
+
+print("
+--- Cas Pratique : Merge ---")
+
+# 5.1 Données Utilisateur (Exemple)
+data = {
+    'date': ['2025-01-01', '2025-02-12', '2025-02-12'],
+    'departement': ['75', '75', '33'] # Paris (C), Paris (C), Gironde (A)
+}
+df_user = pd.DataFrame(data)
+df_user['date'] = pd.to_datetime(df_user['date']).dt.date
+
+# 5.2 Mapping Département -> Zone
+df_user['Zones'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Zone C')
+
+# 5.3 Préparation des Vacances pour le Merge
+# On "explose" les périodes pour avoir une ligne par jour de vacances
+# Cela permet de faire une jointure simple sur ['date', 'Zones']
+holiday_dates = []
+for _, row in df_holidays.iterrows():
+    # On génère tous les jours entre start et end
+    dates_in_period = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1), freq='D')
+    for d in dates_in_period:
+        holiday_dates.append({
+            'date': d.date(), 
+            'Zones': row['Zones'], 
+            'vacances_nom': row['Description']
+        })
+
+df_holidays_exploded = pd.DataFrame(holiday_dates)
+
+# 5.4 Le Merge (Left Join)
+# On garde toutes les lignes utilisateur (left) et on récupère les infos vacances
+df_merged = pd.merge(df_user, df_holidays_exploded, on=['date', 'Zones'], how='left')
+
+# 5.5 Résultat
+# Si 'vacances_nom' est rempli, c'est les vacances !
+df_merged['en_vacances'] = df_merged['vacances_nom'].notna()
+df_merged['vacances_nom'] = df_merged['vacances_nom'].fillna('Non')
+
+print(df_merged[['date', 'departement', 'Zones', 'en_vacances', 'vacances_nom']])
+
 df['en_vacances'] = df['date_only'].apply(lambda x: est_en_vacances(x, df_zone))
 
 # Aperçu
