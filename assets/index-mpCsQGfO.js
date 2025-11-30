@@ -2994,50 +2994,50 @@ sns.heatmap(confusion_matrix(y_test, y_pred), annot = True, fmt = 'd', cmap = 'B
 plt.title('Matrice de Confusion')
 plt.ylabel('Vrai label')
 plt.xlabel('Label prédit')
-plt.show()`}]}]},{id:"marketing",title:"Marketing & Client",description:"Segmentation et analyse comportementale.",snippets:[{id:"rfm_segmentation",title:"Segmentation RFM",description:"Segmenter les clients par Récence, Fréquence et Montant.",code:`import pandas as pd
+plt.show()`}]},{id:"marketing",title:"Marketing & Client",description:"Segmentation et analyse comportementale.",snippets:[{id:"rfm_segmentation",title:"Segmentation RFM",description:"Segmenter les clients par Récence, Fréquence et Montant.",code:`import pandas as pd
 import numpy as np
 import datetime as dt
 
-# --- 1. Génération de Données de Vente -- -
-        np.random.seed(42)
+# --- 1. Génération de Données de Vente ---
+np.random.seed(42)
 n_transactions = 1000
-dates = pd.date_range(end = dt.datetime.today(), periods = 365).to_list()
+dates = pd.date_range(end=dt.datetime.today(), periods=365).to_list()
 
 df = pd.DataFrame({
-            'transaction_id': range(n_transactions),
-            'customer_id': np.random.randint(1, 200, size = n_transactions), # 200 clients
-    'date': np.random.choice(dates, size = n_transactions),
-            'amount': np.random.exponential(scale = 50, size = n_transactions).round(2) + 10 # Montant > 10
-        })
+    'transaction_id': range(n_transactions),
+    'customer_id': np.random.randint(1, 200, size=n_transactions), # 200 clients
+    'date': np.random.choice(dates, size=n_transactions),
+    'amount': np.random.exponential(scale=50, size=n_transactions).round(2) + 10 # Montant > 10
+})
 
-# -- - 2. Calcul RFM-- -
-# Récence: Jours depuis le dernier achat
-# Fréquence: Nombre d'achats
-# Montant: Somme totale dépensée
-now = df['date'].max() + dt.timedelta(days = 1)
+# --- 2. Calcul RFM ---
+# Récence : Jours depuis le dernier achat
+# Fréquence : Nombre d'achats
+# Montant : Somme totale dépensée
+now = df['date'].max() + dt.timedelta(days=1)
 
 rfm = df.groupby('customer_id').agg({
-            'date': lambda x: (now - x.max()).days, # Recency
+    'date': lambda x: (now - x.max()).days, # Recency
     'transaction_id': 'count',              # Frequency
     'amount': 'sum'                         # Monetary
-        }).rename(columns = { 'date': 'R', 'transaction_id': 'F', 'amount': 'M' })
+}).rename(columns={'date': 'R', 'transaction_id': 'F', 'amount': 'M'})
 
-# -- - 3. Scoring(Quintiles)-- -
-# On note de 1 à 5(5 est le meilleur)
-rfm['R_Score'] = pd.qcut(rfm['R'], 5, labels = [5, 4, 3, 2, 1]) # Plus c'est récent (petit), mieux c'est
-rfm['F_Score'] = pd.qcut(rfm['F'].rank(method = 'first'), 5, labels = [1, 2, 3, 4, 5])
-rfm['M_Score'] = pd.qcut(rfm['M'], 5, labels = [1, 2, 3, 4, 5])
+# --- 3. Scoring (Quintiles) ---
+# On note de 1 à 5 (5 est le meilleur)
+rfm['R_Score'] = pd.qcut(rfm['R'], 5, labels=[5, 4, 3, 2, 1]) # Plus c'est récent (petit), mieux c'est
+rfm['F_Score'] = pd.qcut(rfm['F'].rank(method='first'), 5, labels=[1, 2, 3, 4, 5])
+rfm['M_Score'] = pd.qcut(rfm['M'], 5, labels=[1, 2, 3, 4, 5])
 
-# Score RFM global(Concaténation)
+# Score RFM global (Concaténation)
 rfm['RFM_Segment'] = rfm['R_Score'].astype(str) + rfm['F_Score'].astype(str) + rfm['M_Score'].astype(str)
-rfm['Score_Total'] = rfm[['R_Score', 'F_Score', 'M_Score']].sum(axis = 1)
+rfm['Score_Total'] = rfm[['R_Score', 'F_Score', 'M_Score']].sum(axis=1)
 
-# -- - 4. Segmentation-- -
-        def segment_customer(score):
-if score >= 13: return '🏆 Champions'
+# --- 4. Segmentation ---
+def segment_customer(score):
+    if score >= 13: return '🏆 Champions'
     elif score >= 10: return '💎 Fidèles'
-    elif score >= 7: return '💤 À Réveiller'
-    else: return '⚠️ À Risque'
+    elif score >= 7:  return '💤 À Réveiller'
+    else:             return '⚠️ À Risque'
 
 rfm['Segment_Label'] = rfm['Score_Total'].apply(segment_customer)
 
@@ -3046,64 +3046,64 @@ print("\\n--- Distribution des Segments ---")
 print(rfm['Segment_Label'].value_counts())`}]},{id:"production_ml",title:"Mise en Production (MLOps)",description:"Pipelines robustes et Transformers personnalisés.",snippets:[{id:"sklearn_custom_pipeline",title:"Pipeline Sklearn Custom",description:"Créer un Transformer personnalisé pour nettoyer et enrichir les données.",code:`import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
-    from sklearn.impute import SimpleImputer
-    from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
 
-# --- Données Exemple-- -
-    df = pd.DataFrame({
-        'description': [' Produit A ', 'produit B', 'PRODUIT A', None, 'Produit C'],
-        'prix': [100, 200, 100, 50, None],
-        'surface': [50, 60, 50, 100, 20]
-    })
+# --- Données Exemple ---
+df = pd.DataFrame({
+    'description': [' Produit A ', 'produit B', 'PRODUIT A', None, 'Produit C'],
+    'prix': [100, 200, 100, 50, None],
+    'surface': [50, 60, 50, 100, 20]
+})
 
-# -- - Transformer Personnalisé: Nettoyage Texte-- -
-    class TextCleaner(BaseEstimator, TransformerMixin):
+# --- Transformer Personnalisé : Nettoyage Texte ---
+class TextCleaner(BaseEstimator, TransformerMixin):
     def __init__(self, column, case='lower'):
-self.column = column
-self.case = case
+        self.column = column
+        self.case = case
     
-    def fit(self, X, y = None):
-return self # Rien à apprendre
+    def fit(self, X, y=None):
+        return self # Rien à apprendre
     
     def transform(self, X):
-X_copy = X.copy()
+        X_copy = X.copy()
         # 1. Gestion NaN
-X_copy[self.column] = X_copy[self.column].fillna('inconnu')
+        X_copy[self.column] = X_copy[self.column].fillna('inconnu')
         # 2. Strip whitespace
-X_copy[self.column] = X_copy[self.column].str.strip()
+        X_copy[self.column] = X_copy[self.column].str.strip()
         # 3. Case normalization
-if self.case == 'lower':
-    X_copy[self.column] = X_copy[self.column].str.lower()
-return X_copy
+        if self.case == 'lower':
+            X_copy[self.column] = X_copy[self.column].str.lower()
+        return X_copy
 
-# -- - Transformer Personnalisé: Feature Engineering-- -
-    class PricePerSqm(BaseEstimator, TransformerMixin):
-    def fit(self, X, y = None):
-return self
+# --- Transformer Personnalisé : Feature Engineering ---
+class PricePerSqm(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
         
     def transform(self, X):
-X_copy = X.copy()
+        X_copy = X.copy()
         # On évite la division par zéro
-X_copy['prix_m2'] = X_copy['prix'] / X_copy['surface'].replace(0, 1)
-return X_copy
+        X_copy['prix_m2'] = X_copy['prix'] / X_copy['surface'].replace(0, 1)
+        return X_copy
 
-# -- - Construction du Pipeline-- -
+# --- Construction du Pipeline ---
 # L'ordre est crucial !
 data_pipeline = Pipeline([
     # Étape 1 : Nettoyage du texte
-        ('clean_text', TextCleaner(column = 'description')),
+    ('clean_text', TextCleaner(column='description')),
     
-    # Étape 2 : Imputation des valeurs manquantes(numériques)
+    # Étape 2 : Imputation des valeurs manquantes (numériques)
     # Note: SimpleImputer renvoie un array numpy, on le garde pour la fin ou on utilise set_output
     # Ici, on simplifie en supposant que le pipeline gère le DF
     
     # Étape 3 : Création de feature métier
-        ('feature_eng', PricePerSqm())
+    ('feature_eng', PricePerSqm())
 ])
 
 # Exécution
 df_transformed = data_pipeline.fit_transform(df)
-print(df_transformed)`}]},{id:"python_date",title:"Dates (Python)",description:"Manipulation de dates et séries temporelles.",categories:[{id:"datetime_basics",title:"Module datetime",description:"Les bases de la manipulation de dates.",snippets:[{id:"current_date",title:"Date et Heure Actuelles",description:"Récupérer la date et l'heure courantes.",code:`from datetime import datetime
+print(df_transformed)`}]}]},{id:"python_date",title:"Dates (Python)",description:"Manipulation de dates et séries temporelles.",categories:[{id:"datetime_basics",title:"Module datetime",description:"Les bases de la manipulation de dates.",snippets:[{id:"current_date",title:"Date et Heure Actuelles",description:"Récupérer la date et l'heure courantes.",code:`from datetime import datetime
 
 now = datetime.now()
 print(f"Date et heure : {now}")
