@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
-import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout } from 'lucide-react';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal } from 'lucide-react';
 
 const themeIcons = {
     pandas: Layers,
@@ -22,7 +22,9 @@ const themeIcons = {
     simulation: BrainCircuit,
     optimisation: Zap,
     data_science: BarChart,
-    python_date: FileCode
+    data_science: BarChart,
+    python_date: FileCode,
+    language_tools: Terminal
 };
 
 export default function LanguageView({ content, searchQuery }) {

@@ -552,64 +552,7 @@ print(df_transformed)`
             title: 'Dates (Python)',
             description: 'Manipulation de dates et séries temporelles.',
             categories: [
-                {
-                    id: 'datetime_basics',
-                    title: 'Module datetime',
-                    description: 'Les bases de la manipulation de dates.',
-                    snippets: [
-                        {
-                            id: 'current_date',
-                            title: 'Date et Heure Actuelles',
-                            description: 'Récupérer la date et l\'heure courantes.',
-                            code: `from datetime import datetime
 
-now = datetime.now()
-print(f"Date et heure : {now}")
-print(f"Année : {now.year}")
-print(f"Mois : {now.month}")
-print(f"Jour : {now.day}")`
-                        },
-                        {
-                            id: 'formatting',
-                            title: 'Formatage (strftime)',
-                            description: 'Convertir une date en chaîne de caractères.',
-                            code: `from datetime import datetime
-
-now = datetime.now()
-formatted = now.strftime("%Y-%m-%d %H:%M:%S")
-print(f"Format ISO : {formatted}")
-
-custom = now.strftime("%d/%m/%Y à %Hh%M")
-print(f"Format français : {custom}")`
-                        },
-                        {
-                            id: 'parsing',
-                            title: 'Parsing (strptime)',
-                            description: 'Convertir une chaîne en objet date.',
-                            code: `from datetime import datetime
-
-date_str = "25/12/2023"
-date_obj = datetime.strptime(date_str, "%d/%m/%Y")
-print(f"Objet date : {date_obj}")
-print(f"Type : {type(date_obj)}")`
-                        },
-                        {
-                            id: 'timedelta',
-                            title: 'Calculs (timedelta)',
-                            description: 'Ajouter ou soustraire du temps.',
-                            code: `from datetime import datetime, timedelta
-
-now = datetime.now()
-tomorrow = now + timedelta(days=1)
-next_week = now + timedelta(weeks=1)
-past = now - timedelta(hours=2, minutes=30)
-
-print(f"Demain : {tomorrow}")
-print(f"Semaine prochaine : {next_week}")
-print(f"Il y a 2h30 : {past}")`
-                        }
-                    ]
-                },
                 {
                     id: 'practical_cases',
                     title: 'Cas Pratiques',
