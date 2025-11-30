@@ -6,7 +6,6 @@ const themeIcons = {
     pandas: Layers,
     visualization: BarChart,
     ml: BrainCircuit,
-    python_basics: FileCode,
     python_tips: Lightbulb,
     python_production: Settings,
     polars: Zap,
@@ -22,9 +21,8 @@ const themeIcons = {
     simulation: BrainCircuit,
     optimisation: Zap,
     data_science: BarChart,
-    data_science: BarChart,
     python_date: FileCode,
-    language_tools: Terminal
+    python_basics: Terminal
 };
 
 export default function LanguageView({ content, searchQuery }) {
