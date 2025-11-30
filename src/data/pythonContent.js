@@ -16,6 +16,7 @@ export const pythonContent = {
                             id: 'read_csv',
                             title: 'Lire un CSV',
                             description: 'Chargement classique et options utiles.',
+                            level: 'beginner',
                             code: `import pandas as pd
 
 # Chargement simple
@@ -35,6 +36,7 @@ df = pd.read_csv('data.csv',
                             id: 'read_excel',
                             title: 'Lire un Excel',
                             description: 'Chargement depuis un fichier Excel.',
+                            level: 'beginner',
                             code: `# Lire une feuille spécifique
 df = pd.read_excel('data.xlsx', sheet_name='Feuille1')
 
@@ -45,6 +47,7 @@ dfs = pd.read_excel('data.xlsx', sheet_name=None)`
                             id: 'export',
                             title: 'Exporter des données',
                             description: 'Sauvegarder en CSV, Excel ou Pickle.',
+                            level: 'beginner',
                             code: `# CSV (sans l'index)
 df.to_csv('output.csv', index=False)
 
@@ -83,6 +86,7 @@ print(df.columns.tolist())`
                             id: 'stats',
                             title: 'Statistiques & Valeurs',
                             description: 'Comprendre la distribution des données.',
+                            level: 'beginner',
                             code: `# Résumé statistique (numérique)
 df.describe()
 
@@ -117,6 +121,7 @@ print(df['age'].quantile([0.25, 0.75])) # Quartiles`
                             id: 'rename',
                             title: 'Renommer',
                             description: 'Changer le nom des colonnes.',
+                            level: 'intermediate',
                             code: `df = df.rename(columns={
     'old_name': 'new_name',
     'Date de Naissance': 'date_naissance'
@@ -126,6 +131,7 @@ print(df['age'].quantile([0.25, 0.75])) # Quartiles`
                             id: 'types',
                             title: 'Changer les Types',
                             description: 'Conversion explicite des types.',
+                            level: 'intermediate',
                             code: `# Vers numérique
 df['prix'] = pd.to_numeric(df['prix'], errors='coerce')
 
@@ -142,6 +148,7 @@ df['nom'] = df['nom'].astype(str)`
                             id: 'missing',
                             title: 'Valeurs Manquantes',
                             description: 'Gestion des NaN.',
+                            level: 'intermediate',
                             code: `# Voir les manquants
 print(df.isna().sum())
 
@@ -561,6 +568,7 @@ print(df_clean[cols_to_show].tail())`
                             id: 'histplot',
                             title: 'Histogramme',
                             description: 'Distribution numérique (kde=True pour la densité).',
+                            level: 'intermediate',
                             image: '/MemoCode/images/histogram.png',
                             code: `import matplotlib.pyplot as plt
 import seaborn as sns
@@ -576,6 +584,7 @@ plt.show()`
                             id: 'boxplot',
                             title: 'Boxplot',
                             description: 'Détection d\'outliers et quartiles.',
+                            level: 'intermediate',
                             image: '/MemoCode/images/boxplot.png',
                             code: `# Boîte à moustaches (Boxplot)
 # Permet de voir la médiane, les quartiles et les outliers (points)
@@ -623,6 +632,7 @@ plt.show()`
                             id: 'scatterplot',
                             title: 'Scatter Plot',
                             description: 'Relation numérique vs numérique.',
+                            level: 'intermediate',
                             image: '/MemoCode/images/scatterplot.png',
                             code: `# Nuage de points (Scatter Plot)
 # Idéal pour voir la corrélation entre deux variables numériques
@@ -673,6 +683,7 @@ plt.show()`
                             id: 'heatmap',
                             title: 'Heatmap de Corrélation',
                             description: 'Matrice de corrélation.',
+                            level: 'advanced',
                             image: '/MemoCode/images/heatmap.png',
                             code: `# Heatmap de Corrélation
 # 1. Calculer la matrice de corrélation
@@ -691,6 +702,7 @@ plt.show()`
                             id: 'pairplot',
                             title: 'Pairplot',
                             description: 'Vue d\'ensemble des relations.',
+                            level: 'advanced',
                             code: `# Pairplot (Grille de graphiques)
 # Affiche les relations bivariées pour toutes les paires de variables
 # Diagonale : distribution univariée (histogramme/KDE)

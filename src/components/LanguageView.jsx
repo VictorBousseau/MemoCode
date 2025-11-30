@@ -288,7 +288,7 @@ export default function LanguageView({ content, searchQuery }) {
                                                 snippet={snippet}
                                                 language={language}
                                                 isFavorite={isFavorite(snippet.id)}
-                                                onToggleFavorite={() => toggleFavorite(snippet.id, activeTheme.title, activeCategory.title)}
+                                                onToggleFavorite={() => toggleFavorite(snippet)}
                                             />
                                         </React.Fragment>
                                     );
