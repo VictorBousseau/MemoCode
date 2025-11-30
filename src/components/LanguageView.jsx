@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
-import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal } from 'lucide-react';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star } from 'lucide-react';
+import { useFavorites } from '../hooks/useFavorites';
 
 const themeIcons = {
     pandas: Layers,
@@ -26,12 +27,21 @@ const themeIcons = {
 };
 
 export default function LanguageView({ content, searchQuery }) {
-    // Default to first theme and its first category
-    const [activeThemeId, setActiveThemeId] = useState(content.themes[0].id);
+    const { favorites, isFavorite, toggleFavorite } = useFavorites();
+
+    // Add favorites as a special "category"
+    const FAVORITES_ID = '__favorites__';
+
+    // Default to favorites if available, otherwise first theme
+    const [activeThemeId, setActiveThemeId] = useState(
+        favorites.length > 0 ? FAVORITES_ID : content.themes[0].id
+    );
     const [activeCategoryId, setActiveCategoryId] = useState(content.themes[0].categories[0]?.id);
 
     // Get current theme and category objects
-    const activeTheme = content.themes.find(t => t.id === activeThemeId);
+    const activeTheme = activeThemeId === FAVORITES_ID
+        ? null
+        : content.themes.find(t => t.id === activeThemeId);
     const activeCategory = activeTheme?.categories.find(c => c.id === activeCategoryId);
 
     // Determine language based on content structure (simple heuristic)
@@ -127,6 +137,18 @@ export default function LanguageView({ content, searchQuery }) {
         <div className="space-y-8">
             {/* Theme Tabs (Top Navigation) */}
             <div className="flex space-x-2 bg-zinc-900/50 p-1.5 rounded-xl border border-zinc-800 w-fit overflow-x-auto">
+                {/* Favorites Tab */}
+                <button
+                    onClick={() => setActiveThemeId(FAVORITES_ID)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeThemeId === FAVORITES_ID
+                        ? 'bg-zinc-800 text-white shadow-sm ring-1 ring-zinc-700'
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                        }`}
+                >
+                    <Star className={`w-4 h-4 ${activeThemeId === FAVORITES_ID ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                    Favoris {favorites.length > 0 && `(${favorites.length})`}
+                </button>
+
                 {content.themes.map((theme) => {
                     const Icon = themeIcons[theme.id] || Layers;
                     return (
@@ -146,33 +168,96 @@ export default function LanguageView({ content, searchQuery }) {
             </div>
 
             <div className="flex gap-8 items-start">
-                {/* Category Sidebar (Left Navigation) */}
-                <div className="w-64 flex-shrink-0 sticky top-8">
-                    <div className="space-y-1">
-                        <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
-                            {activeTheme?.title}
-                        </h3>
-                        {activeTheme?.categories?.map((category) => (
-                            <button
-                                key={category.id}
-                                onClick={() => setActiveCategoryId(category.id)}
-                                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between group ${activeCategoryId === category.id
-                                    ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
-                                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
-                                    }`}
-                            >
-                                <span className="truncate">{category.title}</span>
-                                {activeCategoryId === category.id && (
-                                    <ChevronRight className="w-4 h-4" />
-                                )}
-                            </button>
-                        ))}
+                {/* Category Sidebar (Left Navigation) - Hidden for Favorites */}
+                {activeThemeId !== FAVORITES_ID && (
+                    <div className="w-64 flex-shrink-0 sticky top-8">
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
+                                {activeTheme?.title}
+                            </h3>
+                            {activeTheme?.categories?.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => setActiveCategoryId(category.id)}
+                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between group ${activeCategoryId === category.id
+                                        ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+                                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'
+                                        }`}
+                                >
+                                    <span className="truncate">{category.title}</span>
+                                    {activeCategoryId === category.id && (
+                                        <ChevronRight className="w-4 h-4" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Main Content Area */}
                 <div className="flex-1 min-w-0">
-                    {activeCategory ? (
+                    {activeThemeId === FAVORITES_ID ? (
+                        /* Favorites View */
+                        <>
+                            <div className="mb-8 border-b border-zinc-800 pb-6">
+                                <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                                    <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                                    Mes Favoris
+                                </h2>
+                                <p className="text-zinc-400">
+                                    Retrouvez tous vos snippets favoris en un seul endroit.
+                                </p>
+                            </div>
+
+                            <div className="grid gap-8">
+                                {favorites.map((fav) => {
+                                    // Find the snippet in all themes/categories
+                                    let snippet = null;
+                                    let themeTitle = '';
+                                    let categoryTitle = '';
+
+                                    for (const theme of content.themes) {
+                                        for (const category of theme.categories) {
+                                            const found = category.snippets.find(s => s.id === fav.id);
+                                            if (found) {
+                                                snippet = found;
+                                                themeTitle = theme.title;
+                                                categoryTitle = category.title;
+                                                break;
+                                            }
+                                        }
+                                        if (snippet) break;
+                                    }
+
+                                    if (!snippet) return null;
+
+                                    return (
+                                        <div key={fav.id}>
+                                            <div className="text-xs text-zinc-500 mb-2 flex items-center gap-2">
+                                                <span>{themeTitle}</span>
+                                                <ChevronRight className="w-3 h-3" />
+                                                <span>{categoryTitle}</span>
+                                            </div>
+                                            <CodeCard
+                                                snippet={snippet}
+                                                language={language}
+                                                isFavorite={true}
+                                                onToggleFavorite={() => toggleFavorite(snippet.id, themeTitle, categoryTitle)}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                                {favorites.length === 0 && (
+                                    <div className="text-center py-16 text-zinc-500">
+                                        <Star className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                                        <p className="text-lg">Aucun favori pour le moment</p>
+                                        <p className="text-sm mt-2">Cliquez sur l'étoile des snippets pour les ajouter ici</p>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    ) : activeCategory ? (
+                        /* Regular Category View */
                         <>
                             <div className="mb-8 border-b border-zinc-800 pb-6">
                                 <h2 className="text-2xl font-bold text-white mb-2">
@@ -199,7 +284,12 @@ export default function LanguageView({ content, searchQuery }) {
                                                     <div className="h-px flex-1 bg-zinc-800 ml-4"></div>
                                                 </h3>
                                             )}
-                                            <CodeCard snippet={snippet} language={language} />
+                                            <CodeCard
+                                                snippet={snippet}
+                                                language={language}
+                                                isFavorite={isFavorite(snippet.id)}
+                                                onToggleFavorite={() => toggleFavorite(snippet.id, activeTheme.title, activeCategory.title)}
+                                            />
                                         </React.Fragment>
                                     );
                                 })}
