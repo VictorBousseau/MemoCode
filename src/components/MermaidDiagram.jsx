@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import mermaid from 'mermaid';
+import mermaid from 'mermaid/dist/mermaid.esm.min.mjs';
 
 export default function MermaidDiagram({ chart }) {
     const [svg, setSvg] = useState('');
