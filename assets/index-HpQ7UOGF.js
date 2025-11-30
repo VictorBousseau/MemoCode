@@ -1113,42 +1113,62 @@ random.shuffle(fruits)          # Mélanger la liste sur place
 print(fruits)
 
 # Échantillon (sans remise)
-print(random.sample(range(100), 5))`},{id:"datetime_lib",title:"Dates & Heures (datetime)",description:"Manipuler le temps.",code:`from datetime import datetime, timedelta
+print(random.sample(range(100), 5))`},{id:"datetime_lib",title:"Dates & Heures (datetime)",description:"Manipuler le temps.",code:`from datetime import datetime, date, timedelta
 
-# Maintenant
+# 1. Création
 now = datetime.now()
-print(f"Date actuelle : {now}")
+today = date.today()
+print(f"Maintenant : {now}")
+print(f"Aujourd'hui : {today}")
 
-# Créer une date spécifique
-dt = datetime(2023, 12, 25, 10, 30) # 25 Déc 2023 à 10h30
+dt = datetime(2023, 12, 25, 10, 30) # Noël
 
-# Formatage (Date -> String)
-print(now.strftime("%d/%m/%Y %H:%M")) # "29/11/2025 09:45"
+# 2. Accès aux composants
+print(f"Année : {now.year}, Mois : {now.month}, Jour : {now.day}")
 
-# Parsing (String -> Date)
-date_str = "2023-01-01"
-date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+# 3. Formatage (Date -> String)
+print(now.strftime("%d/%m/%Y %H:%M")) # "25/12/2023 10:30"
 
-# Arithmétique (Ajouter du temps)
+# 4. Parsing (String -> Date)
+date_obj = datetime.strptime("2023-01-01", "%Y-%m-%d")
+
+# 5. Arithmétique (timedelta)
 demain = now + timedelta(days=1)
-dans_une_heure = now + timedelta(hours=1)`},{id:"os_sys_lib",title:"Système (os, sys)",description:"Interagir avec l'OS et le système de fichiers.",code:`import os
+diff = datetime(2024, 1, 1) - datetime(2023, 1, 1)
+print(f"Jours de différence : {diff.days}")`},{id:"dateutil_lib",title:"Calculs Avancés (dateutil)",description:"Gérer les mois et années (relativedelta).",markdown:"### 🚀 Pourquoi dateutil ?\n`timedelta` ne gère pas les **mois** ni les **années** car leur durée varie (28-31 jours, 365-366 jours).\nPour cela, on utilise `dateutil.relativedelta`.\n\n```bash\npip install python-dateutil\n```",code:`from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+now = datetime.now()
+
+# 1. Ajouter des mois ou des années
+next_month = now + relativedelta(months = 1)
+print(f"Mois prochain : {next_month}")
+
+# 2. Aller au dernier jour du mois
+end_of_month = now + relativedelta(day = 31)
+print(f"Fin du mois : {end_of_month}")
+
+# 3. Calculer l'âge précis
+birth_date = datetime(1990, 5, 15)
+age = relativedelta(now, birth_date)
+print(f"Âge : {age.years} ans, {age.months} mois et {age.days} jours")`},{id:"os_sys_lib",title:"Système (os, sys)",description:"Interagir avec l'OS et le système de fichiers.",code:`import os
 import sys
 
-# --- OS (Operating System) ---
+# --- OS(Operating System)-- -
 # Chemin actuel
 print(os.getcwd())
 
 # Lister les fichiers
 # print(os.listdir('.'))
 
-# Construire des chemins (Compatible Windows/Mac/Linux)
-path = os.path.join("dossier", "sous_dossier", "fichier.txt")
+# Construire des chemins(Compatible Windows/ Mac / Linux)
+        path = os.path.join("dossier", "sous_dossier", "fichier.txt")
 
 # Vérifier si un fichier existe
 if os.path.exists("data.csv"):
     print("Fichier trouvé !")
 
-# --- SYS (System) ---
+# --- SYS(System)-- -
 # Arguments de la ligne de commande
 # print(sys.argv)
 
@@ -1158,26 +1178,26 @@ if os.path.exists("data.csv"):
 # Quitter le script
 # sys.exit(0)`},{id:"collections_lib",title:"Collections Utiles",description:"Counter et defaultdict.",code:`from collections import Counter, defaultdict
 
-# --- Counter ---
+# --- Counter-- -
 # Compte les occurrences automatiquement
-liste = ['a', 'b', 'a', 'c', 'b', 'a']
+liste =['a', 'b', 'a', 'c', 'b', 'a']
 compteur = Counter(liste)
-print(compteur) # Counter({'a': 3, 'b': 2, 'c': 1})
+print(compteur) # Counter({ 'a': 3, 'b': 2, 'c': 1 })
 print(compteur.most_common(1)) # [('a', 3)]
 
-# --- DefaultDict ---
-# Dictionnaire avec valeur par défaut (évite les KeyError)
-d = defaultdict(int) # Valeur par défaut : 0
+# --- DefaultDict-- -
+# Dictionnaire avec valeur par défaut(évite les KeyError)
+d = defaultdict(int) # Valeur par défaut: 0
 d['a'] += 1
 print(d['a']) # 1
-print(d['z']) # 0 (créé automatiquement)`}]},{id:"control_flow",title:"2. Contrôle de Flux",subCategory:"Bases",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
+print(d['z']) # 0(créé automatiquement)`}]},{id:"control_flow",title:"2. Contrôle de Flux",subCategory:"Bases",description:"Boucles et Conditions",snippets:[{id:"loops",title:"Boucles For & While",description:"Itérer sur des séquences ou tant qu'une condition est vraie.",code:`import math
 import random
 import datetime
 import os
 import sys
 
-# Boucle FOR (Itération définie)
-fruits = ["pomme", "banane", "cerise"]
+# Boucle FOR(Itération définie)
+fruits =["pomme", "banane", "cerise"]
 for fruit in fruits:
     print(f"J'aime la {fruit}")
 
@@ -1185,7 +1205,7 @@ for fruit in fruits:
 for i in range(5): # 0 à 4
     print(i)
 
-# Boucle WHILE (Itération indéfinie)
+# Boucle WHILE(Itération indéfinie)
 compteur = 0
 while compteur < 5:
     print(compteur)
@@ -1196,82 +1216,82 @@ if age < 18:
 elif age == 18:
     print("Tout juste majeur")
 else:
-    print("Majeur")
+print("Majeur")
 
-# Opérateur ternaire (One-liner)
+# Opérateur ternaire(One - liner)
 statut = "Majeur" if age >= 18 else "Mineur"`},{id:"break_continue",title:"Break & Continue",description:"Contrôler l'exécution dans les boucles.",code:`for i in range(10):
     if i == 3:
         continue # Passe à l'itération suivante (saute 3)
-    if i == 8:
-        break # Arrête complètement la boucle
-    print(i)`}]},{id:"functions",title:"3. Fonctions",subCategory:"Bases",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message="Bonjour"):
-    """
+if i == 8:
+    break # Arrête complètement la boucle
+print(i)`}]},{id:"functions",title:"3. Fonctions",subCategory:"Bases",description:"Définir et utiliser des blocs de code réutilisables",snippets:[{id:"def_function",title:"Définition (def)",description:"Créer une fonction simple avec paramètres.",code:`def saluer(nom, message = "Bonjour"):
+"""
     Affiche un message de salutation.
-    message est un paramètre optionnel (valeur par défaut).
+    message est un paramètre optionnel(valeur par défaut).
     """
-    return f"{message}, {nom} !"
+return f"{message}, {nom} !"
 
 print(saluer("Alice"))
-print(saluer("Bob", "Salut"))`},{id:"args_kwargs",title:"Args & Kwargs",description:"Fonctions avec un nombre variable d'arguments.",code:`def somme_tout(*args):
+print(saluer("Bob", "Salut"))`},{id:"args_kwargs",title:"Args & Kwargs",description:"Fonctions avec un nombre variable d'arguments.",code:`def somme_tout(* args):
     # args est un tuple
-    return sum(args)
+return sum(args)
 
 print(somme_tout(1, 2, 3, 4)) # 10
 
-def afficher_infos(**kwargs):
+def afficher_infos(** kwargs):
     # kwargs est un dictionnaire
-    for cle, valeur in kwargs.items():
-        print(f"{cle}: {valeur}")
+for cle, valeur in kwargs.items():
+    print(f"{cle}: {valeur}")
 
-afficher_infos(nom="Alice", age=30, ville="Paris")`},{id:"lambda",title:"Fonctions Lambda",description:"Fonctions anonymes en une ligne.",code:`# Syntaxe : lambda arguments : expression
+afficher_infos(nom = "Alice", age = 30, ville = "Paris")`},{id:"lambda",title:"Fonctions Lambda",description:"Fonctions anonymes en une ligne.",code:`# Syntaxe: lambda arguments: expression
 carre = lambda x: x ** 2
 
 print(carre(5)) # 25
 
 # Souvent utilisé avec map() ou filter()
 nombres = [1, 2, 3, 4]
-pairs = list(filter(lambda x: x % 2 == 0, nombres)) # [2, 4]`}]},{id:"data_structures",title:"4. Structures de Données",subCategory:"Bases",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
+pairs = list(filter(lambda x: x % 2 == 0, nombres)) #[2, 4]`}]},{id:"data_structures",title:"4. Structures de Données",subCategory:"Bases",description:"Listes, Dictionnaires, Sets, Tuples",snippets:[{id:"lists",title:"Listes (List)",description:"Collection ordonnée et modifiable.",code:`ma_liste = [1, 2, 3]
 
 # Ajout
-ma_liste.append(4) # [1, 2, 3, 4]
+ma_liste.append(4) #[1, 2, 3, 4]
 
-# Slicing (Découpage)
-print(ma_liste[1:3]) # [2, 3] (Indice de début inclus, fin exclu)
+# Slicing(Découpage)
+print(ma_liste[1: 3]) #[2, 3](Indice de début inclus, fin exclu)
 
-# List Comprehension (Puissant !)
-carres = [x**2 for x in range(5)] # [0, 1, 4, 9, 16]`},{id:"dicts",title:"Dictionnaires (Dict)",description:"Paires Clé-Valeur.",code:`mon_dict = {"nom": "Alice", "age": 25}
+# List Comprehension(Puissant!)
+carres = [x ** 2 for x in range(5)] #[0, 1, 4, 9, 16]`},{id:"dicts",title:"Dictionnaires (Dict)",description:"Paires Clé-Valeur.",code:`mon_dict = { "nom": "Alice", "age": 25 }
 
-# Accès sécurisé (évite l'erreur si la clé n'existe pas)
+# Accès sécurisé(évite l'erreur si la clé n'existe pas)
 print(mon_dict.get("ville", "Inconnu"))
 
 # Parcourir
 for cle, valeur in mon_dict.items():
     print(f"{cle} -> {valeur}")`},{id:"sets",title:"Ensembles (Set)",description:"Collection non-ordonnée d'éléments UNIQUES.",code:`nombres = [1, 2, 2, 3, 3, 3]
-uniques = set(nombres) # {1, 2, 3}
+uniques = set(nombres) # { 1, 2, 3 }
 
 # Opérations ensemblistes
-a = {1, 2, 3}
-b = {3, 4, 5}
+a = { 1, 2, 3}
+b = { 3, 4, 5}
 
-print(a.intersection(b)) # {3}
-print(a.union(b)) # {1, 2, 3, 4, 5}`}]},{id:"error_handling",title:"5. Gestion d'Erreurs",subCategory:"Bases",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
-    resultat = 10 / 0
+print(a.intersection(b)) # { 3 }
+print(a.union(b)) # { 1, 2, 3, 4, 5 } `}]},{id:"error_handling",title:"5. Gestion d'Erreurs",subCategory:"Bases",description:"Try, Except, Finally",snippets:[{id:"try_except",title:"Bloc Try / Except",description:"Gérer les exceptions pour éviter que le programme plante.",code:`try:
+resultat = 10 / 0
 except ZeroDivisionError:
-    print("Erreur : Division par zéro impossible !")
+print("Erreur : Division par zéro impossible !")
 except Exception as e:
-    print(f"Une autre erreur est survenue : {e}")
+print(f"Une autre erreur est survenue : {e}")
 else:
-    print("Tout s'est bien passé (si pas d'erreur)")
+print("Tout s'est bien passé (si pas d'erreur)")
 finally:
-    print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]},{id:"string_formatting",title:"6. Formatage de Chaînes (f-strings)",subCategory:"Astuces",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
+print("S'exécute toujours (utile pour fermer un fichier/connexion)")`}]},{id:"string_formatting",title:"6. Formatage de Chaînes (f-strings)",subCategory:"Astuces",description:"La méthode moderne pour formater du texte.",snippets:[{id:"f_strings_basic",title:"Bases des f-strings",description:"Insérer des variables directement dans les chaînes.",code:`from pprint import pprint
 
 nom = "Alice"
 age = 30
 
-# Avant (vieux)
+# Avant(vieux)
 print("Bonjour " + nom + ", tu as " + str(age) + " ans.")
 
-# Avec f-string (moderne)
+# Avec f - string(moderne)
 print(f"Bonjour {nom}, tu as {age} ans.")`},{id:"f_strings_advanced",title:"Formatage Avancé",description:"Arrondis, dates, alignement.",code:`prix = 19.9999
 pourcentage = 0.1234
 
@@ -1279,52 +1299,52 @@ pourcentage = 0.1234
 print(f"Prix : {prix:.2f}€") # 20.00€
 
 # Afficher en pourcentage
-print(f"Taux : {pourcentage:.1%}") # 12.3%
+print(f"Taux : {pourcentage:.1%}") # 12.3 %
 
-# Debug facile (affiche nom_variable = valeur)
+# Debug facile(affiche nom_variable = valeur)
 x = 10
-print(f"{x=}") # x=10`}]},{id:"documentation",title:"7. Documentation",subCategory:"Astuces",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
-    """
+print(f"{x=}") # x = 10`}]},{id:"documentation",title:"7. Documentation",subCategory:"Astuces",description:"Docstrings et Commentaires",snippets:[{id:"docstrings",title:'Docstrings ("""...""")',description:"Documenter vos fonctions pour les autres (et vous-même).",code:`def calcul_complexe(x, y):
+"""
     Effectue un calcul complexe entre x et y.
 
     Args:
-        x (int): Le premier nombre.
-        y (int): Le deuxième nombre.
+x(int): Le premier nombre.
+    y(int): Le deuxième nombre.
 
-    Returns:
-        int: Le résultat du calcul.
+        Returns:
+int: Le résultat du calcul.
     """
-    return x * y + 10
+return x * y + 10
 
 # Accéder à la doc
 help(calcul_complexe)`}]},{id:"pythonic_idioms",title:'8. Astuces "Pythoniques"',subCategory:"Astuces",description:"Écrire du code plus élégant et concis.",snippets:[{id:"unpacking",title:"Unpacking (Déballage)",description:"Assigner plusieurs variables en une ligne.",code:`coords = (10, 20)
-x, y = coords # x=10, y=20
+x, y = coords # x = 10, y = 20
 
 # Échanger deux variables sans variable temporaire
 a = 5
 b = 10
-a, b = b, a # a=10, b=5`},{id:"enumerate",title:"Enumerate",description:"Avoir l'index ET la valeur dans une boucle.",code:`fruits = ["pomme", "banane", "cerise"]
+a, b = b, a # a = 10, b = 5`},{id:"enumerate",title:"Enumerate",description:"Avoir l'index ET la valeur dans une boucle.",code:`fruits = ["pomme", "banane", "cerise"]
 
-# Pas terrible :
+# Pas terrible:
 # for i in range(len(fruits)):
 #     print(i, fruits[i])
 
-# Pythonique :
+# Pythonique:
 for i, fruit in enumerate(fruits):
     print(f"{i}: {fruit}")`},{id:"zip",title:"Zip",description:"Boucler sur deux listes en parallèle.",code:`noms = ["Alice", "Bob"]
 ages = [25, 30]
 
 for nom, age in zip(noms, ages):
     print(f"{nom} a {age} ans")`}]},{id:"jupyter_magic",title:"9. Jupyter & Notebooks",subCategory:"Astuces",description:"Magics commands pour gagner du temps.",snippets:[{id:"timeit",title:"Mesurer le temps (%timeit)",description:"Chronometrer une ligne de code.",code:`# Mesure le temps d'exécution moyen (lance la commande plusieurs fois)
-%timeit [x**2 for x in range(1000)]
+    % timeit[x ** 2 for x in range(1000)]
 
-# Pour une cellule entière :
-# %%timeit`},{id:"autoreload",title:"Rechargement Auto (%autoreload)",description:"Plus besoin de redémarrer le kernel quand on modifie un module externe.",code:`# À mettre au début du notebook
-%load_ext autoreload
-%autoreload 2
+# Pour une cellule entière:
+# %% timeit`},{id:"autoreload",title:"Rechargement Auto (%autoreload)",description:"Plus besoin de redémarrer le kernel quand on modifie un module externe.",code:`# À mettre au début du notebook
+    % load_ext autoreload
+        % autoreload 2
 
 import mon_module_perso
-# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement !`}]},{id:"arrays",title:"10. Tableaux (Arrays)",subCategory:"Calcul Numérique",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
+# Si vous modifiez mon_module_perso.py, les changements sont pris en compte immédiatement!`}]},{id:"arrays",title:"10. Tableaux (Arrays)",subCategory:"Calcul Numérique",description:"Création et manipulation.",snippets:[{id:"create_array",title:"Création",description:"Différentes façons de créer des arrays.",code:`import numpy as np
 
 # À partir d'une liste
 arr = np.array([1, 2, 3])
@@ -1334,66 +1354,66 @@ zeros = np.zeros((3, 3)) # Matrice 3x3 de 0
 ones = np.ones((2, 4))   # Matrice 2x4 de 1
 
 # Séquences
-range_arr = np.arange(0, 10, 2) # [0, 2, 4, 6, 8]
-linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`},{id:"reshape",title:"Dimensions & Reshape",description:"Changer la forme des données.",code:`arr = np.arange(12) # [0..11]
+range_arr = np.arange(0, 10, 2) #[0, 2, 4, 6, 8]
+linspace_arr = np.linspace(0, 1, 5) # 5 points entre 0 et 1`},{id:"reshape",title:"Dimensions & Reshape",description:"Changer la forme des données.",code:`arr = np.arange(12) #[0..11]
 
 # Changer en matrice 3x4
 mat = arr.reshape(3, 4)
 
-# Aplatir (Flatten)
+# Aplatir(Flatten)
 flat = mat.flatten()`}]},{id:"math_ops",title:"11. Opérations Mathématiques",subCategory:"Calcul Numérique",description:"Calculs vectorisés.",snippets:[{id:"basic_math",title:"Calculs de base",description:"Opérations élément par élément.",code:`a = np.array([1, 2, 3])
 b = np.array([10, 20, 30])
 
-print(a + b) # [11, 22, 33]
-print(a * 2) # [2, 4, 6]
-print(a ** 2) # [1, 4, 9]`},{id:"stats_np",title:"Statistiques",description:"Moyenne, écart-type, etc.",code:`arr = np.array([1, 2, 3, 4, 5])
+print(a + b) #[11, 22, 33]
+print(a * 2) #[2, 4, 6]
+print(a ** 2) #[1, 4, 9]`},{id:"stats_np",title:"Statistiques",description:"Moyenne, écart-type, etc.",code:`arr = np.array([1, 2, 3, 4, 5])
 
 print(np.mean(arr))  # Moyenne
-print(np.std(arr))   # Écart-type
+print(np.std(arr))   # Écart - type
 print(np.median(arr)) # Médiane
-print(np.max(arr))    # Maximum`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 **Pourquoi Polars est plus rapide ?**
+print(np.max(arr))    # Maximum`}]}]},{id:"polars",title:"Polars",description:"DataFrame haute performance (Rust)",categories:[{id:"polars_intro",title:"1. Pourquoi Polars ?",description:"Comprendre les avantages par rapport à Pandas.",snippets:[{id:"pl_advantages",title:"Pourquoi utiliser Polars ?",description:"Vitesse, Parallélisme et Lazy Evaluation.",markdown:`🚀 ** Pourquoi Polars est plus rapide ?**
 
-1. **Écrit en Rust** : Gestion mémoire ultra-efficace et pas de GIL (Global Interpreter Lock).
-2. **Parallélisation** : Utilise tous les cœurs de votre CPU par défaut (Pandas est mono-cœur).
-3. **Apache Arrow** : Format mémoire colonnaire standard (zéro copie).
-4. **Lazy Evaluation** : Optimise la requête AVANT de l'exécuter (comme SQL).
+    1. ** Écrit en Rust ** : Gestion mémoire ultra - efficace et pas de GIL(Global Interpreter Lock).
+2. ** Parallélisation ** : Utilise tous les cœurs de votre CPU par défaut(Pandas est mono - cœur).
+3. ** Apache Arrow ** : Format mémoire colonnaire standard(zéro copie).
+4. ** Lazy Evaluation ** : Optimise la requête AVANT de l'exécuter (comme SQL).
 
-💡 **Mental Model : Polars vs Pandas**
-*   **Pandas (Eager)** : "Fais ça, puis fais ça, puis fais ça..." (Exécution ligne par ligne)
-*   **Polars (Lazy)** : "Voici ce que je veux, trouve le meilleur moyen de le faire." (Optimisation globale)`}]},{id:"polars_io",title:"2. Chargement & Export (I/O)",description:"Lecture optimisée (scan vs read).",snippets:[{id:"pl_read_scan",title:"Read vs Scan (Lazy)",description:"La différence fondamentale.",code:`import polars as pl
+💡 ** Mental Model: Polars vs Pandas **
+*   ** Pandas(Eager) ** : "Fais ça, puis fais ça, puis fais ça..."(Exécution ligne par ligne)
+    *   ** Polars(Lazy) ** : "Voici ce que je veux, trouve le meilleur moyen de le faire."(Optimisation globale)`}]},{id:"polars_io",title:"2. Chargement & Export (I/O)",description:"Lecture optimisée (scan vs read).",snippets:[{id:"pl_read_scan",title:"Read vs Scan (Lazy)",description:"La différence fondamentale.",code:`import polars as pl
 
-# 1. Mode Eager (Classique, comme Pandas)
+# 1. Mode Eager(Classique, comme Pandas)
 # Charge TOUT en mémoire immédiatement.
-df = pl.read_csv("data.csv") 
+    df = pl.read_csv("data.csv") 
 
-# 2. Mode Lazy (Recommandé pour gros fichiers)
-# Ne charge RIEN. Crée un plan d'exécution.
+# 2. Mode Lazy(Recommandé pour gros fichiers)
+# Ne charge RIEN.Crée un plan d'exécution.
 # Permet de traiter des fichiers plus gros que la RAM.
-q = pl.scan_csv("data.csv")
+    q = pl.scan_csv("data.csv")
 
-# Pour voir le plan : q.explain()
-# Pour exécuter : q.collect()`},{id:"pl_parquet",title:"Parquet (Format Roi)",description:"Le format natif idéal pour Polars.",code:`# Lecture
+# Pour voir le plan: q.explain()
+# Pour exécuter: q.collect()`},{id:"pl_parquet",title:"Parquet (Format Roi)",description:"Le format natif idéal pour Polars.",code:`# Lecture
 df = pl.read_parquet("data.parquet")
 q = pl.scan_parquet("data.parquet")
 
 # Écriture
 # Polars est extrêmement rapide pour écrire du Parquet
-df.write_parquet("output.parquet", compression="snappy")`}]},{id:"polars_exploration",title:"3. Découverte (EDA)",description:"Inspecter les données.",snippets:[{id:"pl_glimpse",title:"Glimpse & Schema",description:"Aperçu dense des données.",code:`# Aperçu des premières/dernières lignes
+df.write_parquet("output.parquet", compression = "snappy")`}]},{id:"polars_exploration",title:"3. Découverte (EDA)",description:"Inspecter les données.",snippets:[{id:"pl_glimpse",title:"Glimpse & Schema",description:"Aperçu dense des données.",code:`# Aperçu des premières / dernières lignes
 print(df.head())
 print(df.tail())
 
-# Glimpse (Inspiré de R) : Affiche type + premières valeurs de chaque colonne
+# Glimpse(Inspiré de R) : Affiche type + premières valeurs de chaque colonne
 print(df.glimpse())
 
-# Schéma (Types de données)
+# Schéma(Types de données)
 print(df.schema)`},{id:"pl_describe",title:"Describe",description:"Statistiques descriptives.",code:`# Statistiques sommaires
 print(df.describe())
 
-# Compter les valeurs uniques (Value Counts)
+# Compter les valeurs uniques(Value Counts)
 print(df["categorie"].value_counts())`}]},{id:"polars_subset",title:"4. Sélection & Filtrage",description:"Select, Filter et Expressions.",snippets:[{id:"pl_select",title:"Select (Colonnes)",description:"Choisir et transformer des colonnes.",code:`# Sélection simple
 df.select(["nom", "age"])
 
-# Sélection avec Expressions (Puissant !)
+# Sélection avec Expressions(Puissant!)
 # pl.col("x") est la base de tout en Polars
 df.select([
     pl.col("nom"),
@@ -1406,50 +1426,50 @@ df.select([
 df.select(pl.col(pl.Int64))`},{id:"pl_filter",title:"Filter (Lignes)",description:"Filtrer les données.",code:`# Filtrage simple
 df.filter(pl.col("age") > 18)
 
-# Conditions multiples (& = ET, | = OU)
+# Conditions multiples(& = ET, | = OU)
 df.filter(
-    (pl.col("age") > 18) & 
+    (pl.col("age") > 18) &
     (pl.col("ville") == "Paris")
 )
 
-# Filtrer sur une liste (is_in)
+# Filtrer sur une liste(is_in)
 villes_cibles = ["Paris", "Lyon"]
-df.filter(pl.col("ville").is_in(villes_cibles))`},{id:"pl_with_columns",title:"With Columns (Ajout)",description:"Ajouter ou modifier des colonnes.",code:`# Pandas : df['new'] = ...
-# Polars : .with_columns()
+df.filter(pl.col("ville").is_in(villes_cibles))`},{id:"pl_with_columns",title:"With Columns (Ajout)",description:"Ajouter ou modifier des colonnes.",code:`# Pandas: df['new'] = ...
+# Polars: .with_columns()
 
 df = df.with_columns([
     (pl.col("prix") * 0.2).alias("tva"),
     (pl.col("prix") * 1.2).alias("prix_ttc"),
-    pl.lit("En stock").alias("statut") # Valeur littérale (constante)
-])`}]},{id:"polars_transformation",title:"5. Transformation",description:"GroupBy, Agg et Sort.",snippets:[{id:"pl_groupby",title:"GroupBy & Agg",description:"Agrégations performantes.",code:`# Syntaxe : group_by -> agg
+    pl.lit("En stock").alias("statut") # Valeur littérale(constante)
+])`}]},{id:"polars_transformation",title:"5. Transformation",description:"GroupBy, Agg et Sort.",snippets:[{id:"pl_groupby",title:"GroupBy & Agg",description:"Agrégations performantes.",code:`# Syntaxe: group_by -> agg
 df.group_by("ville").agg([
     pl.col("salaire").mean().alias("salaire_moyen"),
     pl.col("salaire").max().alias("salaire_max"),
     pl.len().alias("nb_habitants") # pl.len() = count
 ])
 
-# Note : group_by (avec underscore) est la nouvelle syntaxe (vs groupby)`},{id:"pl_window",title:"Window Functions (Over)",description:"Calculs par groupe sans réduire le nombre de lignes.",code:`# Ajouter la moyenne de la ville à chaque habitant
-# Pandas : transform()
-# Polars : .over()
+# Note: group_by(avec underscore) est la nouvelle syntaxe(vs groupby)`},{id:"pl_window",title:"Window Functions (Over)",description:"Calculs par groupe sans réduire le nombre de lignes.",code:`# Ajouter la moyenne de la ville à chaque habitant
+# Pandas: transform()
+# Polars: .over()
 
 df.with_columns([
     pl.col("salaire").mean().over("ville").alias("moyenne_ville")
 ])`}]},{id:"polars_combine",title:"6. Combinaison",description:"Join et Concat.",snippets:[{id:"pl_join",title:"Join (Jointures)",description:"Fusionner des DataFrames.",code:`# Join
-# how : 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
-df_merged = df_clients.join(df_commandes, on="client_id", how="left")
+# how: 'inner', 'left', 'outer', 'cross', 'semi', 'anti'
+df_merged = df_clients.join(df_commandes, on = "client_id", how = "left")
 
-# Anti Join (Lignes de A qui ne sont PAS dans B)
+# Anti Join(Lignes de A qui ne sont PAS dans B)
 # Très pratique pour trouver les "non-matchs"
-df_non_trouve = df_clients.join(df_commandes, on="client_id", how="anti")`},{id:"pl_concat",title:"Concat",description:"Empiler des données.",code:`# Vertical (Lignes)
-pl.concat([df1, df2], how="vertical")
+df_non_trouve = df_clients.join(df_commandes, on = "client_id", how = "anti")`},{id:"pl_concat",title:"Concat",description:"Empiler des données.",code:`# Vertical(Lignes)
+pl.concat([df1, df2], how = "vertical")
 
-# Horizontal (Colonnes)
-pl.concat([df1, df2], how="horizontal")`}]},{id:"polars_advanced",title:"7. Polars Avancé",description:"Lazy API, Streaming et SQL.",snippets:[{id:"pl_lazy_flow",title:"Le Flux Lazy Complet",description:"L'exemple canonique d'optimisation.",code:`q = (
+# Horizontal(Colonnes)
+pl.concat([df1, df2], how = "horizontal")`}]},{id:"polars_advanced",title:"7. Polars Avancé",description:"Lazy API, Streaming et SQL.",snippets:[{id:"pl_lazy_flow",title:"Le Flux Lazy Complet",description:"L'exemple canonique d'optimisation.",code:`q = (
     pl.scan_csv("data.csv")
-    .filter(pl.col("date") > "2023-01-01")
-    .group_by("categorie")
-    .agg(pl.col("montant").sum())
-    .sort("montant", descending=True)
+        .filter(pl.col("date") > "2023-01-01")
+        .group_by("categorie")
+        .agg(pl.col("montant").sum())
+        .sort("montant", descending = True)
 )
 
 # Voir le plan optimisé
@@ -1457,12 +1477,12 @@ print(q.explain())
 
 # Exécuter
 df_result = q.collect()`},{id:"pl_streaming",title:"Streaming (Out-of-Core)",description:"Traiter des données plus grosses que la RAM.",code:`# Si le dataset est trop gros pour la RAM,
-# Polars peut le traiter par morceaux (chunks).
+# Polars peut le traiter par morceaux(chunks).
 
-q = pl.scan_csv("big_data.csv")
+    q = pl.scan_csv("big_data.csv")
 
-# streaming=True active le moteur de streaming
-df_result = q.collect(streaming=True)`},{id:"pl_sql",title:"SQL Context",description:"Utiliser du SQL sur des DataFrames Polars.",code:`ctx = pl.SQLContext()
+# streaming = True active le moteur de streaming
+df_result = q.collect(streaming = True)`},{id:"pl_sql",title:"SQL Context",description:"Utiliser du SQL sur des DataFrames Polars.",code:`ctx = pl.SQLContext()
 ctx.register("clients", df_clients)
 ctx.register("ventes", df_ventes)
 
@@ -1474,17 +1494,17 @@ result = ctx.execute("""
     ORDER BY total DESC
 """)
 
-print(result.collect())`}]}]},{id:"skrub",title:"Skrub",description:"Préparation de données tabulaires (ex-DirtyCat)",categories:[{id:"skrub_intro",title:"1. Introduction & Installation",description:"Pourquoi Skrub ?",snippets:[{id:"skrub_install",title:"Installation & Contexte",description:"Skrub facilite le preprocessing pour le Machine Learning.",markdown:`### 🧼 Skrub (ex-DirtyCat)
+print(result.collect())`}]}]},{id:"skrub",title:"Skrub",description:"Préparation de données tabulaires (ex-DirtyCat)",categories:[{id:"skrub_intro",title:"1. Introduction & Installation",description:"Pourquoi Skrub ?",snippets:[{id:"skrub_install",title:"Installation & Contexte",description:"Skrub facilite le preprocessing pour le Machine Learning.",markdown:`### 🧼 Skrub(ex - DirtyCat)
 
 Développé par l'équipe de **scikit-learn**, Skrub est conçu pour combler le fossé entre les données brutes (bases de données, CSV sales) et les modèles de Machine Learning.
 
 **💡 Pourquoi l'utiliser ? Quelle est la plus-value ?**
-Contrairement à un preprocessing manuel fastidieux (nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub **automatise** ces tâches ingrates.
-*   **Gain de temps** : Il détecte automatiquement les types de données.
-*   **Performance** : Il transforme les "mauvaises" catégories (fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
-*   **Simplicité** : Il s'intègre directement dans vos Pipelines scikit-learn.
+Contrairement à un preprocessing manuel fastidieux(nettoyer les chaînes, gérer les dates, encoder les catégories une par une), Skrub ** automatise ** ces tâches ingrates.
+*   ** Gain de temps ** : Il détecte automatiquement les types de données.
+*   ** Performance ** : Il transforme les "mauvaises" catégories(fautes de frappe, variantes comme "Paris" vs "paris") en informations utiles grâce à des encodeurs flous.
+*   ** Simplicité ** : Il s'intègre directement dans vos Pipelines scikit-learn.
 
-\`\`\`bash
+    \`\`\`bash
 pip install skrub
 \`\`\`
 `}]},{id:"skrub_reporting",title:"2. Reporting Interactif",description:"Comprendre ses données en une ligne.",snippets:[{id:"table_report",title:"TableReport",description:"Génère un rapport HTML interactif complet.",code:`from skrub import TableReport
@@ -1762,79 +1782,7 @@ try:
 
 except ValidationError as e:
     print("Douane : Données refusées !")
-    print(e)`}]}]},{id:"language_tools",title:"Langage & Outils",description:"Modules standard et syntaxe Python.",categories:[{id:"standard_modules",title:"Modules Standard",description:"Les indispensables (datetime, math, os...).",snippets:[{id:"datetime_basics",title:"Dates & Heures (datetime)",description:"Manipuler le temps.",code:`from datetime import datetime, date, timedelta
-
-# 1. Maintenant
-now = datetime.now()
-print(f"Maintenant : {now}")
-
-# 2. Aujourd'hui (Date seulement)
-today = date.today()
-print(f"Aujourd'hui : {today}")
-
-# 3. Créer une date spécifique
-# Année, Mois, Jour, Heure, Minute, Seconde
-specific_date = datetime(2023, 12, 25, 10, 30, 0)
-print(f"Noël : {specific_date}")
-
-# 4. Accéder aux éléments
-print(f"Année : {now.year}")
-print(f"Mois : {now.month}")
-print(f"Jour : {now.day}")`},{id:"timedelta",title:"Calculs de Dates (timedelta)",description:"Ajouter ou soustraire du temps.",code:`from datetime import datetime, timedelta
-
-now = datetime.now()
-
-# 1. Ajouter du temps
-# On peut ajouter : weeks, days, hours, minutes, seconds, microseconds
-tomorrow = now + timedelta(days=1)
-next_week = now + timedelta(weeks=1)
-in_2_hours = now + timedelta(hours=2)
-
-print(f"Demain : {tomorrow}")
-
-# 2. Différence entre deux dates
-date1 = datetime(2024, 1, 1)
-date2 = datetime(2023, 1, 1)
-
-diff = date1 - date2
-print(f"Différence : {diff}") # 365 days, 0:00:00
-print(f"Jours : {diff.days}")
-print(f"Secondes totales : {diff.total_seconds()}")`},{id:"formatting",title:"Formatage (strftime/strptime)",description:"Convertir Date <-> Texte.",code:`from datetime import datetime
-
-now = datetime.now()
-
-# 1. Date vers Texte (strftime = String Format Time)
-# %Y : Année (4 chiffres)
-# %m : Mois (01-12)
-# %d : Jour (01-31)
-# %H : Heure (00-23)
-# %M : Minute (00-59)
-text_date = now.strftime("%Y-%m-%d %H:%M")
-print(f"Formaté : {text_date}") # Ex: 2023-10-27 14:30
-
-# 2. Texte vers Date (strptime = String Parse Time)
-date_string = "25/12/2023"
-parsed_date = datetime.strptime(date_string, "%d/%m/%Y")
-print(f"Parsé : {parsed_date}")`},{id:"dateutil",title:"Calculs Avancés (dateutil)",description:"Gérer les mois et années (relativedelta).",markdown:"### 🚀 Pourquoi dateutil ?\n`timedelta` ne gère pas les **mois** ni les **années** car leur durée varie (28-31 jours, 365-366 jours).\nPour cela, on utilise `dateutil.relativedelta`.\n\n```bash\npip install python-dateutil\n```",code:`from datetime import datetime
-from dateutil.relativedelta import relativedelta
-
-now = datetime.now()
-
-# 1. Ajouter des mois ou des années
-next_month = now + relativedelta(months = 1)
-next_year = now + relativedelta(years = 1)
-
-print(f"Mois prochain : {next_month}")
-
-# 2. Aller au dernier jour du mois
-end_of_month = now + relativedelta(day = 31)
-# Note : relativedelta gère intelligemment les mois de 30 jours ou février !
-print(f"Fin du mois : {end_of_month}")
-
-# 3. Calculer l'âge précis
-birth_date = datetime(1990, 5, 15)
-age = relativedelta(now, birth_date)
-print(f"Âge : {age.years} ans, {age.months} mois et {age.days} jours")`}]}]}]},$O={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
+    print(e)`}]}]}]},$O={themes:[{id:"sql_basics",title:"SQL Standard",description:"Extraction et Manipulation de Données",categories:[{id:"fundamentals",title:"1. Les Fondamentaux",description:"Extraction, Filtrage et Tri",snippets:[{id:"select_basics",title:"SELECT, FROM, LIMIT",description:"La base de toute requête.",code:`-- Sélectionner toutes les colonnes (*)
 SELECT * 
 FROM users 
 LIMIT 10; -- Toujours limiter pour explorer !
