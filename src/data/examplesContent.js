@@ -480,7 +480,7 @@ df['jour_ouvre'] = (df['date'].dt.dayofweek < 5) & (~df['jour_ferie'])
 
 # 6. Jour Ouvré Lendemain de Férié (Retour au travail)
 # Logique : C'est un jour ouvré, et le jour précédent (ou la séquence de jours précédents) était férié/weekend.
-def is_return_from_holiday(idx, df):
+def is_return_from_public_holiday(idx, df):
     if not df.loc[idx, 'jour_ouvre']:
         return False
     
@@ -495,7 +495,7 @@ def is_return_from_holiday(idx, df):
         
     return False
 
-df['jour_ouvre_lendemain_ferie'] = [is_return_from_holiday(i, df) for i in range(len(df))]
+df['jour_ouvre_lendemain_ferie'] = [is_return_from_public_holiday(i, df) for i in range(len(df))]
 
 # Aperçu
 print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_ferie']].head(15))`
@@ -525,9 +525,42 @@ df_holidays = df_holidays[cols].copy()
 df_holidays['start'] = pd.to_datetime(df_holidays['Date de début'], utc=True).dt.date
 df_holidays['end'] = pd.to_datetime(df_holidays['Date de fin'], utc=True).dt.date
 
-# 3. Filtrage par Zone (Ex: Zone C = Créteil, Montpellier, Paris, Toulouse, Versailles)
-# Zones disponibles : 'Zone A', 'Zone B', 'Zone C'
-ma_zone = 'Zone C'
+# 3. Filtrage par Département (Plus simple que par Zone)
+# Dictionnaire de mapping (Département -> Zone)
+# Source : Service Public
+DEPARTMENTS_ZONES = {
+    # Zone A
+    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A',
+    '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A',
+    '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A',
+    '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A',
+    '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A',
+    '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
+    
+    # Zone B
+    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B',
+    '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B',
+    '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B',
+    '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B',
+    '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B',
+    '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B',
+    '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B',
+    '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B',
+    '88': 'Zone B',
+    
+    # Zone C
+    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C',
+    '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C',
+    '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C',
+    '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C',
+    '95': 'Zone C'
+}
+
+mon_departement = '75' # Paris
+ma_zone = DEPARTMENTS_ZONES.get(mon_departement, 'Zone C') # Par défaut Zone C si inconnu
+
+print(f"Département {mon_departement} -> {ma_zone}")
+
 df_zone = df_holidays[df_holidays['Zones'] == ma_zone].reset_index(drop=True)
 
 print(f"Vacances récupérées pour {ma_zone} : {len(df_zone)} périodes.")
