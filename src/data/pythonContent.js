@@ -417,8 +417,46 @@ df_large = pd.concat([df_infos, df_metrics], axis=1)`
                     ]
                 },
                 {
+                    id: 'time_series',
+                    title: '7. Séries Temporelles',
+                    description: 'Manipulation de dates et fréquences.',
+                    snippets: [
+                        {
+                            id: 'date_range',
+                            title: 'Générer une plage de dates',
+                            description: 'Créer une séquence de dates.',
+                            code: `import pandas as pd
+
+# Jours
+dates_d = pd.date_range(start='2023-01-01', periods=5, freq='D')
+print("Jours :")
+print(dates_d)
+
+# Mois
+dates_m = pd.date_range(start='2023-01-01', periods=5, freq='M')
+print("\\nMois :")
+print(dates_m)`
+                        },
+                        {
+                            id: 'resampling',
+                            title: 'Rééchantillonnage (Resample)',
+                            description: 'Changer la fréquence des données (ex: jour -> mois).',
+                            code: `import pandas as pd
+import numpy as np
+
+# Données journalières
+rng = pd.date_range('2023-01-01', periods=100, freq='D')
+ts = pd.Series(np.random.randn(len(rng)), index=rng)
+
+# Moyenne mensuelle
+monthly_mean = ts.resample('M').mean()
+print(monthly_mean)`
+                        }
+                    ]
+                },
+                {
                     id: 'ml_dates',
-                    title: '7. Dates & Machine Learning',
+                    title: '8. Dates & Machine Learning',
                     description: 'Préparer les dates pour les modèles prédictifs.',
                     snippets: [
                         {

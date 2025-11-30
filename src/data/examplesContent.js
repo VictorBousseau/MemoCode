@@ -611,55 +611,93 @@ print(f"Il y a 2h30 : {past}")`
                     ]
                 },
                 {
-                    id: 'pandas_dates',
-                    title: 'Séries Temporelles (Pandas)',
-                    description: 'Manipulation avancée avec Pandas.',
+                    id: 'practical_cases',
+                    title: 'Cas Pratiques',
+                    description: 'Exemples concrets et avancés.',
                     snippets: [
                         {
-                            id: 'date_range',
-                            title: 'Générer une plage de dates',
-                            description: 'Créer une séquence de dates.',
-                            code: `import pandas as pd
-
-# Jours
-dates_d = pd.date_range(start='2023-01-01', periods=5, freq='D')
-print("Jours :")
-print(dates_d)
-
-# Mois
-dates_m = pd.date_range(start='2023-01-01', periods=5, freq='M')
-print("\nMois :")
-print(dates_m)`
-                        },
-                        {
-                            id: 'resampling',
-                            title: 'Rééchantillonnage (Resample)',
-                            description: 'Changer la fréquence des données (ex: jour -> mois).',
-                            code: `import pandas as pd
-import numpy as np
-
-# Données journalières
-rng = pd.date_range('2023-01-01', periods=100, freq='D')
-ts = pd.Series(np.random.randn(len(rng)), index=rng)
-
-# Moyenne mensuelle
-monthly_mean = ts.resample('M').mean()
-print(monthly_mean)`
-                        },
-                        {
                             id: 'school_holidays',
-                            title: 'Vacances Scolaires (France)',
-                            description: 'Détecter les vacances scolaires (Zone A, B, C).',
-                            code: `import holidays
-from datetime import date
+                            title: 'Vacances Scolaires (Avancé)',
+                            description: 'Récupérer les données officielles, gérer les zones et croiser avec une liste de dates.',
+                            code: `import pandas as pd
+import requests
+import io
+from datetime import datetime, timedelta
 
-fr_holidays = holidays.France(years=2023)
+# --- 1. Récupération des Données Officielles ---
+# API de l'Éducation Nationale (Calendrier Scolaire)
+url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv"
+print(f"Téléchargement des données depuis {url}...")
 
-d = date(2023, 7, 14)
-if d in fr_holidays:
-    print(f"{d} est férié : {fr_holidays.get(d)}")
-else:
-    print(f"{d} n'est pas férié.")`
+try:
+    df_holidays = pd.read_csv(url, sep=';')
+    print("Données téléchargées avec succès !")
+except Exception as e:
+    print(f"Erreur lors du téléchargement : {e}")
+    # Fallback si pas d'internet pour l'exemple
+    data = """Description;Zones;Date de début;Date de fin
+Vacances de Noël;Zone A;2023-12-23;2024-01-08
+Vacances de Noël;Zone B;2023-12-23;2024-01-08
+Vacances de Noël;Zone C;2023-12-23;2024-01-08
+Vacances d'Hiver;Zone C;2024-02-10;2024-02-26
+Vacances d'Hiver;Zone A;2024-02-17;2024-03-04
+Vacances d'Hiver;Zone B;2024-02-24;2024-03-11"""
+    df_holidays = pd.read_csv(io.StringIO(data), sep=';')
+
+# --- 2. Nettoyage et Préparation ---
+# On ne garde que les vacances (pas les jours fériés isolés qui sont souvent dans une autre colonne ou dataset)
+# Ici on filtre sur les zones A, B, C
+zones_valid = ['Zone A', 'Zone B', 'Zone C']
+df_holidays = df_holidays[df_holidays['Zones'].isin(zones_valid)].copy()
+
+# Conversion des dates
+df_holidays['start'] = pd.to_datetime(df_holidays['Date de début']).dt.date
+df_holidays['end'] = pd.to_datetime(df_holidays['Date de fin']).dt.date
+
+# --- 3. "Explosion" des Périodes (Une ligne par jour de vacances) ---
+# C'est la technique clé pour faire des jointures faciles ensuite.
+holiday_dates = []
+for _, row in df_holidays.iterrows():
+    # On génère tous les jours entre début et fin (fin exclue dans range, mais incluse dans les vacances ?)
+    # Attention : Souvent 'Date de fin' est le jour de reprise, donc exclu.
+    # Vérifions la convention : Si Fin = Lundi matin, alors Dimanche soir est vacances.
+    dates = pd.date_range(start=row['start'], end=row['end'] - timedelta(days=1), freq='D')
+    for d in dates:
+        holiday_dates.append({
+            'date': d.date(), 
+            'Zones': row['Zones'], 
+            'vacances_nom': row['Description']
+        })
+
+df_exploded = pd.DataFrame(holiday_dates)
+
+# --- 4. Cas Pratique : Est-ce que mes clients sont en vacances ? ---
+# Imaginons une liste de clients avec leur département et une date d'achat
+user_data = {
+    'date': ['2024-02-12', '2024-02-12', '2024-02-20'],
+    'departement': ['75', '33', '33'] # 75=Paris(C), 33=Gironde(A)
+}
+df_users = pd.DataFrame(user_data)
+df_users['date'] = pd.to_datetime(df_users['date']).dt.date
+
+# Mapping Départements -> Zones
+DEPARTMENTS_ZONES = {
+    '75': 'Zone C',
+    '33': 'Zone A',
+    # ... à compléter pour toute la France
+}
+df_users['Zones'] = df_users['departement'].map(DEPARTMENTS_ZONES)
+
+# Jointure (Left Join)
+# On garde tous les users, et on ajoute les infos vacances si ça matche (Date + Zone)
+df_merged = pd.merge(df_users, df_exploded, on=['date', 'Zones'], how='left')
+
+# Remplissage des Non-Vacances
+df_merged['en_vacances'] = df_merged['vacances_nom'].notna()
+df_merged['vacances_nom'] = df_merged['vacances_nom'].fillna('Non')
+
+print("\\n--- Résultat Final ---")
+print(df_merged[['date', 'departement', 'Zones', 'en_vacances', 'vacances_nom']])`
                         }
                     ]
                 }
