@@ -419,6 +419,22 @@ plt.show()`
                             id: 'rfm_segmentation',
                             title: 'Segmentation RFM',
                             description: 'Segmenter les clients par Récence, Fréquence et Montant.',
+                            markdown: `### 🎯 Objectif de la Segmentation RFM
+
+La segmentation **RFM** (Recency, Frequency, Monetary) est une méthode éprouvée du marketing pour identifier et classer vos clients en fonction de leur comportement d'achat.
+
+**Pourquoi utiliser RFM ?**
+- 📊 **Identifier vos meilleurs clients** : Qui génère le plus de valeur ?
+- 🎯 **Cibler vos actions marketing** : Personnaliser vos campagnes selon le segment
+- 💰 **Optimiser le ROI** : Concentrer vos efforts là où ils rapportent le plus
+
+**Les 3 Dimensions :**
+1. **Récence (R)** : Depuis combien de temps le client n'a pas acheté ? (Plus c'est récent, mieux c'est)
+2. **Fréquence (F)** : Combien de fois le client a acheté ? (Plus il achète, mieux c'est)
+3. **Montant (M)** : Combien le client dépense au total ? (Plus il dépense, mieux c'est)
+
+**La Logique de Scoring :**
+Chaque dimension est notée de **1 à 5** (5 = meilleur). Un client noté **555** est un **Champion** 🏆 (récent, fréquent, gros montant), tandis qu'un client **111** est **à risque** ⚠️.`,
                             code: `import pandas as pd
 import numpy as np
 import datetime as dt
@@ -430,35 +446,53 @@ dates = pd.date_range(end=dt.datetime.today(), periods=365).to_list()
 
 df = pd.DataFrame({
     'transaction_id': range(n_transactions),
-    'customer_id': np.random.randint(1, 200, size=n_transactions), # 200 clients
+    'customer_id': np.random.randint(1, 200, size=n_transactions), # 200 clients uniques
     'date': np.random.choice(dates, size=n_transactions),
-    'amount': np.random.exponential(scale=50, size=n_transactions).round(2) + 10 # Montant > 10
+    'amount': np.random.exponential(scale=50, size=n_transactions).round(2) + 10 # Montant > 10€
 })
 
-# --- 2. Calcul RFM ---
-# Récence : Jours depuis le dernier achat
-# Fréquence : Nombre d'achats
-# Montant : Somme totale dépensée
+# --- 2. Calcul RFM (Agrégation par Client) ---
+# On définit "maintenant" comme le jour après la dernière transaction
 now = df['date'].max() + dt.timedelta(days=1)
 
 rfm = df.groupby('customer_id').agg({
-    'date': lambda x: (now - x.max()).days, # Recency
-    'transaction_id': 'count',              # Frequency
-    'amount': 'sum'                         # Monetary
+    'date': lambda x: (now - x.max()).days,  # R (Recency) : Nombre de jours depuis le dernier achat
+    'transaction_id': 'count',                # F (Frequency) : Nombre d'achats total
+    'amount': 'sum'                           # M (Monetary) : Somme totale dépensée
 }).rename(columns={'date': 'R', 'transaction_id': 'F', 'amount': 'M'})
 
-# --- 3. Scoring (Quintiles) ---
-# On note de 1 à 5 (5 est le meilleur)
-rfm['R_Score'] = pd.qcut(rfm['R'], 5, labels=[5, 4, 3, 2, 1]) # Plus c'est récent (petit), mieux c'est
+# --- 3. Scoring par Quintiles (Division en 5 groupes) ---
+# Chaque client reçoit un score de 1 à 5 pour chaque dimension
+
+# R_Score : ATTENTION, pour la Récence, plus le nombre de jours est PETIT, mieux c'est
+# Donc on inverse : un client qui a acheté récemment (R petit) aura un score de 5
+rfm['R_Score'] = pd.qcut(rfm['R'], 5, labels=[5, 4, 3, 2, 1])
+
+# F_Score : Plus le client achète souvent, meilleur est le score (1 à 5)
+# rank(method='first') évite les erreurs si plusieurs clients ont la même fréquence
 rfm['F_Score'] = pd.qcut(rfm['F'].rank(method='first'), 5, labels=[1, 2, 3, 4, 5])
+
+# M_Score : Plus le client dépense, meilleur est le score (1 à 5)
 rfm['M_Score'] = pd.qcut(rfm['M'], 5, labels=[1, 2, 3, 4, 5])
 
-# Score RFM global (Concaténation)
+# --- 4. Création du Segment RFM (Concaténation des Scores) ---
+# Exemple : Un client avec R=5, F=5, M=4 aura le segment "554"
 rfm['RFM_Segment'] = rfm['R_Score'].astype(str) + rfm['F_Score'].astype(str) + rfm['M_Score'].astype(str)
+
+# Score_Total : Somme des 3 scores (de 3 à 15)
+# Utilisé pour classer facilement les clients
 rfm['Score_Total'] = rfm[['R_Score', 'F_Score', 'M_Score']].sum(axis=1)
 
-# --- 4. Segmentation ---
+# --- 5. Segmentation Business (Labels Parlants) ---
 def segment_customer(score):
+    """
+    Transforme le score numérique en label business actionnable
+    
+    - Champions (13-15) : Vos meilleurs clients. Récompensez-les (programme VIP).
+    - Fidèles (10-12) : Clients réguliers. Encouragez-les à devenir Champions.
+    - À Réveiller (7-9) : Inactifs mais potentiel. Relancez avec une offre ciblée.
+    - À Risque (3-6) : En perte de vitesse. Action urgente avant qu'ils partent.
+    """
     if score >= 13: return '🏆 Champions'
     elif score >= 10: return '💎 Fidèles'
     elif score >= 7:  return '💤 À Réveiller'
@@ -466,7 +500,8 @@ def segment_customer(score):
 
 rfm['Segment_Label'] = rfm['Score_Total'].apply(segment_customer)
 
-print(rfm[['R', 'F', 'M', 'Segment_Label']].head(10))
+# --- 6. Affichage des Résultats ---
+print(rfm[['R', 'F', 'M', 'R_Score', 'F_Score', 'M_Score', 'Score_Total', 'Segment_Label']].head(10))
 print("\\n--- Distribution des Segments ---")
 print(rfm['Segment_Label'].value_counts())`
                         }
