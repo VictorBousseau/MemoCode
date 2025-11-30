@@ -2,31 +2,7 @@ import { Code } from 'lucide-react';
 
 export const examplesContent = {
     themes: [
-        {
-            id: 'snippets_utiles',
-            title: 'Snippets Utiles',
-            description: 'Bouts de code réutilisables et recettes',
-            categories: [
-                {
-                    id: 'general',
-                    title: 'Général',
-                    description: 'Fonctions utilitaires diverses.',
-                    snippets: [
-                        {
-                            id: 'placeholder',
-                            title: 'À venir...',
-                            description: 'Cette section sera bientôt remplie avec des exemples concrets.',
-                            code: `# Exemple de structure pour vos futurs snippets :
-def ma_super_fonction():
-    """
-    Une fonction qui fait gagner du temps.
-    """
-    pass`
-                        }
-                    ]
-                }
-            ]
-        },
+
         {
             id: 'simulation',
             title: 'Simulation',
@@ -412,10 +388,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 
 # Split Train / Test
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size = 0.2, random_state = 42)
 
-# Entraînement (Random Forest)
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+# Entraînement(Random Forest)
+model = RandomForestClassifier(n_estimators = 100, random_state = 42)
 model.fit(X_train, y_train)
 
 # Prédictions
@@ -425,8 +401,8 @@ y_pred = model.fit(X_train, y_train).predict(X_test)
 print("Rapport de Classification :")
 print(classification_report(y_test, y_pred))
 
-plt.figure(figsize=(6, 5))
-sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues')
+plt.figure(figsize = (6, 5))
+sns.heatmap(confusion_matrix(y_test, y_pred), annot = True, fmt = 'd', cmap = 'Blues')
 plt.title('Matrice de Confusion')
 plt.ylabel('Vrai label')
 plt.xlabel('Label prédit')
@@ -437,197 +413,253 @@ plt.show()`
             ]
         },
         {
+            id: 'marketing',
+            title: 'Marketing & Client',
+            description: 'Segmentation et analyse comportementale.',
+            snippets: [
+                {
+                    id: 'rfm_segmentation',
+                    title: 'Segmentation RFM',
+                    description: 'Segmenter les clients par Récence, Fréquence et Montant.',
+                    code: `import pandas as pd
+import numpy as np
+import datetime as dt
+
+# --- 1. Génération de Données de Vente -- -
+        np.random.seed(42)
+n_transactions = 1000
+dates = pd.date_range(end = dt.datetime.today(), periods = 365).to_list()
+
+df = pd.DataFrame({
+            'transaction_id': range(n_transactions),
+            'customer_id': np.random.randint(1, 200, size = n_transactions), # 200 clients
+    'date': np.random.choice(dates, size = n_transactions),
+            'amount': np.random.exponential(scale = 50, size = n_transactions).round(2) + 10 # Montant > 10
+        })
+
+# -- - 2. Calcul RFM-- -
+# Récence: Jours depuis le dernier achat
+# Fréquence: Nombre d'achats
+# Montant: Somme totale dépensée
+now = df['date'].max() + dt.timedelta(days = 1)
+
+rfm = df.groupby('customer_id').agg({
+            'date': lambda x: (now - x.max()).days, # Recency
+    'transaction_id': 'count',              # Frequency
+    'amount': 'sum'                         # Monetary
+        }).rename(columns = { 'date': 'R', 'transaction_id': 'F', 'amount': 'M' })
+
+# -- - 3. Scoring(Quintiles)-- -
+# On note de 1 à 5(5 est le meilleur)
+rfm['R_Score'] = pd.qcut(rfm['R'], 5, labels = [5, 4, 3, 2, 1]) # Plus c'est récent (petit), mieux c'est
+rfm['F_Score'] = pd.qcut(rfm['F'].rank(method = 'first'), 5, labels = [1, 2, 3, 4, 5])
+rfm['M_Score'] = pd.qcut(rfm['M'], 5, labels = [1, 2, 3, 4, 5])
+
+# Score RFM global(Concaténation)
+rfm['RFM_Segment'] = rfm['R_Score'].astype(str) + rfm['F_Score'].astype(str) + rfm['M_Score'].astype(str)
+rfm['Score_Total'] = rfm[['R_Score', 'F_Score', 'M_Score']].sum(axis = 1)
+
+# -- - 4. Segmentation-- -
+        def segment_customer(score):
+if score >= 13: return '🏆 Champions'
+    elif score >= 10: return '💎 Fidèles'
+    elif score >= 7: return '💤 À Réveiller'
+    else: return '⚠️ À Risque'
+
+rfm['Segment_Label'] = rfm['Score_Total'].apply(segment_customer)
+
+print(rfm[['R', 'F', 'M', 'Segment_Label']].head(10))
+print("\\n--- Distribution des Segments ---")
+print(rfm['Segment_Label'].value_counts())`
+                }
+            ]
+        },
+        {
+            id: 'production_ml',
+            title: 'Mise en Production (MLOps)',
+            description: 'Pipelines robustes et Transformers personnalisés.',
+            snippets: [
+                {
+                    id: 'sklearn_custom_pipeline',
+                    title: 'Pipeline Sklearn Custom',
+                    description: 'Créer un Transformer personnalisé pour nettoyer et enrichir les données.',
+                    code: `import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import Pipeline
+    from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import StandardScaler
+
+# --- Données Exemple-- -
+    df = pd.DataFrame({
+        'description': [' Produit A ', 'produit B', 'PRODUIT A', None, 'Produit C'],
+        'prix': [100, 200, 100, 50, None],
+        'surface': [50, 60, 50, 100, 20]
+    })
+
+# -- - Transformer Personnalisé: Nettoyage Texte-- -
+    class TextCleaner(BaseEstimator, TransformerMixin):
+    def __init__(self, column, case='lower'):
+self.column = column
+self.case = case
+    
+    def fit(self, X, y = None):
+return self # Rien à apprendre
+    
+    def transform(self, X):
+X_copy = X.copy()
+        # 1. Gestion NaN
+X_copy[self.column] = X_copy[self.column].fillna('inconnu')
+        # 2. Strip whitespace
+X_copy[self.column] = X_copy[self.column].str.strip()
+        # 3. Case normalization
+if self.case == 'lower':
+    X_copy[self.column] = X_copy[self.column].str.lower()
+return X_copy
+
+# -- - Transformer Personnalisé: Feature Engineering-- -
+    class PricePerSqm(BaseEstimator, TransformerMixin):
+    def fit(self, X, y = None):
+return self
+        
+    def transform(self, X):
+X_copy = X.copy()
+        # On évite la division par zéro
+X_copy['prix_m2'] = X_copy['prix'] / X_copy['surface'].replace(0, 1)
+return X_copy
+
+# -- - Construction du Pipeline-- -
+# L'ordre est crucial !
+data_pipeline = Pipeline([
+    # Étape 1 : Nettoyage du texte
+        ('clean_text', TextCleaner(column = 'description')),
+    
+    # Étape 2 : Imputation des valeurs manquantes(numériques)
+    # Note: SimpleImputer renvoie un array numpy, on le garde pour la fin ou on utilise set_output
+    # Ici, on simplifie en supposant que le pipeline gère le DF
+    
+    # Étape 3 : Création de feature métier
+        ('feature_eng', PricePerSqm())
+])
+
+# Exécution
+df_transformed = data_pipeline.fit_transform(df)
+print(df_transformed)`
+                }
+            ]
+        },
+        {
             id: 'python_date',
-            title: 'Python Date',
-            description: 'Manipulation de dates et jours fériés en France',
+            title: 'Dates (Python)',
+            description: 'Manipulation de dates et séries temporelles.',
             categories: [
                 {
-                    id: 'date_features',
-                    title: 'Features Temporelles',
-                    description: 'Création de variables dérivées des dates (Jours fériés, ouvrés, etc.)',
+                    id: 'datetime_basics',
+                    title: 'Module datetime',
+                    description: 'Les bases de la manipulation de dates.',
                     snippets: [
                         {
-                            id: 'french_calendar',
-                            title: 'Calendrier Français & Jours Fériés',
-                            description: 'Gestion des jours fériés, veilles, lendemains et jours ouvrés.',
-                            code: `import pandas as pd
-import holidays
-from datetime import timedelta
+                            id: 'current_date',
+                            title: 'Date et Heure Actuelles',
+                            description: 'Récupérer la date et l\'heure courantes.',
+                            code: `from datetime import datetime
 
-# 1. Création d'un jeu de données exemple
-dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
-df = pd.DataFrame({'date': dates})
-
-# 2. Ajout du nom du jour (en français)
-days_fr = {
-    0: 'Lundi', 1: 'Mardi', 2: 'Mercredi', 3: 'Jeudi', 
-    4: 'Vendredi', 5: 'Samedi', 6: 'Dimanche'
-}
-df['jour_nom'] = df['date'].dt.dayofweek.map(days_fr)
-
-# 3. Jours Fériés (France)
-# Nécessite : pip install holidays
-fr_holidays = holidays.France(years=[2025])
-df['jour_ferie'] = df['date'].apply(lambda x: x in fr_holidays)
-
-# 4. Veille et Lendemain de jour férié
-# Shift(-1) -> La valeur de demain vient ici (donc si demain est férié, ici c'est veille)
-df['veille_jour_ferie'] = df['jour_ferie'].shift(-1).fillna(False)
-df['lendemain_jour_ferie'] = df['jour_ferie'].shift(1).fillna(False)
-
-# 5. Jour Ouvré (Lundi-Vendredi ET Pas férié)
-df['jour_ouvre'] = (df['date'].dt.dayofweek < 5) & (~df['jour_ferie'])
-
-# 6. Jour Ouvré Lendemain de Férié (Retour au travail)
-# Logique : C'est un jour ouvré, et le jour précédent (ou la séquence de jours précédents) était férié/weekend.
-def is_return_from_public_holiday(idx, df):
-    if not df.loc[idx, 'jour_ouvre']:
-        return False
-    
-    # On regarde en arrière
-    prev_idx = idx - 1
-    while prev_idx >= 0:
-        if df.loc[prev_idx, 'jour_ouvre']:
-            return False # On a trouvé un jour ouvré avant, donc ce n'est pas un retour de vacances
-        if df.loc[prev_idx, 'jour_ferie']:
-            return True # On a trouvé un férié sans croiser de jour ouvré -> C'est un retour !
-        prev_idx -= 1
-        
-    return False
-
-df['jour_ouvre_lendemain_ferie'] = [is_return_from_public_holiday(i, df) for i in range(len(df))]
-
-# 7. Ponts (Faire le pont)
-# Logique :
-# - Lundi est un pont si Mardi est férié
-# - Vendredi est un pont si Jeudi est férié
-is_lundi = df['date'].dt.dayofweek == 0
-is_vendredi = df['date'].dt.dayofweek == 4
-
-# On regarde demain (shift -1) pour le Lundi
-demain_ferie = df['jour_ferie'].shift(-1).fillna(False)
-# On regarde hier (shift 1) pour le Vendredi
-hier_ferie = df['jour_ferie'].shift(1).fillna(False)
-
-df['pont'] = (is_lundi & demain_ferie) | (is_vendredi & hier_ferie)
-
-# 8. Semaine avec jour férié
-# Utile pour l'analyse de saisonnalité (ex: baisse de productivité prévue)
-# On groupe par année/semaine et on regarde s'il y a au moins un jour férié
-df['year'] = df['date'].dt.isocalendar().year
-df['week'] = df['date'].dt.isocalendar().week
-df['semaine_avec_ferie'] = df.groupby(['year', 'week'])['jour_ferie'].transform('any')
-
-# Aperçu
-print(df[['date', 'jour_nom', 'jour_ferie', 'pont', 'semaine_avec_ferie']].head(15))`
+now = datetime.now()
+print(f"Date et heure : {now}")
+print(f"Année : {now.year}")
+print(f"Mois : {now.month}")
+print(f"Jour : {now.day}")`
                         },
-
                         {
-                            id: 'school_holidays',
-                            title: 'Vacances Scolaires (Zones A, B, C)',
-                            description: 'Récupérer les vacances officielles depuis l\'API du gouvernement.',
+                            id: 'formatting',
+                            title: 'Formatage (strftime)',
+                            description: 'Convertir une date en chaîne de caractères.',
+                            code: `from datetime import datetime
+
+now = datetime.now()
+formatted = now.strftime("%Y-%m-%d %H:%M:%S")
+print(f"Format ISO : {formatted}")
+
+custom = now.strftime("%d/%m/%Y à %Hh%M")
+print(f"Format français : {custom}")`
+                        },
+                        {
+                            id: 'parsing',
+                            title: 'Parsing (strptime)',
+                            description: 'Convertir une chaîne en objet date.',
+                            code: `from datetime import datetime
+
+date_str = "25/12/2023"
+date_obj = datetime.strptime(date_str, "%d/%m/%Y")
+print(f"Objet date : {date_obj}")
+print(f"Type : {type(date_obj)}")`
+                        },
+                        {
+                            id: 'timedelta',
+                            title: 'Calculs (timedelta)',
+                            description: 'Ajouter ou soustraire du temps.',
+                            code: `from datetime import datetime, timedelta
+
+now = datetime.now()
+tomorrow = now + timedelta(days=1)
+next_week = now + timedelta(weeks=1)
+past = now - timedelta(hours=2, minutes=30)
+
+print(f"Demain : {tomorrow}")
+print(f"Semaine prochaine : {next_week}")
+print(f"Il y a 2h30 : {past}")`
+                        }
+                    ]
+                },
+                {
+                    id: 'pandas_dates',
+                    title: 'Séries Temporelles (Pandas)',
+                    description: 'Manipulation avancée avec Pandas.',
+                    snippets: [
+                        {
+                            id: 'date_range',
+                            title: 'Générer une plage de dates',
+                            description: 'Créer une séquence de dates.',
+                            code: `import pandas as pd
+
+# Jours
+dates_d = pd.date_range(start='2023-01-01', periods=5, freq='D')
+print("Jours :")
+print(dates_d)
+
+# Mois
+dates_m = pd.date_range(start='2023-01-01', periods=5, freq='M')
+print("\nMois :")
+print(dates_m)`
+                        },
+                        {
+                            id: 'resampling',
+                            title: 'Rééchantillonnage (Resample)',
+                            description: 'Changer la fréquence des données (ex: jour -> mois).',
                             code: `import pandas as pd
 import numpy as np
 
-# --- 1. CONFIGURATION & DONNÉES ---
-URL_API = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
+# Données journalières
+rng = pd.date_range('2023-01-01', periods=100, freq='D')
+ts = pd.Series(np.random.randn(len(rng)), index=rng)
 
-DEPARTMENTS_ZONES = {
-    # Zone A
-    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A', '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A', '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A', '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A', '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A', '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
-    # Zone B
-    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B', '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B', '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B', '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B', '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B', '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B', '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B', '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B', '88': 'Zone B',
-    # Zone C
-    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C', '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C', '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C', '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C', '95': 'Zone C',
-    # DOM
-    '971': 'Guadeloupe', '972': 'Martinique', '973': 'Guyane', '974': 'La Réunion', '976': 'Mayotte'
-}
+# Moyenne mensuelle
+monthly_mean = ts.resample('M').mean()
+print(monthly_mean)`
+                        },
+                        {
+                            id: 'school_holidays',
+                            title: 'Vacances Scolaires (France)',
+                            description: 'Détecter les vacances scolaires (Zone A, B, C).',
+                            code: `import holidays
+from datetime import date
 
-def preparer_calendrier_vacances():
-    print("Téléchargement et préparation des vacances...")
-    df = pd.read_csv(URL_API, sep=';')
-    
-    # Nettoyage de base
-    df = df[['Description', 'Zones', 'Date de début', 'Date de fin']].copy()
-    df['start'] = pd.to_datetime(df['Date de début'], utc=True).dt.date
-    df['end'] = pd.to_datetime(df['Date de fin'], utc=True).dt.date
-    
-    # Filtrage des zones
-    df = df[df['Zones'].isin(['Zone A', 'Zone B', 'Zone C'])]
-    
-    # Étape 1 : On explose les périodes en jours individuels
-    holiday_days = []
-    for _, row in df.iterrows():
-        # end est exclusif dans date_range, mais inclusif dans les données éducation ? 
-        # Vérification standard : souvent [start, end[. Si end est le jour de reprise, il faut faire -1 jour.
-        dates_in_holiday = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1))
-        
-        for d in dates_in_holiday:
-            holiday_days.append({
-                'date_ref': d.date(),
-                'zone': row['Zones'],
-                'vacances_nom': row['Description']
-            })
-            
-    df_flat = pd.DataFrame(holiday_days)
-    
-    # --- FIX ANTI-DOUBLONS ---
-    # C'est ici que la magie opère.
-    # On regroupe par [date, zone]. Si doublon, on garde le nom unique ou on concatène.
-    # Ex: Si on a "Vacances Hiver" et "Vacances Hiver" -> on garde une seule fois.
-    df_flat = df_flat.groupby(['date_ref', 'zone'], as_index=False).agg({
-        'vacances_nom': lambda x: ' / '.join(sorted(set(str(v) for v in x if pd.notna(v))))
-    })
-    
-    return df_flat
+fr_holidays = holidays.France(years=2023)
 
-# --- 2. EXÉCUTION ---
-
-# A. Préparation du référentiel (unique par jour/zone)
-df_calendrier_flat = preparer_calendrier_vacances()
-
-# B. Génération de Données Exemple (pour remplacer le fichier Excel)
-print("Génération de données test...")
-dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
-# On simule des départements aléatoires pour l'exemple
-# 75 (Paris - C), 33 (Gironde - A), 69 (Rhône - A), 59 (Nord - B)
-departements_exemples = ['75', '33', '69', '59']
-df_user = pd.DataFrame({
-    'date': dates,
-    'departement': np.random.choice(departements_exemples, size=len(dates))
-})
-
-# Sauvegarde du nombre de lignes pour vérification
-nb_lignes_avant = len(df_user)
-
-# C. Préparation Utilisateur
-df_user['date_ref'] = pd.to_datetime(df_user['date']).dt.date
-# Nettoyage département (string, 2 chiffres)
-df_user['departement'] = pd.to_numeric(df_user['departement'], errors='coerce').astype('Int64').astype(str).str.zfill(2)
-df_user['zone'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Hors Zone')
-
-# D. Fusion (Left Join)
-df_final = pd.merge(
-    df_user,
-    df_calendrier_flat,
-    on=['date_ref', 'zone'],
-    how='left'
-)
-
-# E. Finalisation
-df_final['en_vacances'] = df_final['vacances_nom'].notna()
-df_final['vacances_nom'] = df_final['vacances_nom'].fillna('Non')
-df_final = df_final.drop(columns=['date_ref'])
-
-# VÉRIFICATION FINALE
-nb_lignes_apres = len(df_final)
-print("-" * 30)
-if nb_lignes_avant == nb_lignes_apres:
-    print(f"SUCCÈS : Le fichier contient bien {nb_lignes_apres} lignes (pas de doublons).")
+d = date(2023, 7, 14)
+if d in fr_holidays:
+    print(f"{d} est férié : {fr_holidays.get(d)}")
 else:
-    print(f"ATTENTION : Le fichier est passé de {nb_lignes_avant} à {nb_lignes_apres} lignes !")
-
-print(df_final.head())`
+    print(f"{d} n'est pas férié.")`
                         }
                     ]
                 }

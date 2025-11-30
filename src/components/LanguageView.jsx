@@ -18,7 +18,11 @@ const themeIcons = {
     streamlit: Layout,
     dax_mastery: BarChart,
     power_query_ui: Layout,
-    m_language: Code
+    m_language: Code,
+    simulation: BrainCircuit,
+    optimisation: Zap,
+    data_science: BarChart,
+    python_date: FileCode
 };
 
 export default function LanguageView({ content, searchQuery }) {
@@ -148,7 +152,7 @@ export default function LanguageView({ content, searchQuery }) {
                         <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
                             {activeTheme?.title}
                         </h3>
-                        {activeTheme?.categories.map((category) => (
+                        {activeTheme?.categories?.map((category) => (
                             <button
                                 key={category.id}
                                 onClick={() => setActiveCategoryId(category.id)}

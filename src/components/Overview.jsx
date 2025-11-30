@@ -73,6 +73,14 @@ const languages = [
         bg: 'bg-red-400/10',
         description: "Gérez vos versions. Les commandes indispensables pour sauvegarder, partager et collaborer sur vos projets de code."
     },
+    {
+        id: 'Exemples',
+        name: 'Exemples',
+        icon: FileCode2,
+        color: 'text-purple-400',
+        bg: 'bg-purple-400/10',
+        description: "Cas pratiques et projets. De la simulation numérique à l'optimisation avec Gurobi, en passant par des projets Data Science complets."
+    },
 ];
 
 export default function Overview({ onNavigate }) {
