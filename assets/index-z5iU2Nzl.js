@@ -3096,67 +3096,130 @@ rfm['Segment_Label'] = rfm['Score_Total'].apply(segment_customer)
 # --- 6. Affichage des Résultats ---
 print(rfm[['R', 'F', 'M', 'R_Score', 'F_Score', 'M_Score', 'Score_Total', 'Segment_Label']].head(10))
 print("\\n--- Distribution des Segments ---")
-print(rfm['Segment_Label'].value_counts())`}]},{id:"production_ml",title:"Mise en Production (MLOps)",description:"Pipelines robustes et Transformers personnalisés.",snippets:[{id:"sklearn_custom_pipeline",title:"Pipeline Sklearn Custom",description:"Créer un Transformer personnalisé pour nettoyer et enrichir les données.",code:`import pandas as pd
+print(rfm['Segment_Label'].value_counts())`}]},{id:"production_ml",title:"Mise en Production (MLOps)",description:"Pipelines robustes et Transformers personnalisés.",snippets:[{id:"sklearn_custom_pipeline",title:"Pipeline Sklearn Custom",description:"Créer un Transformer personnalisé pour nettoyer et enrichir les données.",markdown:`### 🔧 Objectif : Pipeline de Preprocessing Robuste
+
+Un **Pipeline Scikit-Learn** permet d'enchaîner plusieurs étapes de transformation de données de manière **automatique**, **reproductible** et **déployable** en production.
+
+**Pourquoi créer des Transformers personnalisés ?**
+- 🧹 **Nettoyage métier** : Standardiser les données textuelles (casse, espaces, valeurs manquantes)
+- 🚀 **Feature Engineering** : Créer des variables calculées (ex: prix au m²)
+- 🔄 **Réutilisabilité** : Appliquer les mêmes transformations sur Train ET Test (évite le Data Leakage)
+- 📦 **Production** : Sauvegarder le pipeline complet avec \`joblib\` ou \`pickle\`
+
+**Architecture d'un Transformer Custom :**
+1. Hériter de \`BaseEstimator\` et \`TransformerMixin\`
+2. Implémenter \`fit()\` : Apprendre des statistiques (si nécessaire)
+3. Implémenter \`transform()\` : Appliquer les transformations
+
+**Avantages du Pipeline :**
+- ✅ Pas de risque d'oublier une étape sur les nouvelles données
+- ✅ Code propre et maintenable
+- ✅ Compatible avec GridSearchCV pour le tuning des hyperparamètres`,code:`import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
-# --- Données Exemple ---
+# --- Données Exemple : Catalogue Immobilier ---
+# Problèmes typiques : Texte sale, valeurs manquantes, unités incohérentes
 df = pd.DataFrame({
     'description': [' Produit A ', 'produit B', 'PRODUIT A', None, 'Produit C'],
-    'prix': [100, 200, 100, 50, None],
-    'surface': [50, 60, 50, 100, 20]
+    'prix': [100, 200, 100, 50, None],  # Prix en milliers d'euros
+    'surface': [50, 60, 50, 100, 20]     # Surface en m²
 })
 
-# --- Transformer Personnalisé : Nettoyage Texte ---
+# --- Transformer Personnalisé 1 : Nettoyage de Texte ---
 class TextCleaner(BaseEstimator, TransformerMixin):
+    """
+    Nettoie une colonne texte en :
+    1. Remplaçant les NaN par 'inconnu'
+    2. Supprimant les espaces superflus
+    3. Normalisant la casse (minuscule ou majuscule)
+    
+    Paramètres :
+    - column (str) : Nom de la colonne à nettoyer
+    - case (str) : 'lower' (défaut) ou 'upper' pour la normalisation
+    """
     def __init__(self, column, case='lower'):
         self.column = column
         self.case = case
     
     def fit(self, X, y=None):
-        return self # Rien à apprendre
+        # Ce transformer ne "apprend" rien des données, il applique juste des règles
+        return self
     
     def transform(self, X):
-        X_copy = X.copy()
-        # 1. Gestion NaN
+        X_copy = X.copy()  # IMPORTANT : Toujours copier pour ne pas modifier l'original
+        
+        # 1. Gestion des valeurs manquantes (NaN -> 'inconnu')
         X_copy[self.column] = X_copy[self.column].fillna('inconnu')
-        # 2. Strip whitespace
+        
+        # 2. Suppression des espaces en début/fin de chaîne
         X_copy[self.column] = X_copy[self.column].str.strip()
-        # 3. Case normalization
+        
+        # 3. Normalisation de la casse (ex: "Produit A" -> "produit a")
         if self.case == 'lower':
             X_copy[self.column] = X_copy[self.column].str.lower()
+        elif self.case == 'upper':
+            X_copy[self.column] = X_copy[self.column].str.upper()
+        
         return X_copy
 
-# --- Transformer Personnalisé : Feature Engineering ---
+# --- Transformer Personnalisé 2 : Feature Engineering ---
 class PricePerSqm(BaseEstimator, TransformerMixin):
+    """
+    Crée une nouvelle colonne 'prix_m2' (Prix au mètre carré).
+    Métier : Indicateur clé en immobilier pour comparer les biens.
+    
+    Gère automatiquement :
+    - Division par zéro (si surface = 0, on considère 1 pour éviter l'erreur)
+    """
     def fit(self, X, y=None):
-        return self
-        
+        return self  # Pas d'apprentissage nécessaire
+    
     def transform(self, X):
         X_copy = X.copy()
-        # On évite la division par zéro
+        
+        # Calcul du prix au m² avec gestion de la division par zéro
+        # replace(0, 1) : Si surface = 0, on la remplace par 1 (évite division par 0)
         X_copy['prix_m2'] = X_copy['prix'] / X_copy['surface'].replace(0, 1)
+        
         return X_copy
 
-# --- Construction du Pipeline ---
-# L'ordre est crucial !
+# --- Construction du Pipeline Complet ---
+# L'ORDRE des étapes est CRUCIAL : chaque étape reçoit la sortie de la précédente
+
 data_pipeline = Pipeline([
-    # Étape 1 : Nettoyage du texte
-    ('clean_text', TextCleaner(column='description')),
+    # Étape 1 : Nettoyage du texte (standardisation des descriptions)
+    ('clean_text', TextCleaner(column='description', case='lower')),
     
-    # Étape 2 : Imputation des valeurs manquantes (numériques)
-    # Note: SimpleImputer renvoie un array numpy, on le garde pour la fin ou on utilise set_output
-    # Ici, on simplifie en supposant que le pipeline gère le DF
+    # Étape 2 : Feature Engineering métier (création du prix au m²)
+    # Cette variable peut être très prédictive pour un modèle ML
+    ('feature_eng', PricePerSqm()),
     
-    # Étape 3 : Création de feature métier
-    ('feature_eng', PricePerSqm())
+    # Étape 3 (optionnel, commenté ici) : Imputation des valeurs manquantes numériques
+    # ('impute_num', SimpleImputer(strategy='median')),
+    
+    # Étape 4 (optionnel) : Scaling pour les algorithmes sensibles (SVM, KNN...)
+    # ('scaler', StandardScaler())
 ])
 
-# Exécution
+# --- Exécution du Pipeline ---
+# fit_transform() applique toutes les étapes séquentiellement
 df_transformed = data_pipeline.fit_transform(df)
-print(df_transformed)`}]}]},{id:"python_date",title:"Dates (Python)",description:"Manipulation de dates et séries temporelles.",categories:[{id:"practical_cases",title:"Cas Pratiques",description:"Exemples concrets et avancés.",snippets:[{id:"french_calendar",title:"Calendrier Français (Fériés & Ponts)",description:"Détecter les jours fériés, les ponts et les retours de vacances.",code:`import pandas as pd
+
+# --- Résultat ---
+print("=== Données Transformées ===")
+print(df_transformed)
+
+# --- Utilisation en Production ---
+# 1. Sauvegarder le pipeline avec joblib
+# import joblib
+# joblib.dump(data_pipeline, 'preprocessing_pipeline.pkl')
+
+# 2. Charger et appliquer sur de nouvelles données
+# pipeline_loaded = joblib.load('preprocessing_pipeline.pkl')
+# new_data_transformed = pipeline_loaded.transform(new_data)`}]}]},{id:"python_date",title:"Dates (Python)",description:"Manipulation de dates et séries temporelles.",categories:[{id:"practical_cases",title:"Cas Pratiques",description:"Exemples concrets et avancés.",snippets:[{id:"french_calendar",title:"Calendrier Français (Fériés & Ponts)",description:"Détecter les jours fériés, les ponts et les retours de vacances.",code:`import pandas as pd
 import holidays
 from datetime import timedelta
 
