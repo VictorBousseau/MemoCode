@@ -435,6 +435,123 @@ plt.show()`
                     ]
                 }
             ]
+        },
+        {
+            id: 'python_date',
+            title: 'Python Date',
+            description: 'Manipulation de dates et jours fériés en France',
+            categories: [
+                {
+                    id: 'date_features',
+                    title: 'Features Temporelles',
+                    description: 'Création de variables dérivées des dates (Jours fériés, ouvrés, etc.)',
+                    snippets: [
+                        {
+                            id: 'french_calendar',
+                            title: 'Calendrier Français & Jours Fériés',
+                            description: 'Gestion des jours fériés, veilles, lendemains et jours ouvrés.',
+                            code: `import pandas as pd
+import holidays
+from datetime import timedelta
+
+# 1. Création d'un jeu de données exemple
+dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
+df = pd.DataFrame({'date': dates})
+
+# 2. Ajout du nom du jour (en français)
+days_fr = {
+    0: 'Lundi', 1: 'Mardi', 2: 'Mercredi', 3: 'Jeudi', 
+    4: 'Vendredi', 5: 'Samedi', 6: 'Dimanche'
+}
+df['jour_nom'] = df['date'].dt.dayofweek.map(days_fr)
+
+# 3. Jours Fériés (France)
+# Nécessite : pip install holidays
+fr_holidays = holidays.France(years=[2025])
+df['jour_ferie'] = df['date'].apply(lambda x: x in fr_holidays)
+
+# 4. Veille et Lendemain de jour férié
+# Shift(-1) -> La valeur de demain vient ici (donc si demain est férié, ici c'est veille)
+df['veille_jour_ferie'] = df['jour_ferie'].shift(-1).fillna(False)
+df['lendemain_jour_ferie'] = df['jour_ferie'].shift(1).fillna(False)
+
+# 5. Jour Ouvré (Lundi-Vendredi ET Pas férié)
+df['jour_ouvre'] = (df['date'].dt.dayofweek < 5) & (~df['jour_ferie'])
+
+# 6. Jour Ouvré Lendemain de Férié (Retour au travail)
+# Logique : C'est un jour ouvré, et le jour précédent (ou la séquence de jours précédents) était férié/weekend.
+def is_return_from_holiday(idx, df):
+    if not df.loc[idx, 'jour_ouvre']:
+        return False
+    
+    # On regarde en arrière
+    prev_idx = idx - 1
+    while prev_idx >= 0:
+        if df.loc[prev_idx, 'jour_ouvre']:
+            return False # On a trouvé un jour ouvré avant, donc ce n'est pas un retour de vacances
+        if df.loc[prev_idx, 'jour_ferie']:
+            return True # On a trouvé un férié sans croiser de jour ouvré -> C'est un retour !
+        prev_idx -= 1
+        
+    return False
+
+df['jour_ouvre_lendemain_ferie'] = [is_return_from_holiday(i, df) for i in range(len(df))]
+
+# Aperçu
+print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_ferie']].head(15))`
+                        },
+                        {
+                            id: 'school_holidays',
+                            title: 'Vacances Scolaires (Zones A, B, C)',
+                            description: 'Récupérer les vacances officielles depuis l\'API du gouvernement.',
+                            code: `import pandas as pd
+import requests
+import io
+
+# 1. Récupération des données (API Gouvernement)
+# Dataset : "Le calendrier scolaire" sur data.education.gouv.fr
+url = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
+
+print("Téléchargement des données...")
+# On lit le CSV directement depuis l'URL
+df_holidays = pd.read_csv(url, sep=';')
+
+# 2. Nettoyage et Préparation
+# On garde les colonnes utiles
+cols = ['Description', 'Zones', 'Date de début', 'Date de fin', 'Annee_scolaire']
+df_holidays = df_holidays[cols].copy()
+
+# Conversion en datetime (UTC pour éviter les soucis de timezone)
+df_holidays['start'] = pd.to_datetime(df_holidays['Date de début'], utc=True).dt.date
+df_holidays['end'] = pd.to_datetime(df_holidays['Date de fin'], utc=True).dt.date
+
+# 3. Filtrage par Zone (Ex: Zone C = Créteil, Montpellier, Paris, Toulouse, Versailles)
+# Zones disponibles : 'Zone A', 'Zone B', 'Zone C'
+ma_zone = 'Zone C'
+df_zone = df_holidays[df_holidays['Zones'] == ma_zone].reset_index(drop=True)
+
+print(f"Vacances récupérées pour {ma_zone} : {len(df_zone)} périodes.")
+
+# 4. Application sur notre DataFrame
+# Créons un DataFrame exemple
+dates = pd.date_range(start='2025-01-01', end='2025-12-31', freq='D')
+df = pd.DataFrame({'date': dates})
+df['date_only'] = df['date'].dt.date
+
+def est_en_vacances(date_ref, holidays_df):
+    # Vérifie si la date est comprise dans une des périodes de vacances
+    # Note : Pour de gros volumes, préférer une jointure par intervalle ou une structure optimisée
+    mask = (holidays_df['start'] <= date_ref) & (holidays_df['end'] >= date_ref)
+    return mask.any()
+
+df['en_vacances'] = df['date_only'].apply(lambda x: est_en_vacances(x, df_zone))
+
+# Aperçu
+print(df[df['en_vacances']].head(10))`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
