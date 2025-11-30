@@ -332,7 +332,7 @@ df.to_csv('output.csv', index=False)
 df.to_excel('output.xlsx', sheet_name='Resultats', index=False)
 
 # Pickle (format binaire rapide pour Python)
-df.to_pickle('data.pkl')`}]},{id:"exploration",title:"2. Découverte (EDA)",description:"Aperçu, statistiques et analyse de distribution",snippets:[{id:"overview",title:"Aperçu Global",description:"Premières commandes à lancer.",code:`# Début et fin
+df.to_pickle('data.pkl')`}]},{id:"exploration",title:"2. Découverte (EDA)",description:"Aperçu, statistiques et analyse de distribution",snippets:[{id:"overview",title:"Aperçu Global",description:"Premières commandes à lancer.",level:"beginner",code:`# Début et fin
 df.head()  # 5 premières lignes
 df.tail()  # 5 dernières lignes
 
@@ -445,7 +445,7 @@ df['prix_ttc'] = df['prix_ht'].apply(lambda x: x * 1.2)
 
 # Mapper des valeurs
 mapping = {'H': 'Homme', 'F': 'Femme'}
-df['genre_label'] = df['genre'].map(mapping)`},{id:"groupby",title:"Agrégation (GroupBy)",description:"Calculs par groupes.",code:`# Moyenne par groupe
+df['genre_label'] = df['genre'].map(mapping)`},{id:"groupby",title:"Agrégation (GroupBy)",description:"Calculs par groupes.",level:"intermediate",code:`# Moyenne par groupe
 df.groupby('ville')['salaire'].mean()
 
 # Plusieurs métriques
@@ -2756,7 +2756,7 @@ def euler_method(f, y0, t0, tf, h):
         
         y_values.append(y_next)
 
-    return t_values, np.array(y_values)`},{id:"rk4",title:"Runge-Kutta 4 (RK4)",description:"Méthode standard pour résoudre les équations différentielles.",code:`import numpy as np
+    return t_values, np.array(y_values)`},{id:"rk4",title:"Runge-Kutta 4 (RK4)",description:"Méthode standard pour résoudre les équations différentielles.",level:"advanced",code:`import numpy as np
 import matplotlib.pyplot as plt
 
 def runge_kutta_4(f, y0, t0, tf, h):
