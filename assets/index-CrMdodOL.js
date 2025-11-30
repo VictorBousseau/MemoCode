@@ -3068,55 +3068,67 @@ def est_en_vacances(date_ref, holidays_df):
     mask = (holidays_df['start'] <= date_ref) & (holidays_df['end'] >= date_ref)
     return mask.any()
 
-# 5. Cas Pratique : Vérifier une liste (Date, Département)
-# Si vous avez un DataFrame avec des dates et des départements, le plus efficace
-# est de faire une jointure (merge) plutôt qu'une boucle.
+# 5. Cas Pratique : Fonction Réutilisable (Merge)
+def ajouter_infos_vacances(df_input, df_calendrier, col_date='date', col_dept='departement'):
+    """
+    Enrichit le DataFrame avec les infos vacances : 'en_vacances', 'vacances_nom', 'Zones'.
+    """
+    df = df_input.copy()
+    
+    # 1. Standardisation des dates (vers datetime.date)
+    # On s'assure de comparer des dates sans heures
+    if not pd.api.types.is_datetime64_any_dtype(df[col_date]):
+        df[col_date] = pd.to_datetime(df[col_date])
+    df['date_join'] = df[col_date].dt.date
+    
+    # 2. Mapping Département -> Zone
+    # On utilise le dictionnaire DEPARTMENTS_ZONES défini plus haut
+    df['Zones'] = df[col_dept].astype(str).map(DEPARTMENTS_ZONES).fillna('Zone C')
+    
+    # 3. Préparation du calendrier (Explode)
+    # On transforme les périodes [début, fin] en une liste de jours
+    # Idéalement, faire cette étape une seule fois en dehors de la fonction pour la perf
+    holiday_dates = []
+    for _, row in df_calendrier.iterrows():
+        dates = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1), freq='D')
+        for d in dates:
+            holiday_dates.append({
+                'date_join': d.date(), 
+                'Zones': row['Zones'], 
+                'vacances_nom': row['Description']
+            })
+    df_flat_holidays = pd.DataFrame(holiday_dates)
+    
+    # 4. Jointure (Left Join)
+    # On garde toutes les lignes de l'utilisateur (left)
+    df_merged = pd.merge(
+        df, 
+        df_flat_holidays, 
+        on=['date_join', 'Zones'], 
+        how='left'
+    )
+    
+    # 5. Nettoyage final
+    df_merged['en_vacances'] = df_merged['vacances_nom'].notna()
+    df_merged['vacances_nom'] = df_merged['vacances_nom'].fillna('Non')
+    
+    # On retire la colonne temporaire
+    df_merged = df_merged.drop(columns=['date_join'])
+    
+    return df_merged
 
-print("
---- Cas Pratique : Merge ---")
-
-# 5.1 Données Utilisateur (Exemple)
+# --- Exemple d'utilisation ---
 data = {
     'date': ['2025-01-01', '2025-02-12', '2025-02-12'],
     'departement': ['75', '75', '33'] # Paris (C), Paris (C), Gironde (A)
 }
 df_user = pd.DataFrame(data)
-df_user['date'] = pd.to_datetime(df_user['date']).dt.date
 
-# 5.2 Mapping Département -> Zone
-df_user['Zones'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Zone C')
+# Appel de la fonction
+df_resultat = ajouter_infos_vacances(df_user, df_holidays)
 
-# 5.3 Préparation des Vacances pour le Merge
-# On "explose" les périodes pour avoir une ligne par jour de vacances
-# Cela permet de faire une jointure simple sur ['date', 'Zones']
-holiday_dates = []
-for _, row in df_holidays.iterrows():
-    # On génère tous les jours entre start et end
-    dates_in_period = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1), freq='D')
-    for d in dates_in_period:
-        holiday_dates.append({
-            'date': d.date(), 
-            'Zones': row['Zones'], 
-            'vacances_nom': row['Description']
-        })
-
-df_holidays_exploded = pd.DataFrame(holiday_dates)
-
-# 5.4 Le Merge (Left Join)
-# On garde toutes les lignes utilisateur (left) et on récupère les infos vacances
-df_merged = pd.merge(df_user, df_holidays_exploded, on=['date', 'Zones'], how='left')
-
-# 5.5 Résultat
-# Si 'vacances_nom' est rempli, c'est les vacances !
-df_merged['en_vacances'] = df_merged['vacances_nom'].notna()
-df_merged['vacances_nom'] = df_merged['vacances_nom'].fillna('Non')
-
-print(df_merged[['date', 'departement', 'Zones', 'en_vacances', 'vacances_nom']])
-
-df['en_vacances'] = df['date_only'].apply(lambda x: est_en_vacances(x, df_zone))
-
-# Aperçu
-print(df[df['en_vacances']].head(10))`}]}]}]},WO={themes:[{id:"power_query_ui",title:"Tutoriels Interface (UI)",description:"Guides pas-à-pas pour les actions courantes via l'interface.",categories:[{id:"columns_ui",title:"1. Colonnes & Transformations",description:"Manipulations classiques sans coder.",snippets:[{id:"conditional_col",title:"Colonne Conditionnelle",description:"Créer une colonne basée sur des règles (If/Else).",markdown:`### 📝 Marche à suivre
+print("Résultat enrichi :")
+print(df_resultat)`}]}]}]},WO={themes:[{id:"power_query_ui",title:"Tutoriels Interface (UI)",description:"Guides pas-à-pas pour les actions courantes via l'interface.",categories:[{id:"columns_ui",title:"1. Colonnes & Transformations",description:"Manipulations classiques sans coder.",snippets:[{id:"conditional_col",title:"Colonne Conditionnelle",description:"Créer une colonne basée sur des règles (If/Else).",markdown:`### 📝 Marche à suivre
 1. Allez dans l'onglet **Ajouter une colonne**.
 2. Cliquez sur **Colonne conditionnelle**.
 3. Dans la fenêtre :
