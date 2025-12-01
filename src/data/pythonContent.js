@@ -343,6 +343,27 @@ df.groupby('ville').agg({
 })`
                         },
                         {
+                            id: 'merge_diff_cols',
+                            title: 'Fusion (Merge) - Colonnes Différentes',
+                            description: 'Jointure sur des colonnes avec des noms différents.',
+                            level: 'intermediate',
+                            tags: ['transformation', 'merge', 'join', 'pandas'],
+                            code: `# Situation courante : Les deux tables n'ont pas le même nom de colonne pour la clé
+# Ex: Table A a 'identifiant_princ_pp', Table B a 'identifiant_pp'
+
+fusion = pd.merge(
+    Souscription_individuelle_selec, 
+    Interactions, 
+    left_on='identifiant_princ_pp',   # Colonne dans la table de gauche
+    right_on='identifiant_pp',        # Colonne dans la table de droite
+    how='left'                        # Type de jointure (left, right, inner, outer)
+)
+
+# Résultat : Les deux colonnes seront présentes dans le résultat
+# Vous pouvez ensuite supprimer la colonne redondante si besoin :
+fusion = fusion.drop(columns=['identifiant_pp'])`
+                        },
+                        {
                             id: 'pivot',
                             title: 'Pivot Table',
                             description: 'Tableaux croisés dynamiques.',
@@ -2333,17 +2354,32 @@ print(np.max(arr))    # Maximum`
                             tags: ['polars', 'io', 'lazy'],
                             code: `import polars as pl
 
-# 1. Mode Eager(Classique, comme Pandas)
+# 1. Mode Eager (Classique, comme Pandas)
 # Charge TOUT en mémoire immédiatement.
-    df = pl.read_csv("data.csv") 
+df = pl.read_csv("data.csv") 
+# ↑ Retourne directement un DataFrame
 
-# 2. Mode Lazy(Recommandé pour gros fichiers)
-# Ne charge RIEN.Crée un plan d'exécution.
+# 2. Mode Lazy (Recommandé pour gros fichiers)
+# Ne charge RIEN. Crée un plan d'exécution.
 # Permet de traiter des fichiers plus gros que la RAM.
-    q = pl.scan_csv("data.csv")
+q = pl.scan_csv("data.csv")
+# ↑ Retourne un LazyFrame (pas encore de données en mémoire)
 
-# Pour voir le plan: q.explain()
-# Pour exécuter: q.collect()`
+# IMPORTANT : q.collect() MATÉRIALISE le LazyFrame en DataFrame
+# C'est SEULEMENT à ce moment que les données sont chargées en mémoire
+df = q.collect()  # ← Maintenant df est un vrai DataFrame avec les données
+
+# 💡 Bonne pratique : Enchaînez toutes vos transformations AVANT collect()
+# Polars optimisera automatiquement l'ensemble des opérations
+result = (
+    pl.scan_csv("data.csv")
+    .filter(pl.col("age") > 18)
+    .select(["nom", "ville"])
+    .collect()  # ← collect() toujours à la FIN
+)
+
+# Pour voir le plan d'exécution optimisé (avant collect) :
+# q.explain()`
                         },
                         {
                             id: 'pl_parquet',
