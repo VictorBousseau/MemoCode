@@ -1,0 +1,1 @@
+import{m as e}from"./index-CBSBoR_i.js";function a(c,t){c.accDescr&&t.setAccDescription?.(c.accDescr),c.accTitle&&t.setAccTitle?.(c.accTitle),c.title&&t.setDiagramTitle?.(c.title)}e(a,"populateCommonDb");export{a as c};
