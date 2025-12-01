@@ -735,117 +735,178 @@ print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_
                         },
                         {
                             id: 'school_holidays',
-                            title: 'Vacances Scolaires (Avancé)',
-                            description: 'Récupération API, gestion des zones et déduplication robuste.',
+                            title: 'Vacances Scolaires - Référentiel Complet',
+                            description: 'Générer un calendrier par département sur une période donnée.',
                             level: 'advanced',
                             tags: ['python', 'dates', 'api', 'pandas'],
-                            code: `import pandas as pd
-import numpy as np
+                            markdown: `### 📚 Objectif de cette Fonction
 
-# --- 1. CONFIGURATION & DONNÉES ---
-URL_API = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv?lang=fr&timezone=Europe%2FParis&use_labels=true&delimiter=%3B"
+Cette fonction génère un **référentiel complet** des vacances scolaires pour tous les départements français sur une période donnée.
+
+**Entrées** :
+- Date de début (ex: '2024-01-01')
+- Date de fin (ex: '2026-01-01')
+
+**Sortie** :
+Un DataFrame avec une ligne pour **chaque jour** et **chaque département**, indiquant :
+- Si c'est une période de vacances scolaires
+- Le nom des vacances (ex: "Vacances de Noël")
+
+**Cas d'usage** :
+- Analyser l'impact des vacances sur les ventes
+- Planifier des campagnes marketing
+- Prévoir la charge de travail (éducation, transport, tourisme)`,
+                            code: `import pandas as pd
+import requests
+import io
+
+# --- 1. CONFIGURATION ---
+BASE_URL = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/exports/csv"
 
 DEPARTMENTS_ZONES = {
-    # Zone A
-    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A', '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A', '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A', '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A', '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A', '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
-    # Zone B
-    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B', '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B', '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B', '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B', '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B', '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B', '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B', '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B', '88': 'Zone B',
-    # Zone C
-    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C', '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C', '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C', '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C', '95': 'Zone C',
-    # DOM
-    '971': 'Guadeloupe', '972': 'Martinique', '973': 'Guyane', '974': 'La Réunion', '976': 'Mayotte'
+    '01': 'Zone A', '03': 'Zone A', '07': 'Zone A', '15': 'Zone A', '16': 'Zone A', 
+    '17': 'Zone A', '19': 'Zone A', '21': 'Zone A', '23': 'Zone A', '24': 'Zone A', 
+    '25': 'Zone A', '26': 'Zone A', '33': 'Zone A', '38': 'Zone A', '39': 'Zone A', 
+    '40': 'Zone A', '42': 'Zone A', '47': 'Zone A', '58': 'Zone A', '63': 'Zone A', 
+    '64': 'Zone A', '69': 'Zone A', '70': 'Zone A', '71': 'Zone A', '73': 'Zone A', 
+    '74': 'Zone A', '79': 'Zone A', '86': 'Zone A', '87': 'Zone A', '90': 'Zone A',
+    '02': 'Zone B', '04': 'Zone B', '05': 'Zone B', '06': 'Zone B', '08': 'Zone B', 
+    '10': 'Zone B', '13': 'Zone B', '14': 'Zone B', '18': 'Zone B', '22': 'Zone B', 
+    '27': 'Zone B', '28': 'Zone B', '29': 'Zone B', '35': 'Zone B', '36': 'Zone B', 
+    '37': 'Zone B', '41': 'Zone B', '44': 'Zone B', '45': 'Zone B', '49': 'Zone B', 
+    '50': 'Zone B', '51': 'Zone B', '52': 'Zone B', '53': 'Zone B', '54': 'Zone B', 
+    '55': 'Zone B', '56': 'Zone B', '57': 'Zone B', '59': 'Zone B', '60': 'Zone B', 
+    '61': 'Zone B', '62': 'Zone B', '67': 'Zone B', '68': 'Zone B', '72': 'Zone B', 
+    '76': 'Zone B', '80': 'Zone B', '83': 'Zone B', '84': 'Zone B', '85': 'Zone B', 
+    '88': 'Zone B',
+    '09': 'Zone C', '11': 'Zone C', '12': 'Zone C', '30': 'Zone C', '31': 'Zone C', 
+    '32': 'Zone C', '34': 'Zone C', '46': 'Zone C', '48': 'Zone C', '65': 'Zone C', 
+    '66': 'Zone C', '75': 'Zone C', '77': 'Zone C', '78': 'Zone C', '81': 'Zone C', 
+    '82': 'Zone C', '91': 'Zone C', '92': 'Zone C', '93': 'Zone C', '94': 'Zone C', 
+    '95': 'Zone C',
+    '2A': 'Zone B', '2B': 'Zone B'
 }
 
-def preparer_calendrier_vacances():
-    print("Téléchargement et préparation des vacances...")
+# --- 2. FONCTION APPEL API ---
+def get_vacances_from_api(date_debut, date_fin):
+    print(f"Appel API pour la période : {date_debut} à {date_fin}...")
+    
+    # Filtre sur les dates
+    where_query = f'end_date >= "{date_debut}" AND start_date <= "{date_fin}"'
+    
+    params = {
+        'lang': 'fr',
+        'timezone': 'Europe/Paris',
+        'delimiter': ';',
+        'where': where_query,
+        'limit': -1
+    }
+    
     try:
-        df = pd.read_csv(URL_API, sep=';')
-    except Exception as e:
-        print(f"Erreur API ({e}), utilisation de données factices pour l'exemple.")
-        # Fallback pour l'exemple si pas d'internet
-        data = {'Description': ['Noël', 'Noël'], 'Zones': ['Zone A', 'Zone C'], 
-                'Date de début': ['2023-12-23', '2023-12-23'], 'Date de fin': ['2024-01-08', '2024-01-08']}
-        df = pd.DataFrame(data)
-
-    # Nettoyage de base
-    df = df[['Description', 'Zones', 'Date de début', 'Date de fin']].copy()
-    df['start'] = pd.to_datetime(df['Date de début'], utc=True).dt.date
-    df['end'] = pd.to_datetime(df['Date de fin'], utc=True).dt.date
-    
-    # Filtrage des zones
-    df = df[df['Zones'].isin(['Zone A', 'Zone B', 'Zone C'])]
-    
-    # Étape 1 : On explose les périodes en jours individuels
-    holiday_days = []
-    for _, row in df.iterrows():
-        # end est exclusif dans date_range, mais inclusif dans les données éducation ? 
-        # Vérification standard : souvent [start, end[. Si end est le jour de reprise, il faut faire -1 jour.
-        dates_in_holiday = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1))
+        response = requests.get(BASE_URL, params=params)
+        response.raise_for_status()
         
-        for d in dates_in_holiday:
-            holiday_days.append({
-                'date_ref': d.date(),
-                'zone': row['Zones'],
-                'vacances_nom': row['Description']
-            })
+        df = pd.read_csv(io.StringIO(response.text), sep=';')
+        
+        # Renommage des colonnes pour standardisation
+        mapping_cols = {
+            'zones': 'Zones',
+            'description': 'Description',
+            'start_date': 'Date de début',
+            'end_date': 'Date de fin'
+        }
+        df = df.rename(columns=mapping_cols)
+        
+        if 'Zones' not in df.columns:
+            print("ATTENTION: Colonnes reçues :", df.columns.tolist())
+            return pd.DataFrame()
             
-    df_flat = pd.DataFrame(holiday_days)
+        return df
+
+    except Exception as e:
+        print(f"Erreur API/Connexion : {e}")
+        return pd.DataFrame()
+
+# --- 3. GÉNÉRATION DU RÉFÉRENTIEL ---
+def generer_referentiel_par_dates(date_debut_str, date_fin_str):
     
-    # --- FIX ANTI-DOUBLONS ---
-    # C'est ici que la magie opère.
-    # On regroupe par [date, zone]. Si doublon, on garde le nom unique ou on concatène.
-    # Ex: Si on a "Vacances Hiver" et "Vacances Hiver" -> on garde une seule fois.
-    df_flat = df_flat.groupby(['date_ref', 'zone'], as_index=False).agg({
-        'vacances_nom': lambda x: ' / '.join(sorted(set(str(v) for v in x if pd.notna(v))))
-    })
+    # A. Récupération
+    df_api = get_vacances_from_api(date_debut_str, date_fin_str)
     
-    return df_flat
+    if df_api.empty:
+        print("Aucune donnée. Arrêt.")
+        return pd.DataFrame()
 
-# --- 2. EXÉCUTION ---
+    # B. Nettoyage
+    df_api = df_api[df_api['Zones'].isin(['Zone A', 'Zone B', 'Zone C'])].copy()
+    
+    df_api['start'] = pd.to_datetime(df_api['Date de début'], utc=True).dt.date
+    df_api['end'] = pd.to_datetime(df_api['Date de fin'], utc=True).dt.date
+    
+    # C. "Aplatir" le calendrier
+    print("Traitement des périodes...")
+    holiday_rows = []
+    for _, row in df_api.iterrows():
+        if row['end'] > row['start']:
+            dates = pd.date_range(start=row['start'], end=row['end'] - pd.Timedelta(days=1))
+            for d in dates:
+                holiday_rows.append({
+                    'date': d.date(),
+                    'zone': row['Zones'],
+                    'nom_vacances': row['Description'],
+                    'vacances_scolaires': True
+                })
+    
+    df_vacances_flat = pd.DataFrame(holiday_rows)
+    
+    if df_vacances_flat.empty:
+        print("Attention: Les données API sont vides après filtrage.")
+        return pd.DataFrame()
 
-# A. Préparation du référentiel (unique par jour/zone)
-df_calendrier_flat = preparer_calendrier_vacances()
+    # D. Structure complète (Cartésien Jours * Départements)
+    print("Création du calendrier complet...")
+    all_dates = pd.date_range(start=date_debut_str, end=date_fin_str)
+    all_depts = list(DEPARTMENTS_ZONES.keys())
+    
+    index = pd.MultiIndex.from_product([all_dates, all_depts], names=['date', 'departement'])
+    df_final = pd.DataFrame(index=index).reset_index()
+    
+    df_final['date'] = df_final['date'].dt.date
+    df_final['zone'] = df_final['departement'].map(DEPARTMENTS_ZONES)
+    
+    # E. Fusion
+    df_final = pd.merge(
+        df_final,
+        df_vacances_flat,
+        on=['date', 'zone'],
+        how='left'
+    )
+    
+    # F. Remplissage
+    df_final['vacances_scolaires'] = df_final['vacances_scolaires'].fillna(False)
+    df_final['nom_vacances'] = df_final['nom_vacances'].fillna('Période scolaire')
+    
+    df_final = df_final.drop(columns=['zone'])
+    
+    return df_final.drop_duplicates().reset_index(drop=True)
 
-# B. Génération de Données Exemple
-print("Génération de données test...")
-# df_user = pd.read_excel(r'C:\\Users\\bouss\\Downloads\\Test.xlsx', sheet_name='Feuil1')
-# Pour l'exemple reproductible, on crée un DataFrame à la volée :
-df_user = pd.DataFrame({
-    'date': ['2024-02-12', '2024-02-12', '2024-02-20'],
-    'departement': ['75', '33', '33'] # 75=Paris(C), 33=Gironde(A)
-})
+# --- 4. EXÉCUTION ---
+DEBUT = '2024-01-01'
+FIN = '2026-01-01'
 
-# Sauvegarde du nombre de lignes pour vérification
-nb_lignes_avant = len(df_user)
+df_referentiel = generer_referentiel_par_dates(DEBUT, FIN)
 
-# C. Préparation Utilisateur
-df_user['date_ref'] = pd.to_datetime(df_user['date']).dt.date
-# Nettoyage département (string, 2 chiffres)
-df_user['departement'] = pd.to_numeric(df_user['departement'], errors='coerce').astype('Int64').astype(str).str.zfill(2)
-df_user['zone'] = df_user['departement'].map(DEPARTMENTS_ZONES).fillna('Hors Zone')
-
-# D. Fusion (Left Join)
-df_final = pd.merge(
-    df_user,
-    df_calendrier_flat,
-    on=['date_ref', 'zone'],
-    how='left'
-)
-
-# E. Finalisation
-df_final['en_vacances'] = df_final['vacances_nom'].notna()
-df_final['vacances_nom'] = df_final['vacances_nom'].fillna('Non')
-df_final = df_final.drop(columns=['date_ref'])
-
-# VÉRIFICATION FINALE
-nb_lignes_apres = len(df_final)
 print("-" * 30)
-if nb_lignes_avant == nb_lignes_apres:
-    print(f"SUCCÈS : Le fichier contient bien {nb_lignes_apres} lignes (pas de doublons).")
-else:
-    print(f"ATTENTION : Le fichier est passé de {nb_lignes_avant} à {nb_lignes_apres} lignes !")
-
-print(df_final.head())`
+if not df_referentiel.empty:
+    print(f"Référentiel généré : {len(df_referentiel)} lignes")
+    print(df_referentiel.head())
+    
+    # Test Rapide
+    print("Test Paris Noël 2024:")
+    print(df_referentiel[
+        (df_referentiel['departement'] == '75') & 
+        (df_referentiel['date'] == pd.to_datetime('2024-12-25').date())
+    ])`
                         }
                     ]
                 }
