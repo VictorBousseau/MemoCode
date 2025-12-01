@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Layout from './components/Layout';
 import LanguageView from './components/LanguageView';
 import { pythonContent } from './data/pythonContent';
@@ -77,17 +78,35 @@ export default function App() {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     >
-      {selectedLanguage === 'Overview' && !searchQuery ? (
-        <Overview onNavigate={setSelectedLanguage} />
-      ) : (
-        <LanguageView
-          content={getContent()}
-          searchQuery={searchQuery}
-          languageName={selectedLanguage}
-          onNavigate={setSelectedLanguage}
-          onSearch={setSearchQuery}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {selectedLanguage === 'Overview' && !searchQuery ? (
+          <motion.div
+            key="overview"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Overview onNavigate={setSelectedLanguage} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key={selectedLanguage}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <LanguageView
+              content={getContent()}
+              searchQuery={searchQuery}
+              languageName={selectedLanguage}
+              onNavigate={setSelectedLanguage}
+              onSearch={setSearchQuery}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }

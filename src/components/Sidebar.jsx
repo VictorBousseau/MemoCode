@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings } from 'lucide-react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X } from 'lucide-react';
 import DataSettings from './DataSettings';
 
 const languages = [
@@ -14,16 +14,31 @@ const languages = [
     { name: 'Exemples', icon: FileCode2 },
 ];
 
-export default function Sidebar({ selectedLanguage, onSelectLanguage }) {
+export default function Sidebar({ selectedLanguage, onSelectLanguage, onClose }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
         <aside className="w-64 bg-zinc-900 text-white flex flex-col border-r border-zinc-800 h-full overflow-y-auto">
             <div className="p-6 border-b border-zinc-800">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    MemoCode
-                </h1>
-                <p className="text-xs text-zinc-400 mt-1">Snippets Data Science</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                            MemoCode
+                        </h1>
+                        <p className="text-xs text-zinc-400 mt-1">Snippets Data Science</p>
+                    </div>
+
+                    {/* Close button for mobile */}
+                    {onClose && (
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-zinc-800 rounded-lg transition-colors md:hidden"
+                            aria-label="Fermer le menu"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    )}
+                </div>
             </div>
             <nav className="flex-1 p-4 space-y-2">
                 <button

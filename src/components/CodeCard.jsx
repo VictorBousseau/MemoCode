@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, Star, Pencil } from 'lucide-react';
@@ -9,6 +10,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import MermaidDiagram from './MermaidDiagram';
 import DifficultyBadge from './DifficultyBadge';
+import { scaleOnHover } from '../utils/animations';
 
 import { useStats } from '../hooks/useStats';
 
@@ -59,16 +61,17 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
     };
 
     return (
-        <div
+        <motion.div
             onClick={onClick}
-            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-300 cursor-pointer animate-in fade-in slide-in-from-bottom-4"
+            whileTap={{ scale: 0.98 }}
+            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-300 cursor-pointer"
         >
             {breadcrumb && (
-                <div className="bg-blue-500/10 text-blue-400 text-xs px-4 py-2 border-b border-blue-500/20">
+                <div className="bg-blue-500/10 text-blue-400 text-xs px-3 sm:px-4 py-2 border-b border-blue-500/20">
                     {breadcrumb}
                 </div>
             )}
-            <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
+            <div className="p-3 sm:p-4 md:p-6 border-b border-zinc-800 bg-zinc-900/50">
                 <div className="flex justify-between items-start">
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -213,6 +216,6 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                     </SyntaxHighlighter>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 }
