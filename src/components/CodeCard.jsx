@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Copy, Check, Star, Pencil } from 'lucide-react';
+import { Copy, Check, Star, Pencil, GripVertical } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -10,11 +10,12 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import MermaidDiagram from './MermaidDiagram';
 import DifficultyBadge from './DifficultyBadge';
+import PriorityRating from './PriorityRating';
 import { scaleOnHover } from '../utils/animations';
 
 import { useStats } from '../hooks/useStats';
 
-export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb }) {
+export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb, priority = 0, onPriorityChange, dragHandleProps }) {
     const [copied, setCopied] = useState(false);
     const [showNote, setShowNote] = useState(false);
     const { logView } = useStats();
@@ -73,6 +74,11 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
             )}
             <div className="p-3 sm:p-4 md:p-6 border-b border-zinc-800 bg-zinc-900/50">
                 <div className="flex justify-between items-start">
+                    {dragHandleProps && (
+                        <div {...dragHandleProps} className="mr-3 mt-1 cursor-grab active:cursor-grabbing text-zinc-600 hover:text-zinc-400" onClick={(e) => e.stopPropagation()}>
+                            <GripVertical className="w-5 h-5" />
+                        </div>
+                    )}
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="text-lg font-semibold text-zinc-100">
@@ -88,6 +94,9 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                     #{tag}
                                 </span>
                             ))}
+                            <div className="ml-auto pl-2 border-l border-zinc-800">
+                                <PriorityRating priority={priority} onChange={onPriorityChange} />
+                            </div>
                         </div>
                         <p className="text-sm text-zinc-400 mt-1 whitespace-pre-line text-left">
                             {highlightText(snippet.description, searchQuery)}

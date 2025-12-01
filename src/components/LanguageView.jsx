@@ -5,6 +5,10 @@ import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Sett
 import { useFavorites } from '../hooks/useFavorites';
 import { useHistory } from '../hooks/useHistory';
 import { useNotes } from '../hooks/useNotes';
+import { useUserData } from '../hooks/useUserData';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const themeIcons = {
     pandas: Layers,
@@ -30,10 +34,39 @@ const themeIcons = {
 
 import Breadcrumbs from './Breadcrumbs';
 
+function SortableItem({ id, children }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className="touch-none">
+            {children({ ...attributes, ...listeners })}
+        </div>
+    );
+}
+
 export default function LanguageView({ content, searchQuery, languageName, onNavigate, onSearch }) {
     const { favorites, isFavorite, toggleFavorite } = useFavorites();
     const { history, addToHistory } = useHistory();
     const { getNote, setNote } = useNotes();
+    const { getPriority, setPriority, getSortOrder, updateSortOrder } = useUserData();
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     // Add favorites and history as special "categories"
     const FAVORITES_ID = '__favorites__';
@@ -44,6 +77,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         favorites.length > 0 ? FAVORITES_ID : (content.themes[0]?.id || null)
     );
     const [activeCategoryId, setActiveCategoryId] = useState(content.themes[0]?.categories[0]?.id);
+    const [sortBy, setSortBy] = useState('manual'); // 'manual' | 'priority'
 
     // Filter State
     const [showFilters, setShowFilters] = useState(false);
@@ -71,6 +105,51 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         ? null
         : content.themes.find(t => t.id === activeThemeId);
     const activeCategory = activeTheme?.categories.find(c => c.id === activeCategoryId);
+
+    // Sort snippets based on saved order or priority
+    const sortedSnippets = React.useMemo(() => {
+        if (!activeCategory) return [];
+
+        let snippets = [...activeCategory.snippets];
+
+        // 1. Apply Priority Sort if active
+        if (sortBy === 'priority') {
+            return snippets.sort((a, b) => {
+                const pA = getPriority(a.id);
+                const pB = getPriority(b.id);
+                if (pA !== pB) return pB - pA; // Descending priority
+                // Secondary sort: keep original order or alphabetical
+                return 0;
+            });
+        }
+
+        // 2. Apply Manual Sort (default)
+        const savedOrder = getSortOrder(activeCategory.id);
+        if (!savedOrder) return snippets;
+
+        const snippetMap = new Map(snippets.map(s => [s.id, s]));
+        const sorted = savedOrder
+            .map(id => snippetMap.get(id))
+            .filter(s => s !== undefined);
+
+        // Add any new snippets that weren't in the saved order
+        const savedIds = new Set(savedOrder);
+        const newSnippets = snippets.filter(s => !savedIds.has(s.id));
+
+        return [...sorted, ...newSnippets];
+    }, [activeCategory, getSortOrder, sortBy, getPriority]);
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over.id) {
+            const oldIndex = sortedSnippets.findIndex((s) => s.id === active.id);
+            const newIndex = sortedSnippets.findIndex((s) => s.id === over.id);
+
+            const newOrder = arrayMove(sortedSnippets, oldIndex, newIndex).map(s => s.id);
+            updateSortOrder(activeCategory.id, newOrder);
+        }
+    };
 
     // Determine language based on content structure (simple heuristic)
     // If themes have 'sql_basics', it's SQL. If 'git_basics', it's Bash. Otherwise Python.
@@ -233,6 +312,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                     onNoteChange={(text) => setNote(snippet.id, text)}
                                     onTagClick={handleTagClick}
                                     theme={snippet.themeTitle}
+                                    priority={getPriority(snippet.id)}
+                                    onPriorityChange={(level) => setPriority(snippet.id, level)}
                                     searchQuery={searchQuery}
                                     breadcrumb={`${snippet.contextName ? `${snippet.contextName} > ` : ''}${snippet.themeTitle} > ${snippet.categoryTitle}`}
                                 />
@@ -372,6 +453,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                             note={getNote(item.id)}
                                             onNoteChange={(text) => setNote(item.id, text)}
                                             theme={item.themeTitle}
+                                            priority={getPriority(item.id)}
+                                            onPriorityChange={(level) => setPriority(item.id, level)}
                                         />
                                     </div>
                                 ))}
@@ -434,6 +517,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                                 note={getNote(snippet.id)}
                                                 onNoteChange={(text) => setNote(snippet.id, text)}
                                                 theme={themeTitle}
+                                                priority={getPriority(snippet.id)}
+                                                onPriorityChange={(level) => setPriority(snippet.id, level)}
                                             />
                                         </div>
                                     );
@@ -450,52 +535,83 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                     ) : activeCategory ? (
                         /* Regular Category View */
                         <>
-                            <div className="mb-8 border-b border-zinc-800 pb-6">
-                                <h2 className="text-2xl font-bold text-white mb-2">
-                                    {activeCategory.title}
-                                </h2>
-                                <p className="text-zinc-400">
-                                    {activeCategory.description}
-                                </p>
+                            <div className="mb-8 border-b border-zinc-800 pb-6 flex justify-between items-end">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-white mb-2">
+                                        {activeCategory.title}
+                                    </h2>
+                                    <p className="text-zinc-400">
+                                        {activeCategory.description}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setSortBy(prev => prev === 'manual' ? 'priority' : 'manual')}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border ${sortBy === 'priority'
+                                        ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                                        : 'bg-zinc-800/50 text-zinc-400 border-zinc-700 hover:bg-zinc-800 hover:text-zinc-300'
+                                        }`}
+                                >
+                                    <Star className={`w-4 h-4 ${sortBy === 'priority' ? 'fill-current' : ''}`} />
+                                    {sortBy === 'priority' ? 'Tri : Priorité' : 'Tri : Manuel'}
+                                </button>
                             </div>
 
-                            <div className="grid gap-8">
-                                {activeCategory.snippets.map((snippet, index) => {
-                                    // Check if we need to render a sub-category header
-                                    const showSubHeader = snippet.subCategory && (
-                                        index === 0 || activeCategory.snippets[index - 1].subCategory !== snippet.subCategory
-                                    );
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <SortableContext
+                                    items={sortedSnippets.map(s => s.id)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    <div className="grid gap-8">
+                                        {sortedSnippets.map((snippet, index) => {
+                                            // Check if we need to render a sub-category header
+                                            const showSubHeader = snippet.subCategory && (
+                                                index === 0 || sortedSnippets[index - 1].subCategory !== snippet.subCategory
+                                            );
 
-                                    return (
-                                        <React.Fragment key={snippet.id}>
-                                            {showSubHeader && (
-                                                <h3 className="text-xl font-semibold text-blue-400 mt-4 mb-2 flex items-center gap-2">
-                                                    <div className="h-px flex-1 bg-zinc-800 mr-4"></div>
-                                                    {snippet.subCategory}
-                                                    <div className="h-px flex-1 bg-zinc-800 ml-4"></div>
-                                                </h3>
-                                            )}
-                                            <div className="animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards" style={{ animationDelay: `${index * 50}ms` }}>
-                                                <CodeCard
-                                                    snippet={snippet}
-                                                    language={snippet.language || language}
-                                                    isFavorite={isFavorite(snippet.id)}
-                                                    onToggleFavorite={() => toggleFavorite(snippet)}
-                                                    onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
-                                                    note={getNote(snippet.id)}
-                                                    onNoteChange={(text) => setNote(snippet.id, text)}
-                                                    theme={activeTheme.title}
-                                                />
+                                            return (
+                                                <React.Fragment key={snippet.id}>
+                                                    {showSubHeader && (
+                                                        <h3 className="text-xl font-semibold text-blue-400 mt-4 mb-2 flex items-center gap-2">
+                                                            <div className="h-px flex-1 bg-zinc-800 mr-4"></div>
+                                                            {snippet.subCategory}
+                                                            <div className="h-px flex-1 bg-zinc-800 ml-4"></div>
+                                                        </h3>
+                                                    )}
+                                                    <SortableItem id={snippet.id}>
+                                                        {(dragHandleProps) => (
+                                                            <CodeCard
+                                                                snippet={snippet}
+                                                                language={snippet.language || language}
+                                                                isFavorite={isFavorite(snippet.id)}
+                                                                onToggleFavorite={() => toggleFavorite(snippet)}
+                                                                onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
+                                                                note={getNote(snippet.id)}
+                                                                onNoteChange={(text) => setNote(snippet.id, text)}
+                                                                theme={activeTheme.title}
+                                                                priority={getPriority(snippet.id)}
+                                                                onPriorityChange={(level) => setPriority(snippet.id, level)}
+                                                                dragHandleProps={sortBy === 'manual' ? dragHandleProps : undefined}
+                                                            />
+                                                        )}
+                                                    </SortableItem>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                        {sortedSnippets.length === 0 && (
+                                            <div className="text-zinc-500 italic">
+                                                Aucun snippet pour le moment.
                                             </div>
-                                        </React.Fragment>
-                                    );
-                                })}
-                                {activeCategory.snippets.length === 0 && (
-                                    <div className="text-zinc-500 italic">
-                                        Aucun snippet pour le moment.
+                                        )}
                                     </div>
-                                )}
-                            </div>
+                                </SortableContext>
+                                <DragOverlay>
+                                    {/* Optional: Custom overlay */}
+                                </DragOverlay>
+                            </DndContext>
                         </>
                     ) : (
                         <div className="text-zinc-500">Sélectionnez une catégorie.</div>
