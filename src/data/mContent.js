@@ -312,6 +312,154 @@ Table.SelectRows(Source, each (try Date.From([MaColonneDate]))[HasError] = false
 Cela évite de casser toute la requête pour quelques lignes mal formées.`
                         }
                     ]
+                },
+                {
+                    id: 'tips',
+                    title: '5. Tips & Raccourcis',
+                    description: 'Astuces pour gagner du temps.',
+                    snippets: [
+                        {
+                            id: 'keyboard_shortcuts_pq',
+                            title: 'Raccourcis Clavier (Power Query)',
+                            description: 'Les raccourcis essentiels pour l\'éditeur avancé.',
+                            level: 'beginner',
+                            tags: ['m', 'tips', 'shortcuts', 'productivity'],
+                            markdown: `### ⌨️ Raccourcis Indispensables
+
+#### Commentaires
+- **Commenter** : \`Ctrl + K, C\` (ou \`Ctrl + /\`)
+- **Décommenter** : \`Ctrl + K, U\` (ou \`Ctrl + /\` à nouveau)
+
+💡 Utile pour tester différentes versions d'une transformation.
+
+#### Éditeur Avancé
+- **Ouvrir l'éditeur avancé** : \`Alt + F3\` (ou clic droit > Éditeur avancé)
+- **Fermer l'éditeur** : \`Ctrl + Enter\` (valide et ferme)
+- **Annuler** : \`Ctrl + Z\`
+
+#### Navigation
+- **Rechercher** : \`Ctrl + F\`
+- **Remplacer** : \`Ctrl + H\`
+- **Dupliquer une requête** : Clic droit > Dupliquer
+
+#### Édition
+- **Dupliquer une ligne** : \`Ctrl + D\`
+- **Déplacer une ligne** : \`Alt + ↑\` / \`Alt + ↓\`
+- **Indentation** : \`Tab\` / \`Shift + Tab\`
+
+#### Productivité
+- **Actualiser l'aperçu** : \`Ctrl + R\`
+- **Afficher les types de données** : Vue > Types de colonnes`
+                        },
+                        {
+                            id: 'format_code_pq',
+                            title: 'Formater son Code M',
+                            description: 'Rendre le code lisible et maintenable.',
+                            level: 'beginner',
+                            tags: ['m', 'tips', 'formatting', 'best-practices'],
+                            markdown: `### 🎨 Pourquoi Formater ?
+
+Un code M bien formaté est **beaucoup plus facile** à déboguer et maintenir.
+
+**Bonnes pratiques :**
+- Une étape par ligne
+- Indentation de 4 espaces pour les contenus imbriqués
+- Nommer les étapes de façon explicite
+- Commenter les transformations complexes
+- Séparer visuellement les grandes parties avec des commentaires`,
+                            code: `// ❌ MAL FORMATÉ
+= Table.SelectRows(Table.AddColumn(Source,"Age Catégorie",each if [Age]>18 then "Majeur" else "Mineur"),each [Statut]="Actif")
+
+// ✅ BIEN FORMATÉ
+let
+    Source = Excel.CurrentWorkbook(){[Name="Données"]}[Content],
+    
+    // Ajout d'une colonne conditionnelle
+    AjoutCategorie = Table.AddColumn(
+        Source, 
+        "Age Catégorie", 
+        each if [Age] > 18 then "Majeur" else "Mineur"
+    ),
+    
+    // Filtrage des actifs seulement
+    FiltrageActifs = Table.SelectRows(
+        AjoutCategorie, 
+        each [Statut] = "Actif"
+    )
+in
+    FiltrageActifs`
+                        },
+                        {
+                            id: 'naming_steps',
+                            title: 'Nommer les Étapes Correctement',
+                            description: 'Clarté et maintenabilité du code.',
+                            level: 'beginner',
+                            tags: ['m', 'tips', 'naming', 'best-practices'],
+                            markdown: `### 📝 Bonnes Pratiques de Nommage
+
+**Objectif :** Qu'une personne qui lit le code comprenne immédiatement ce que fait chaque étape.
+
+**Règles d'or :**
+1. **Utiliser le français** (ou l'anglais, mais cohérent dans tout le projet)
+2. **Décrire l'action** : "FiltrageParDate" plutôt que "Étape1"
+3. **Éviter les accents** dans les noms techniques : "FiltrageDonnees" ✅ vs "FiltrageDonnées" ❌
+4. **Format PascalCase** : Majuscule à chaque mot sans espace
+
+**Exemples :**`,
+                            code: `// ❌ MAUVAIS NOMMAGE
+let
+    Source = ...,
+    Etape1 = Table.SelectRows(Source, ...),
+    Etape2 = Table.AddColumn(Etape1, ...),
+    Resultat = Etape2
+in
+    Resultat
+
+// ✅ BON NOMMAGE
+let
+    Source = Excel.CurrentWorkbook(){[Name="Ventes"]}[Content],
+    FiltrageAnneeEnCours = Table.SelectRows(Source, each [Année] = 2024),
+    AjoutMontantTTC = Table.AddColumn(FiltrageAnneeEnCours, "TTC", each [HT] * 1.2),
+    TriParDate = Table.Sort(AjoutMontantTTC, {{"Date", Order.Descending}})
+in
+    TriParDate`
+                        },
+                        {
+                            id: 'debugging_tips',
+                            title: 'Déboguer une Requête',
+                            description: 'Techniques pour trouver et corriger les erreurs.',
+                            level: 'intermediate',
+                            tags: ['m', 'tips', 'debugging', 'error'],
+                            markdown: `### 🐛 Stratégies de Débogage
+
+**1. Tester Étape par Étape**
+- Cliquez sur chaque étape dans le volet droit pour isoler où l'erreur apparaît
+- La dernière étape qui fonctionne indique où chercher
+
+**2. Utiliser Table.RowCount**
+Ajoutez temporairement une étape pour compter les lignes :
+\`\`\`powerquery
+VerificationNombre = Table.RowCount(EtapePrecedente)
+\`\`\`
+
+**3. Inspecter les Types**
+Les erreurs viennent souvent d'un mauvais type :
+- Vérifiez que les colonnes avec des calculs sont bien en \`type number\`
+- Vérifiez que les dates sont bien en \`type date\`
+
+**4. Commenter des Étapes**
+Commentez les étapes suspectes pour les désactiver temporairement :
+\`\`\`powerquery
+// SuperfluousSteps = Table.TransformColumns(...),
+\`\`\`
+
+**5. Table.FirstN pour Limiter**
+Si la requête est lente, limitez temporairement :
+\`\`\`powerquery
+PremiersTest = Table.FirstN(Source, 100)
+\`\`\``
+                        }
+                    ]
                 }
             ]
         },

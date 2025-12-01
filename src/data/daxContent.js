@@ -123,6 +123,108 @@ SUMX(
 )`
                         }
                     ]
+                },
+                {
+                    id: 'tips',
+                    title: '4. Tips & Raccourcis',
+                    description: 'Astuces pour gagner du temps.',
+                    snippets: [
+                        {
+                            id: 'keyboard_shortcuts',
+                            title: 'Raccourcis Clavier (DAX Studio / Power BI)',
+                            description: 'Les raccourcis essentiels pour éditer du code DAX.',
+                            level: 'beginner',
+                            tags: ['dax', 'tips', 'shortcuts', 'productivity'],
+                            markdown: `### ⌨️ Raccourcis Indispensables
+
+#### Commentaires
+- **Commenter** : \`Ctrl + K, C\` (ou \`Ctrl + /\`)
+- **Décommenter** : \`Ctrl + K, U\` (ou \`Ctrl + /\` à nouveau)
+
+💡 Très utile pour tester différentes versions d'une mesure.
+
+#### Édition
+- **Dupliquer une ligne** : \`Ctrl + D\`
+- **Déplacer une ligne** : \`Alt + ↑\` / \`Alt + ↓\`
+- **Suppression rapide** : \`Ctrl + Shift + K\` (supprime la ligne entière)
+
+#### Navigation
+- **Rechercher** : \`Ctrl + F\`
+- **Remplacer** : \`Ctrl + H\`
+- **Aller à la ligne** : \`Ctrl + G\`
+
+#### Formatage (DAX Studio)
+- **Formater le code** : \`F6\` (DAX Studio uniquement)
+- **Indentation** : \`Tab\` / \`Shift + Tab\``
+                        },
+                        {
+                            id: 'dax_formatter',
+                            title: 'Formater son Code DAX',
+                            description: 'Rendre le code lisible et maintenable.',
+                            level: 'beginner',
+                            tags: ['dax', 'tips', 'formatting', 'best-practices'],
+                            markdown: `### 🎨 Pourquoi Formater ?
+
+Un code DAX bien formaté est **10x plus facile** à déboguer et maintenir.
+
+**Outils recommandés :**
+1. **DAX Formatter** (en ligne) : [daxformatter.com](https://www.daxformatter.com)
+2. **DAX Studio** : Formatage intégré (F6)
+3. **Tabular Editor** : Formatage automatique
+
+**Bonnes pratiques :**
+- Une ligne par argument de fonction
+- Indentation cohérente (4 espaces)
+- Variables nommées explicitement
+- Commentaires pour la logique complexe`,
+                            code: `// ❌ MAL FORMATÉ
+Ratio = DIVIDE(CALCULATE(SUM(Ventes[Montant]),Ventes[Statut]="Payé"),CALCULATE(SUM(Ventes[Montant]),ALL(Ventes[Statut])))
+
+// ✅ BIEN FORMATÉ
+Ratio = 
+VAR VentesPayees = 
+    CALCULATE(
+        SUM(Ventes[Montant]),
+        Ventes[Statut] = "Payé"
+    )
+VAR VentesTotales = 
+    CALCULATE(
+        SUM(Ventes[Montant]),
+        ALL(Ventes[Statut])
+    )
+RETURN
+    DIVIDE(VentesPayees, VentesTotales)`
+                        },
+                        {
+                            id: 'dax_variables',
+                            title: 'Utiliser les Variables (VAR)',
+                            description: 'Clarté + Performance en un seul mot-clé.',
+                            level: 'intermediate',
+                            tags: ['dax', 'tips', 'var', 'performance'],
+                            markdown: `### 🚀 Double Bénéfice des Variables
+
+**1. Lisibilité** : Nommer les étapes intermédiaires
+**2. Performance** : DAX calcule chaque VAR une seule fois (pas de recalcul)
+
+**Règle d'or :**
+> Si vous utilisez la même expression 2+ fois → VAR obligatoire !
+
+**Exemple typique :**`,
+                            code: `// ❌ SANS VAR : [Montant Total] est calculé 2 fois !
+Rentabilité % = 
+DIVIDE(
+    [Montant Total] - [Coûts],
+    [Montant Total]
+)
+
+// ✅ AVEC VAR : [Montant Total] n'est calculé qu'UNE fois
+Rentabilité % = 
+VAR Total = [Montant Total]
+VAR Profit = Total - [Coûts]
+RETURN
+    DIVIDE(Profit, Total)`
+                        }
+                    ]
                 }
             ]
         },

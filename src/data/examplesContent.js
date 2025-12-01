@@ -911,6 +911,262 @@ if not df_referentiel.empty:
                     ]
                 }
             ]
+        },
+        {
+            id: 'tips',
+            title: 'Tips & Productivité',
+            description: 'Raccourcis et astuces pour gagner du temps.',
+            categories: [
+                {
+                    id: 'windows_shortcuts',
+                    title: 'Raccourcis Windows Essentiels',
+                    description: 'Les raccourcis universels pour tous les outils.',
+                    snippets: [
+                        {
+                            id: 'clipboard_shortcuts',
+                            title: 'Copier/Coller & Presse-papiers',
+                            description: 'Manipulation du texte et du contenu.',
+                            level: 'beginner',
+                            tags: ['tips', 'windows', 'shortcuts', 'clipboard'],
+                            markdown: `### 📋 Presse-papiers
+
+#### Basiques
+- **Copier** : \`Ctrl + C\`
+- **Couper** : \`Ctrl + X\`
+- **Coller** : \`Ctrl + V\`
+- **Annuler** : \`Ctrl + Z\`
+- **Rétablir** : \`Ctrl + Y\` (ou \`Ctrl + Shift + Z\`)
+
+#### Avancés
+- **Presse-papiers multiple** : \`Windows + V\` (Windows 10+)
+  - Historique des 25 derniers éléments copiés
+  - Très utile pour copier plusieurs cellules Excel
+- **Coller sans formatage** : \`Ctrl + Shift + V\` (dans certaines apps)
+
+💡 **Astuce** : Dans Excel, après un \`Ctrl + C\`, utilisez \`Ctrl + Alt + V\` pour ouvrir le menu "Collage spécial"`
+                        },
+                        {
+                            id: 'navigation_shortcuts',
+                            title: 'Navigation & Recherche',
+                            description: 'Se déplacer efficacement.',
+                            level: 'beginner',
+                            tags: ['tips', 'windows', 'shortcuts', 'navigation'],
+                            markdown: `### 🔍 Navigation Rapide
+
+#### Recherche
+- **Rechercher dans un fichier** : \`Ctrl + F\`
+- **Rechercher et remplacer** : \`Ctrl + H\`
+- **Rechercher le suivant** : \`F3\` (ou \`Ctrl + G\`)
+
+#### Navigation dans le texte
+- **Début de ligne** : \`Home\`
+- **Fin de ligne** : \`End\`
+- **Début du document** : \`Ctrl + Home\`
+- **Fin du document** : \`Ctrl + End\`
+- **Mot suivant/précédent** : \`Ctrl + ←/→\`
+
+#### Sélection
+- **Sélectionner tout** : \`Ctrl + A\`
+- **Sélectionner jusqu'au début** : \`Shift + Home\`
+- **Sélectionner jusqu'à la fin** : \`Shift + End\`
+- **Sélectionner mot par mot** : \`Ctrl + Shift + ←/→\`
+
+💡 **Astuce Excel** : \`Ctrl + Shift + Fin\` sélectionne jusqu'à la dernière cellule utilisée`
+                        },
+                        {
+                            id: 'file_management',
+                            title: 'Gestion de Fichiers',
+                            description: 'Fichiers et dossiers.',
+                            level: 'beginner',
+                            tags: ['tips', 'windows', 'shortcuts', 'files'],
+                            markdown: `### 📁 Fichiers & Dossiers
+
+#### Actions de base
+- **Nouveau fichier/dossier** : \`Ctrl + N\` (contexte dépendant)
+- **Ouvrir** : \`Ctrl + O\`
+- **Enregistrer** : \`Ctrl + S\`
+- **Enregistrer sous** : \`Ctrl + Shift + S\`
+- **Fermer** : \`Ctrl + W\` (ou \`Ctrl + F4\`)
+- **Imprimer** : \`Ctrl + P\`
+
+#### Explorateur Windows
+- **Ouvrir l'Explorateur** : \`Windows + E\`
+- **Créer un nouveau dossier** : \`Ctrl + Shift + N\`
+- **Renommer** : \`F2\`
+- **Supprimer** : \`Suppr\` (Corbeille) ou \`Shift + Suppr\` (Définitif ⚠️)
+- **Actualiser** : \`F5\`
+- **Barre d'adresse** : \`Ctrl + L\` ou \`Alt + D\`
+
+#### Multi-sélection
+- **Sélection continue** : Clic puis \`Shift + Clic\`
+- **Sélection multiple** : \`Ctrl + Clic\` (un par un)`
+                        },
+                        {
+                            id: 'window_management',
+                            title: 'Gestion des Fenêtres',
+                            description: 'Organiser l\'espace de travail.',
+                            level: 'beginner',
+                            tags: ['tips', 'windows', 'shortcuts', 'multitasking'],
+                            markdown: `### 🪟 Multi-fenêtrage
+
+#### Basculer entre applications
+- **Basculer** : \`Alt + Tab\` (maintenir Alt et presser Tab)
+- **Vue des tâches** : \`Windows + Tab\`
+- **Fermer une fenêtre** : \`Alt + F4\`
+- **Minimiser toutes les fenêtres** : \`Windows + D\`
+
+#### Ancrage des fenêtres (Snap)
+- **Ancrer à gauche** : \`Windows + ←\`
+- **Ancrer à droite** : \`Windows + →\`
+- **Maximiser** : \`Windows + ↑\`
+- **Minimiser** : \`Windows + ↓\`
+
+#### Bureaux virtuels (Windows 10+)
+- **Nouveau bureau** : \`Windows + Ctrl + D\`
+- **Fermer le bureau actuel** : \`Windows + Ctrl + F4\`
+- **Basculer entre bureaux** : \`Windows + Ctrl + ←/→\`
+
+💡 **Astuce** : Ancrer 2 fenêtres côte à côte pour comparer des données facilement`
+                        }
+                    ]
+                },
+                {
+                    id: 'excel_productivity',
+                    title: 'Excel - Raccourcis Avancés',
+                    description: 'Manipulation ultra-rapide de données.',
+                    snippets: [
+                        {
+                            id: 'excel_navigation',
+                            title: 'Navigation Ultra-Rapide',
+                            description: 'Se déplacer dans de grandes tables.',
+                            level: 'intermediate',
+                            tags: ['tips', 'excel', 'shortcuts', 'navigation'],
+                            markdown: `### ⚡ Navigation Express dans Excel
+
+#### Sauts intelligents
+- **Aller à la fin des données** : \`Ctrl + ↓\` (colonne), \`Ctrl + →\` (ligne)
+- **Revenir au début** : \`Ctrl + Home\`
+- **Aller à la dernière cellule** : \`Ctrl + End\`
+
+#### Sélection rapide
+- **Sélectionner jusqu'à la fin** : \`Ctrl + Shift + ↓/→\`
+- **Sélectionner toute la colonne** : \`Ctrl + Espace\`
+- **Sélectionner toute la ligne** : \`Shift + Espace\`
+- **Sélectionner tout le tableau** : \`Ctrl + A\` (ou \`Ctrl + Shift + *\`)
+
+#### Onglets
+- **Onglet suivant** : \`Ctrl + Page Down\`
+- **Onglet précédent** : \`Ctrl + Page Up\`
+
+💡 **Pro Tip** : \`Ctrl + Shift + L\` active/désactive les filtres automatiques`
+                        },
+                        {
+                            id: 'excel_editing',
+                            title: 'Édition & Formules',
+                            description: 'Éditer efficacement.',
+                            level: 'intermediate',
+                            tags: ['tips', 'excel', 'shortcuts', 'editing'],
+                            markdown: `### ✏️ Édition Rapide
+
+#### Mode édition
+- **Éditer la cellule** : \`F2\`
+- **Éditer dans la barre de formule** : Cliquez dans la barre
+- **Annuler l'édition** : \`Echap\`
+- **Valider et descendre** : \`Entrée\`
+- **Valider et rester** : \`Ctrl + Entrée\`
+
+#### Copier/Remplir
+- **Recopier vers le bas** : \`Ctrl + D\` (Fill Down)
+- **Recopier vers la droite** : \`Ctrl + R\` (Fill Right)
+- **Incrémenter** : Glisser avec la poignée de recopie (coin bas-droit)
+
+#### Insertion/Suppression
+- **Insérer des cellules** : \`Ctrl + Shift + +\`
+- **Supprimer des cellules** : \`Ctrl + -\`
+- **Insérer une ligne** : Sélectionner ligne puis \`Ctrl + Shift + +\`
+
+#### Formules
+- **Somme automatique** : \`Alt + =\`
+- **Références absolues** : \`F4\` (bascule entre A1, $A$1, $A1, A$1)
+- **Afficher les formules** : \`Ctrl + \\\`\`
+
+💡 **Astuce** : Double-clic sur la poignée de recopie remplit jusqu'à la fin des données adjacentes`
+                        },
+                        {
+                            id: 'excel_formatting',
+                            title: 'Formatage Rapide',
+                            description: 'Mettre en forme sans la souris.',
+                            level: 'intermediate',
+                            tags: ['tips', 'excel', 'shortcuts', 'formatting'],
+                            markdown: `### 🎨 Formatage Express
+
+#### Mise en forme du texte
+- **Gras** : \`Ctrl + B\` (Bold)
+- **Italique** : \`Ctrl + I\`
+- **Souligné** : \`Ctrl + U\`
+- **Barré** : \`Ctrl + 5\`
+
+#### Formats de nombres
+- **Format nombre** : \`Ctrl + Shift + 1\` (1 234,56)
+- **Format pourcentage** : \`Ctrl + Shift + 5\` (12%)
+- **Format date** : \`Ctrl + Shift + 3\` (jj-mmm-aa)
+- **Format monétaire** : \`Ctrl + Shift + 4\` (€)
+
+#### Bordures
+- **Bordure extérieure** : \`Ctrl + Shift + 7\`
+- **Supprimer les bordures** : \`Ctrl + Shift + _\`
+
+#### Autres
+- **Ajuster la largeur de colonne** : Sélectionner puis \`Alt + H, O, I\` (auto-fit)
+- **Masquer une colonne** : \`Ctrl + 0\`
+- **Masquer une ligne** : \`Ctrl + 9\`
+
+💡 **Pro Tip** : \`Ctrl + 1\` ouvre la boîte de dialogue de formatage complète`
+                        }
+                    ]
+                },
+                {
+                    id: 'vscode_shortcuts',
+                    title: 'VS Code - Pour les Développeurs',
+                    description: 'Raccourcis pour coder plus vite.',
+                    snippets: [
+                        {
+                            id: 'vscode_essentials',
+                            title: 'Raccourcis Essentiels VS Code',
+                            description: 'Les indispensables pour développer.',
+                            level: 'intermediate',
+                            tags: ['tips', 'vscode', 'shortcuts', 'coding'],
+                            markdown: `### 💻 VS Code - Les Must-Have
+
+#### Édition
+- **Commenter/Décommenter** : \`Ctrl + /\`
+- **Dupliquer une ligne** : \`Ctrl + D\` (sélection) ou \`Shift + Alt + ↓\`
+- **Déplacer une ligne** : \`Alt + ↑/↓\`
+- **Supprimer une ligne** : \`Ctrl + Shift + K\`
+- **Indenter** : \`Ctrl + ]\` / \`Ctrl + [\`
+
+#### Multi-curseurs
+- **Ajouter un curseur** : \`Alt + Clic\`
+- **Multi-curseurs sur même mot** : \`Ctrl + D\` (répétez)
+- **Multi-curseurs sur toutes occurrences** : \`Ctrl + Shift + L\`
+- **Colonne de curseurs** : \`Ctrl + Alt + ↑/↓\`
+
+#### Navigation
+- **Palette de commandes** : \`Ctrl + Shift + P\` (ou \`F1\`)
+- **Chercher un fichier** : \`Ctrl + P\`
+- **Aller à la ligne** : \`Ctrl + G\`
+- **Aller à la définition** : \`F12\`
+- **Retour arrière** : \`Alt + ←\`
+
+#### Terminal
+- **Ouvrir le terminal** : \`Ctrl + \\\`\`
+- **Nouveau terminal** : \`Ctrl + Shift + \\\`\`
+
+💡 **Pro Tip** : \`Ctrl + K, Ctrl + S\` ouvre la liste complète des raccourcis`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };
