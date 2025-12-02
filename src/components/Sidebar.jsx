@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X } from 'lucide-react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2 } from 'lucide-react';
 import DataSettings from './DataSettings';
 
 const languages = [
@@ -50,6 +50,17 @@ export default function Sidebar({ selectedLanguage, onSelectLanguage, onClose })
                 >
                     <LayoutGrid className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="font-medium">Vue d'ensemble</span>
+                </button>
+
+                <button
+                    onClick={() => onSelectLanguage('CodeCreation')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'CodeCreation'
+                        ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
+                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        }`}
+                >
+                    <Wand2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Création de code</span>
                 </button>
 
                 <div className="h-px bg-zinc-800 my-2 mx-2" />

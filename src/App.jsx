@@ -12,6 +12,7 @@ import { examplesContent } from './data/examplesContent';
 import { mContent } from './data/mContent';
 import { nosqlContent } from './data/nosqlContent';
 import Overview from './components/Overview';
+import CodeGenerator from './components/CodeGenerator';
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
@@ -88,6 +89,16 @@ export default function App() {
             transition={{ duration: 0.3 }}
           >
             <Overview onNavigate={setSelectedLanguage} />
+          </motion.div>
+        ) : selectedLanguage === 'CodeCreation' ? (
+          <motion.div
+            key="code-generator"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CodeGenerator />
           </motion.div>
         ) : (
           <motion.div

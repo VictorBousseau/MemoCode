@@ -31,7 +31,11 @@ df = pd.read_csv('data.csv',
     sep=';',              # Séparateur
     index_col=0,          # Colonne d'index
     parse_dates=['date']  # Parsing des dates
-)`
+)
+
+# Quand l'en-tête n'est pas la première ligne
+# header=2 signifie que la 3ème ligne (index 2) contient les noms de colonnes
+data_insee = pd.read_csv('./data/Export_insee.csv', sep=';', header=2)`
                         },
                         {
                             id: 'read_excel',
@@ -362,6 +366,23 @@ fusion = pd.merge(
 # Résultat : Les deux colonnes seront présentes dans le résultat
 # Vous pouvez ensuite supprimer la colonne redondante si besoin :
 fusion = fusion.drop(columns=['identifiant_pp'])`
+                        },
+                        {
+                            id: 'merge_multi_cols',
+                            title: 'Fusion (Merge) - Clés Multiples',
+                            description: 'Jointure sur plusieurs colonnes.',
+                            level: 'intermediate',
+                            tags: ['transformation', 'merge', 'join', 'pandas'],
+                            code: `# Jointure sur plusieurs colonnes (Clé composite)
+# Utile quand une seule colonne ne suffit pas à identifier une ligne unique
+
+Souscription_individuelle_selec = pd.merge(
+    Souscription_individuelle_selec,    # Gauche
+    df_referentiel,                     # Droite (votre calendrier généré plus tôt)
+    left_on=['date_creation_propo_F_date', 'departement_pp_princ'], # Clés Gauche
+    right_on=['date', 'departement'],   # Clés Droite
+    how='left'
+)`
                         },
                         {
                             id: 'pivot',
