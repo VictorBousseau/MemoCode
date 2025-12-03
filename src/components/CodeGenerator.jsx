@@ -9,6 +9,57 @@ export default function CodeGenerator() {
     const [generatedCode, setGeneratedCode] = useState('');
     const [copied, setCopied] = useState(false);
 
+    // --- Smart Import State ---
+    const [infoText, setInfoText] = useState('');
+    const [columns, setColumns] = useState([]);
+    const [showSmartImport, setShowSmartImport] = useState(false);
+
+    const parseInfo = (text) => {
+        const lines = text.split('\n');
+        const newCols = [];
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            // Match lines starting with a number (index)
+            if (/^\d+\s+/.test(trimmed)) {
+                // Strategy: Remove the index at the start
+                let content = trimmed.replace(/^\d+\s+/, '');
+
+                // Remove "X non-null" if present (standard df.info())
+                content = content.replace(/\s+\d+\s+non-null/, '');
+
+                // The last word is likely the dtype
+                const parts = content.split(/\s+/);
+                const dtype = parts.pop();
+
+                // The rest is the name
+                const name = parts.join(' ');
+
+                if (name && name.trim() !== '') {
+                    newCols.push({ name: name.trim(), type: dtype });
+                }
+            }
+        });
+        setColumns(newCols);
+        if (newCols.length > 0) {
+            setShowSmartImport(false); // Close panel on success
+        }
+    };
+
+    // Helper Component for Inputs with Suggestions
+    const ColumnInput = ({ value, onChange, placeholder = "Nom de la colonne" }) => (
+        <div className="relative">
+            <input
+                type="text"
+                value={value}
+                onChange={onChange}
+                list="column-suggestions"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                placeholder={placeholder}
+            />
+        </div>
+    );
+
     // --- Form States (Data) ---
     const [mergeData, setMergeData] = useState({ leftTable: 'df_left', rightTable: 'df_right', joinType: 'left', leftOn: 'id', rightOn: 'id', isMultiCol: false });
     const [readCsvData, setReadCsvData] = useState({ filePath: 'data.csv', sep: ',', header: '0', hasHeader: true });
@@ -164,6 +215,46 @@ export default function CodeGenerator() {
                 <p className="text-zinc-400">Créez vos snippets rapidement sans IA.</p>
             </div>
 
+            {/* Smart Import Toggle */}
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+                <button
+                    onClick={() => setShowSmartImport(!showSmartImport)}
+                    className="flex items-center gap-2 text-sm font-medium text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                    <Database className="w-4 h-4" />
+                    {showSmartImport ? 'Masquer l\'import intelligent' : 'Importer mes colonnes (depuis df.info())'}
+                </button>
+
+                {showSmartImport && (
+                    <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2">
+                        <p className="text-xs text-zinc-500">
+                            Copiez le résultat de <code>df.info()</code> ici pour avoir l'autocomplétion des colonnes.
+                        </p>
+                        <textarea
+                            value={infoText}
+                            onChange={(e) => setInfoText(e.target.value)}
+                            placeholder={`Exemple :\n 0   PassengerId  891 non-null    int64\n 1   Survived     891 non-null    int64`}
+                            className="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs font-mono text-zinc-300 focus:ring-2 focus:ring-purple-500 outline-none"
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => parseInfo(infoText)}
+                                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium rounded-lg transition-colors"
+                            >
+                                Analyser les colonnes
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {columns.length > 0 && (
+                    <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
+                        <Check className="w-3 h-3" />
+                        {columns.length} colonnes détectées
+                    </div>
+                )}
+            </div>
+
             {/* Mode Switcher */}
             <div className="flex p-1 bg-zinc-900 rounded-lg w-fit border border-zinc-800">
                 <button
@@ -218,8 +309,8 @@ export default function CodeGenerator() {
                                         </div>
                                         <div><label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer"><input type="checkbox" checked={mergeData.isMultiCol} onChange={(e) => setMergeData({ ...mergeData, isMultiCol: e.target.checked })} className="rounded border-zinc-700 bg-zinc-900 text-purple-500 focus:ring-purple-500" /> Jointure sur plusieurs colonnes</label></div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div><label className="block text-xs text-zinc-500 mb-1">{mergeData.isMultiCol ? 'Clés Gauche (csv)' : 'Clé Gauche'}</label><input type="text" value={mergeData.leftOn} onChange={(e) => setMergeData({ ...mergeData, leftOn: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
-                                            <div><label className="block text-xs text-zinc-500 mb-1">{mergeData.isMultiCol ? 'Clés Droite (csv)' : 'Clé Droite'}</label><input type="text" value={mergeData.rightOn} onChange={(e) => setMergeData({ ...mergeData, rightOn: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">{mergeData.isMultiCol ? 'Clés Gauche (csv)' : 'Clé Gauche'}</label><ColumnInput value={mergeData.leftOn} onChange={(e) => setMergeData({ ...mergeData, leftOn: e.target.value })} /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">{mergeData.isMultiCol ? 'Clés Droite (csv)' : 'Clé Droite'}</label><ColumnInput value={mergeData.rightOn} onChange={(e) => setMergeData({ ...mergeData, rightOn: e.target.value })} /></div>
                                         </div>
                                         <div><label className="block text-xs text-zinc-500 mb-1">Type</label><select value={mergeData.joinType} onChange={(e) => setMergeData({ ...mergeData, joinType: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="left">Left</option><option value="right">Right</option><option value="inner">Inner</option><option value="outer">Outer</option></select></div>
                                     </div>
@@ -236,14 +327,14 @@ export default function CodeGenerator() {
                                 )}
                                 {action === 'convert_type' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonne</label><input type="text" value={convertData.column} onChange={(e) => setConvertData({ ...convertData, column: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonne</label><ColumnInput value={convertData.column} onChange={(e) => setConvertData({ ...convertData, column: e.target.value })} /></div>
                                         <div><label className="block text-xs text-zinc-500 mb-1">Type Cible</label><select value={convertData.targetType} onChange={(e) => setConvertData({ ...convertData, targetType: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="numeric">Numérique</option><option value="datetime">Date</option><option value="str">Texte</option><option value="category">Catégorie</option></select></div>
                                         {(convertData.targetType === 'numeric' || convertData.targetType === 'datetime') && (<div><label className="block text-xs text-zinc-500 mb-1">Erreurs</label><select value={convertData.errors} onChange={(e) => setConvertData({ ...convertData, errors: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="coerce">Coerce</option><option value="raise">Raise</option><option value="ignore">Ignore</option></select></div>)}
                                     </div>
                                 )}
                                 {action === 'filter' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonne</label><input type="text" value={filterData.column} onChange={(e) => setFilterData({ ...filterData, column: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonne</label><ColumnInput value={filterData.column} onChange={(e) => setFilterData({ ...filterData, column: e.target.value })} /></div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div><label className="block text-xs text-zinc-500 mb-1">Opérateur</label><select value={filterData.operator} onChange={(e) => setFilterData({ ...filterData, operator: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="==">==</option><option value="!=">!=</option><option value=">">&gt;</option><option value="<">&lt;</option><option value=">=">&gt;=</option><option value="<=">&lt;=</option><option value="contains">Contient</option><option value="isin">Est dans</option></select></div>
                                             <div><label className="block text-xs text-zinc-500 mb-1">Valeur</label><input type="text" value={filterData.value} onChange={(e) => setFilterData({ ...filterData, value: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
@@ -252,9 +343,9 @@ export default function CodeGenerator() {
                                 )}
                                 {action === 'groupby' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                        <div><label className="block text-xs text-zinc-500 mb-1">Groupes</label><input type="text" value={groupData.groupCols} onChange={(e) => setGroupData({ ...groupData, groupCols: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                        <div><label className="block text-xs text-zinc-500 mb-1">Groupes</label><ColumnInput value={groupData.groupCols} onChange={(e) => setGroupData({ ...groupData, groupCols: e.target.value })} /></div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div><label className="block text-xs text-zinc-500 mb-1">Cible</label><input type="text" value={groupData.targetCol} onChange={(e) => setGroupData({ ...groupData, targetCol: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">Cible</label><ColumnInput value={groupData.targetCol} onChange={(e) => setGroupData({ ...groupData, targetCol: e.target.value })} /></div>
                                             <div><label className="block text-xs text-zinc-500 mb-1">Fonction</label><select value={groupData.aggFunc} onChange={(e) => setGroupData({ ...groupData, aggFunc: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="mean">Moyenne</option><option value="sum">Somme</option><option value="count">Compte</option><option value="min">Min</option><option value="max">Max</option></select></div>
                                         </div>
                                     </div>
@@ -262,11 +353,11 @@ export default function CodeGenerator() {
                                 {action === 'pivot' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div><label className="block text-xs text-zinc-500 mb-1">Index</label><input type="text" value={pivotData.index} onChange={(e) => setPivotData({ ...pivotData, index: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
-                                            <div><label className="block text-xs text-zinc-500 mb-1">Colonnes</label><input type="text" value={pivotData.columns} onChange={(e) => setPivotData({ ...pivotData, columns: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">Index</label><ColumnInput value={pivotData.index} onChange={(e) => setPivotData({ ...pivotData, index: e.target.value })} /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">Colonnes</label><ColumnInput value={pivotData.columns} onChange={(e) => setPivotData({ ...pivotData, columns: e.target.value })} /></div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div><label className="block text-xs text-zinc-500 mb-1">Valeurs</label><input type="text" value={pivotData.values} onChange={(e) => setPivotData({ ...pivotData, values: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                            <div><label className="block text-xs text-zinc-500 mb-1">Valeurs</label><ColumnInput value={pivotData.values} onChange={(e) => setPivotData({ ...pivotData, values: e.target.value })} /></div>
                                             <div><label className="block text-xs text-zinc-500 mb-1">Fonction</label><select value={pivotData.aggfunc} onChange={(e) => setPivotData({ ...pivotData, aggfunc: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="mean">Moyenne</option><option value="sum">Somme</option><option value="count">Compte</option></select></div>
                                         </div>
                                     </div>
@@ -277,7 +368,7 @@ export default function CodeGenerator() {
                                         {cleanData.action === 'drop' ? (
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div><label className="block text-xs text-zinc-500 mb-1">Axe</label><select value={cleanData.axis} onChange={(e) => setCleanData({ ...cleanData, axis: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="rows">Lignes</option><option value="columns">Colonnes</option></select></div>
-                                                <div><label className="block text-xs text-zinc-500 mb-1">Subset</label><input type="text" value={cleanData.subset} onChange={(e) => setCleanData({ ...cleanData, subset: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                                <div><label className="block text-xs text-zinc-500 mb-1">Subset</label><ColumnInput value={cleanData.subset} onChange={(e) => setCleanData({ ...cleanData, subset: e.target.value })} /></div>
                                             </div>
                                         ) : (
                                             <div><label className="block text-xs text-zinc-500 mb-1">Valeur</label><input type="text" value={cleanData.fillValue} onChange={(e) => setCleanData({ ...cleanData, fillValue: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
@@ -286,7 +377,7 @@ export default function CodeGenerator() {
                                 )}
                                 {action === 'sort' && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonnes</label><input type="text" value={sortData.columns} onChange={(e) => setSortData({ ...sortData, columns: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" /></div>
+                                        <div><label className="block text-xs text-zinc-500 mb-1">Colonnes</label><ColumnInput value={sortData.columns} onChange={(e) => setSortData({ ...sortData, columns: e.target.value })} /></div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div><label className="block text-xs text-zinc-500 mb-1">Croissant</label><select value={sortData.ascending} onChange={(e) => setSortData({ ...sortData, ascending: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="True">Oui</option><option value="False">Non</option></select></div>
                                             <div><label className="block text-xs text-zinc-500 mb-1">NaN</label><select value={sortData.naPosition} onChange={(e) => setSortData({ ...sortData, naPosition: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm"><option value="last">Fin</option><option value="first">Début</option></select></div>
@@ -342,12 +433,12 @@ export default function CodeGenerator() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs text-zinc-500 mb-1">Axe X</label>
-                                        <input type="text" value={vizData.x} onChange={(e) => setVizData({ ...vizData, x: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" />
+                                        <ColumnInput value={vizData.x} onChange={(e) => setVizData({ ...vizData, x: e.target.value })} />
                                     </div>
                                     {vizAction !== 'histogram' && (
                                         <div>
                                             <label className="block text-xs text-zinc-500 mb-1">Axe Y</label>
-                                            <input type="text" value={vizData.y} onChange={(e) => setVizData({ ...vizData, y: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" />
+                                            <ColumnInput value={vizData.y} onChange={(e) => setVizData({ ...vizData, y: e.target.value })} />
                                         </div>
                                     )}
                                     {vizAction === 'histogram' && (
@@ -361,7 +452,7 @@ export default function CodeGenerator() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-xs text-zinc-500 mb-1">Couleur (Hue - Optionnel)</label>
-                                        <input type="text" value={vizData.hue} onChange={(e) => setVizData({ ...vizData, hue: e.target.value })} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-white text-sm" placeholder="colonne_categorie" />
+                                        <ColumnInput value={vizData.hue} onChange={(e) => setVizData({ ...vizData, hue: e.target.value })} placeholder="colonne_categorie" />
                                     </div>
                                     <div>
                                         <label className="block text-xs text-zinc-500 mb-1">Titre</label>
@@ -396,6 +487,12 @@ export default function CodeGenerator() {
                     </div>
                 </div>
             </div>
+            {/* Global Datalist for Column Suggestions */}
+            <datalist id="column-suggestions">
+                {columns.map((col, idx) => (
+                    <option key={idx} value={col.name}>{col.name} ({col.type})</option>
+                ))}
+            </datalist>
         </div>
     );
 }

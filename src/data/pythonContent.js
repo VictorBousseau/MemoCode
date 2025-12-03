@@ -425,6 +425,16 @@ df = df.sort_values(by = ['ville', 'age'], ascending = [True, False])
 df.reset_index(drop = True, inplace = True)
 
 # Sans drop = True, l'ancien index devient une colonne nommée "index".`
+                        },
+                        {
+                            id: 'create_col_condition',
+                            title: 'Création de Colonne (Condition)',
+                            description: 'Créer une colonne booléenne basée sur une condition.',
+                            level: 'beginner',
+                            tags: ['transformation', 'columns', 'pandas'],
+                            code: `# Création d'une nouvelle colonne 'Propo_gagné'
+# Elle contiendra True si 'statut_production' vaut 'Gagné', sinon False
+Souscription_individuelle_selec['Propo_gagné'] = (Souscription_individuelle_selec['statut_production'] == 'Gagné')`
                         }
                     ]
                 },
@@ -433,6 +443,34 @@ df.reset_index(drop = True, inplace = True)
                     title: 'Feature Engineering Temporel',
                     description: 'Techniques avancées pour les dates.',
                     snippets: [
+                        {
+                            id: 'date_decomposition_basic',
+                            title: 'Décomposition de Dates (Basic)',
+                            description: 'Transformer une liste de dates en Année/Mois/Jour.',
+                            level: 'intermediate',
+                            tags: ['time-series', 'feature-engineering', 'pandas'],
+                            code: `# 1. Liste de vos colonnes dates
+cols_dates = ['date_creation_propo', 'date_remise_propo'] # Ajoutez vos autres dates ici
+
+# 2. Boucle pour transformer chaque date en chiffres
+for col in cols_dates:
+    # On vérifie que c'est bien une date
+    Souscription_individuelle_epargne[col] = pd.to_datetime(Souscription_individuelle_epargne[col], errors='coerce')
+    
+    # On crée de nouvelles colonnes numériques
+    Souscription_individuelle_epargne[f'{col}_year'] = Souscription_individuelle_epargne[col].dt.year
+    Souscription_individuelle_epargne[f'{col}_month'] = Souscription_individuelle_epargne[col].dt.month
+    Souscription_individuelle_epargne[f'{col}_dayofweek'] = Souscription_individuelle_epargne[col].dt.dayofweek # 0=Lundi, 6=Dimanche
+    
+    # On remplit les vides (si une date manque) par -1 ou 0
+    Souscription_individuelle_epargne[f'{col}_year'] = Souscription_individuelle_epargne[f'{col}_year'].fillna(-1)
+    Souscription_individuelle_epargne[f'{col}_month'] = Souscription_individuelle_epargne[f'{col}_month'].fillna(-1)
+    Souscription_individuelle_epargne[f'{col}_dayofweek'] = Souscription_individuelle_epargne[f'{col}_dayofweek'].fillna(-1)
+
+# 3. IMPORTANT : On supprime les colonnes dates originales
+# (L'algo plantera si on les laisse)
+Souscription_individuelle_epargne = Souscription_individuelle_epargne.drop(columns=cols_dates)`
+                        },
                         {
                             id: 'date_feature_engineering_advanced',
                             title: 'Feature Engineering Temporel Avancé',
@@ -958,6 +996,28 @@ $$ Entropie = - \\sum_{i=1}^{C} p_i \\log_2(p_i) $$
 # max_depth=5 : Limite la profondeur pour éviter le sur-apprentissage
 tree = DecisionTreeClassifier(criterion='gini', max_depth=5)
 tree.fit(X_train, y_train)`
+                        },
+                        {
+                            id: 'random_forest',
+                            title: 'Random Forest',
+                            description: 'Forêt Aléatoire (Ensemble de Bagging).',
+                            level: 'intermediate',
+                            tags: ['ml', 'classification', 'forest', 'sklearn'],
+                            code: `# Random forest
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# 1. Configuration du modèle
+# n_estimators=100 : Il va créer 100 arbres différents
+# max_depth=10 : On limite la profondeur pour éviter que ça prenne trop de mémoire/temps
+# n_jobs=-1 : Utilise toute la puissance de ton ordinateur (très important !)
+rf = RandomForestClassifier(
+    n_estimators=100, 
+    max_depth=10, 
+    criterion='gini', 
+    random_state=42, 
+    n_jobs=-1
+)`
                         },
                         {
                             id: 'svm',
