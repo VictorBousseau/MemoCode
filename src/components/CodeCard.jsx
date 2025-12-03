@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, Star, Pencil, GripVertical } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -14,11 +14,13 @@ import PriorityRating from './PriorityRating';
 import { scaleOnHover } from '../utils/animations';
 
 import { useStats } from '../hooks/useStats';
+import { useTheme } from '../hooks/useTheme';
 
 export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb, priority = 0, onPriorityChange, dragHandleProps }) {
     const [copied, setCopied] = useState(false);
     const [showNote, setShowNote] = useState(false);
     const { logView } = useStats();
+    const { currentTheme } = useTheme();
 
     // Helper for highlighting text
     const highlightText = (text, query) => {
@@ -210,10 +212,10 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
             )}
 
             {snippet.code && (
-                <div className="relative group">
+                <div className="relative group rounded-b-xl">
                     <SyntaxHighlighter
                         language={language}
-                        style={vscDarkPlus}
+                        style={currentTheme === 'light' ? vs : vscDarkPlus}
                         customStyle={{
                             margin: 0,
                             padding: '1.5rem',
