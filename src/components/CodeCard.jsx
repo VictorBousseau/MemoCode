@@ -67,7 +67,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
         <motion.div
             onClick={onClick}
             whileTap={{ scale: 0.98 }}
-            className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-300 cursor-pointer"
+            className="bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all duration-300 cursor-pointer"
         >
             {breadcrumb && (
                 <div className="bg-blue-500/10 text-blue-400 text-xs px-3 sm:px-4 py-2 border-b border-blue-500/20">
@@ -175,57 +175,145 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                 </div>
             )}
 
-            {snippet.markdown && (
-                <div className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0">
-                    <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
-                        components={{
-                            code({ node, inline, className, children, ...props }) {
-                                const match = /language-(\w+)/.exec(className || '');
-                                return !inline && match && match[1] === 'mermaid' ? (
-                                    <MermaidDiagram chart={String(children).replace(/\n$/, '')} />
-                                ) : (
-                                    <code className={className} {...props}>
-                                        {children}
-                                    </code>
-                                );
-                            },
-                            strong: ({ node, ...props }) => <span className="font-bold text-white" {...props} />,
-                            ul: ({ node, ...props }) => <ul className="list-disc pl-4 space-y-2 my-2" {...props} />,
-                            li: ({ node, ...props }) => <li className="text-zinc-300" {...props} />,
-                            p: ({ node, ...props }) => <p className="mb-2 leading-relaxed" {...props} />,
-                            h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-white mt-4 mb-2" {...props} />,
-                            h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-white mt-3 mb-2" {...props} />,
-                            h3: ({ node, ...props }) => <h3 className="text-md font-bold text-white mt-2 mb-1" {...props} />,
-                            table: ({ node, ...props }) => <table className="min-w-full divide-y divide-zinc-700 border border-zinc-700 rounded-lg my-4" {...props} />,
-                            thead: ({ node, ...props }) => <thead className="bg-zinc-800" {...props} />,
-                            tbody: ({ node, ...props }) => <tbody className="divide-y divide-zinc-700 bg-zinc-900/50" {...props} />,
-                            tr: ({ node, ...props }) => <tr className="hover:bg-zinc-800/50 transition-colors" {...props} />,
-                            th: ({ node, ...props }) => <th className="px-4 py-3 text-left text-xs font-medium text-zinc-300 uppercase tracking-wider border-r border-zinc-700 last:border-r-0" {...props} />,
-                            td: ({ node, ...props }) => <td className="px-4 py-3 text-sm text-zinc-400 border-r border-zinc-700 last:border-r-0" {...props} />,
-                        }}
-                    >
-                        {snippet.markdown}
-                    </ReactMarkdown>
-                </div>
-            )}
+            {/* Multi-Cell Rendering */}
+            {snippet.cells ? (
+                <div className="divide-y divide-zinc-800">
+                    {snippet.cells.map((cell, index) => (
+                        <div key={index} className="group/cell">
+                            {cell.title && (
+                                <div className="px-6 pt-6 pb-2">
+                                    <h4 className="text-md font-bold text-blue-400 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+                                        {cell.title}
+                                    </h4>
+                                </div>
+                            )}
 
-            {snippet.code && (
-                <div className="relative group rounded-b-xl">
-                    <SyntaxHighlighter
-                        language={language}
-                        style={currentTheme === 'light' ? vs : vscDarkPlus}
-                        customStyle={{
-                            margin: 0,
-                            padding: '1.5rem',
-                            background: 'transparent',
-                            fontSize: '0.9rem',
-                        }}
-                    >
-                        {snippet.code}
-                    </SyntaxHighlighter>
+                            {cell.markdown && (
+                                <div className="px-6 py-4 text-zinc-300 overflow-x-auto">
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm, remarkMath]}
+                                        rehypePlugins={[rehypeKatex]}
+                                        components={{
+                                            code({ node, inline, className, children, ...props }) {
+                                                const match = /language-(\w+)/.exec(className || '');
+                                                return !inline && match && match[1] === 'mermaid' ? (
+                                                    <MermaidDiagram chart={String(children).replace(/\n$/, '')} />
+                                                ) : (
+                                                    <code className={className} {...props}>
+                                                        {children}
+                                                    </code>
+                                                );
+                                            },
+                                            strong: ({ node, ...props }) => <span className="font-bold text-white" {...props} />,
+                                            ul: ({ node, ...props }) => <ul className="list-disc pl-4 space-y-2 my-2" {...props} />,
+                                            li: ({ node, ...props }) => <li className="text-zinc-300" {...props} />,
+                                            p: ({ node, ...props }) => <p className="mb-2 leading-relaxed" {...props} />,
+                                            h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-white mt-4 mb-2" {...props} />,
+                                            h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-white mt-3 mb-2" {...props} />,
+                                            h3: ({ node, ...props }) => <h3 className="text-md font-bold text-white mt-2 mb-1" {...props} />,
+                                            table: ({ node, ...props }) => <table className="min-w-full divide-y divide-zinc-700 border border-zinc-700 rounded-lg my-4" {...props} />,
+                                            thead: ({ node, ...props }) => <thead className="bg-zinc-800" {...props} />,
+                                            tbody: ({ node, ...props }) => <tbody className="divide-y divide-zinc-700 bg-zinc-900/50" {...props} />,
+                                            tr: ({ node, ...props }) => <tr className="hover:bg-zinc-800/50 transition-colors" {...props} />,
+                                            th: ({ node, ...props }) => <th className="px-4 py-3 text-left text-xs font-medium text-zinc-300 uppercase tracking-wider border-r border-zinc-700 last:border-r-0" {...props} />,
+                                            td: ({ node, ...props }) => <td className="px-4 py-3 text-sm text-zinc-400 border-r border-zinc-700 last:border-r-0" {...props} />,
+                                        }}
+                                    >
+                                        {cell.markdown}
+                                    </ReactMarkdown>
+                                </div>
+                            )}
+
+                            {cell.code && (
+                                <div className="relative">
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover/cell:opacity-100 transition-opacity z-10">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigator.clipboard.writeText(cell.code);
+                                                // We could start a local copied state here if needed, 
+                                                // but simplistic approach for now is just copy
+                                            }}
+                                            className="p-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-white border border-zinc-700"
+                                            title="Copier ce bloc"
+                                        >
+                                            <Copy className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                    <SyntaxHighlighter
+                                        language={language}
+                                        style={currentTheme === 'light' ? vs : vscDarkPlus}
+                                        customStyle={{
+                                            margin: 0,
+                                            padding: '1.5rem',
+                                            background: 'rgba(0,0,0,0.2)',
+                                            fontSize: '0.9rem',
+                                        }}
+                                    >
+                                        {cell.code}
+                                    </SyntaxHighlighter>
+                                </div>
+                            )}
+                        </div>
+                    ))}
                 </div>
+            ) : (
+                /* Legacy: Single Block Rendering */
+                <>
+                    {snippet.markdown && (
+                        <div className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm, remarkMath]}
+                                rehypePlugins={[rehypeKatex]}
+                                components={{
+                                    code({ node, inline, className, children, ...props }) {
+                                        const match = /language-(\w+)/.exec(className || '');
+                                        return !inline && match && match[1] === 'mermaid' ? (
+                                            <MermaidDiagram chart={String(children).replace(/\n$/, '')} />
+                                        ) : (
+                                            <code className={className} {...props}>
+                                                {children}
+                                            </code>
+                                        );
+                                    },
+                                    strong: ({ node, ...props }) => <span className="font-bold text-white" {...props} />,
+                                    ul: ({ node, ...props }) => <ul className="list-disc pl-4 space-y-2 my-2" {...props} />,
+                                    li: ({ node, ...props }) => <li className="text-zinc-300" {...props} />,
+                                    p: ({ node, ...props }) => <p className="mb-2 leading-relaxed" {...props} />,
+                                    h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-white mt-4 mb-2" {...props} />,
+                                    h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-white mt-3 mb-2" {...props} />,
+                                    h3: ({ node, ...props }) => <h3 className="text-md font-bold text-white mt-2 mb-1" {...props} />,
+                                    table: ({ node, ...props }) => <table className="min-w-full divide-y divide-zinc-700 border border-zinc-700 rounded-lg my-4" {...props} />,
+                                    thead: ({ node, ...props }) => <thead className="bg-zinc-800" {...props} />,
+                                    tbody: ({ node, ...props }) => <tbody className="divide-y divide-zinc-700 bg-zinc-900/50" {...props} />,
+                                    tr: ({ node, ...props }) => <tr className="hover:bg-zinc-800/50 transition-colors" {...props} />,
+                                    th: ({ node, ...props }) => <th className="px-4 py-3 text-left text-xs font-medium text-zinc-300 uppercase tracking-wider border-r border-zinc-700 last:border-r-0" {...props} />,
+                                    td: ({ node, ...props }) => <td className="px-4 py-3 text-sm text-zinc-400 border-r border-zinc-700 last:border-r-0" {...props} />,
+                                }}
+                            >
+                                {snippet.markdown}
+                            </ReactMarkdown>
+                        </div>
+                    )}
+
+                    {snippet.code && (
+                        <div className="relative group rounded-b-xl">
+                            <SyntaxHighlighter
+                                language={language}
+                                style={currentTheme === 'light' ? vs : vscDarkPlus}
+                                customStyle={{
+                                    margin: 0,
+                                    padding: '1.5rem',
+                                    background: 'transparent',
+                                    fontSize: '0.9rem',
+                                }}
+                            >
+                                {snippet.code}
+                            </SyntaxHighlighter>
+                        </div>
+                    )}
+                </>
             )}
         </motion.div>
     );

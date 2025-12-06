@@ -755,6 +755,178 @@ msno.bar(df)
 plt.show()`
                         }
                     ]
+                },
+                {
+                    id: 'advanced_viz',
+                    title: '5. Dashboard & Corrélations',
+                    description: 'Créer des vues d\'ensemble (Subplots) et matrices.',
+                    snippets: [
+                        {
+                            id: 'subplots_concept',
+                            title: 'Grille de Graphiques (Subplots)',
+                            description: 'Afficher plusieurs graphiques côte à côte.',
+                            level: 'advanced',
+                            tags: ['viz', 'matplotlib', 'dashboard'],
+                            cells: [
+                                {
+                                    title: '1. Concept : plt.subplots',
+                                    markdown: `### 🖼️ La Grille (Figure & Axes)
+Au lieu de faire un seul \`plt.show()\`, on crée une grille.
+\`fig, ax = plt.subplots(lines, cols)\` renvoie :
+*   **fig** : Le cadre global (la feuille de papier).
+*   **ax** : Une liste (ou matrice) de zones de dessin. On dessine sur \`ax[0]\`, \`ax[1]\`, etc.`,
+                                    code: `import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Créer une grille 1 ligne x 2 colonnes
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+# Graphique 1 (à gauche) -> axes[0]
+sns.boxplot(data=df, x='statut_production', y='age', ax=axes[0])
+axes[0].set_title("Distribution de l'Âge")
+
+# Graphique 2 (à droite) -> axes[1]
+sns.countplot(data=df, x='statut_production', ax=axes[1])
+axes[1].set_title("Volume par Statut")
+
+plt.tight_layout() # Ajuste les marges automatiquement
+plt.show()`
+                                },
+                                {
+                                    title: '2. Boucle Automatique',
+                                    markdown: `### 🔄 Générer en boucle
+Très puissant pour explorer 50 variables d'un coup.
+On utilise \`enumerate\` pour savoir case utiliser.`,
+                                    code: `cols_to_plot = ['nb_email_30j', 'nb_rdv_30j', 'nb_appels_30j']
+
+# Grille de 1 ligne x 3 colonnes
+fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+
+for idx, col in enumerate(cols_to_plot):
+    # On dessine sur l'axe correspondant à l'index (0, 1, 2)
+    sns.histplot(data=df, x=col, ax=axes[idx], kde=True)
+    axes[idx].set_title(f"Distribution : {col}")
+
+plt.tight_layout()
+plt.show()`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'correlation_heatmap',
+                            title: 'Matrice de Corrélation',
+                            description: 'Heatmap avancée et Top Corrélations.',
+                            level: 'advanced',
+                            tags: ['viz', 'statistics', 'seaborn'],
+                            cells: [
+                                {
+                                    title: '1. Calcul & Filtrage',
+                                    markdown: `### 🧮 Sélectionner les Numériques
+La corrélation (Pearson) ne marche que sur des chiffres. Il faut filtrer.`,
+                                    code: `# Sélection semi-automatique des numériques
+numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+
+# Optionnel : Ajoutez manuellement d'autres colonnes spécifiques
+target_cols = ['age', 'revunu_moyen', 'score_appetence']
+final_cols = [c for c in numeric_cols if c in target_cols] # ou tout garder
+
+# Calcul de la matrice (Carrée)
+corr_matrix = df[numeric_cols].corr()`
+                                },
+                                {
+                                    title: '2. Heatmap Pro',
+                                    markdown: `### 🌡️ Visualisation Heatmap
+Un code robuste pour une belle matrice lisible.`,
+                                    code: `plt.figure(figsize=(12, 10))
+
+# mask : Pour cacher la moitié haute (redondante)
+mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+
+sns.heatmap(
+    corr_matrix,
+    mask=mask,
+    annot=True,       # Affiche les valeurs
+    fmt=".2f",        # 2 chiffres après la virgule
+    cmap='coolwarm',  # Bleu (neg) -> Rouge (pos)
+    vmax=1, vmin=-1,  # Bornes fixes pour que le blanc soit bien 0
+    center=0,
+    square=True,
+    linewidths=.5,
+    cbar_kws={"shrink": .5} # Barre de légende plus petite
+)
+plt.title("Matrice de Corrélation")
+plt.show()`
+                                },
+                                {
+                                    title: '3. Top Corrélations',
+                                    markdown: `### 🏆 Extraire le TOP 10
+Lire une heatmap géante est dur. Voici comment extraire un tableau propre des paires les plus liées.`,
+                                    code: `# On "déplie" la matrice (unstack) et on trie
+corr_pairs = corr_matrix.unstack()
+sorted_pairs = corr_pairs.sort_values(kind="quicksort", ascending=False)
+
+# On filtre les auto-corrélations (valeur 1.0 sur la diagonale)
+strong_pairs = sorted_pairs[sorted_pairs != 1.0]
+
+# Afficher les 10 plus fortes (positives ou négatives)
+print(strong_pairs.head(10))`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'categorical_impact',
+                            title: 'Impact Business (Barplots)',
+                            description: 'Analyser des taux de conversion par catégorie.',
+                            level: 'advanced',
+                            tags: ['viz', 'business', 'categorical'],
+                            cells: [
+                                {
+                                    title: '1. Crosstab & Taux',
+                                    markdown: `### 📊 Taux de Transformation
+Comment une catégorie influence une cible binaire (ex: Vente O/N, Production O/N) ?
+On utilise \`pd.crosstab\` avec \`normalize='index'\`.`,
+                                    code: `# Tableau croisé : Lignes=Region, Colonnes=Vente (0/1)
+# normalize='index' : Chaque ligne somme à 100%
+cross = pd.crosstab(df['region'], df['vente'], normalize='index') * 100
+
+# Plot Stacked (Empilé)
+cross.plot(kind='bar', stacked=True, figsize=(10, 6), color=['tomato', 'mediumseagreen'])
+plt.title("Taux de Vente par Région")
+plt.ylabel("Proportion (%)")
+plt.legend(title='Vente', loc='upper right')
+plt.show()`
+                                },
+                                {
+                                    title: '2. Dashboard Multi-Flags',
+                                    markdown: `### 🎛️ Analyser 10 Flags d'un coup
+Créer une grille de barplots pour voir l'impact de plusieurs variables binaires (Flags) sur la cible.`,
+                                    code: `flags = ['flag_email', 'flag_sms', 'flag_app', 'flag_premium']
+target = 'statut_vente'
+
+# Grille automatique (2 lignes, 2 colonnes)
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+fig.suptitle('Impact des Canaux sur la Vente', fontsize=16)
+
+for idx, col in enumerate(flags):
+    row, c = divmod(idx, 2) # Calcul magique des indices (ligne, col)
+    
+    # Crosstab rapide
+    ct = pd.crosstab(df[col], df[target], normalize='index') * 100
+    
+    # Plot sur l'axe spécifique
+    ct.plot(kind='bar', stacked=True, ax=axes[row, c], legend=False)
+    axes[row, c].set_title(col)
+    axes[row, c].set_xlabel('')
+
+# Une seule légende pour tout le monde
+handles, labels = axes[0,0].get_legend_handles_labels()
+fig.legend(handles, labels, title='Vente', loc='upper right')
+plt.tight_layout()
+plt.show()`
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },
@@ -917,6 +1089,142 @@ X_train_scaled = scaler.fit_transform(X_train)
 
 # Transform uniquement sur le Test
 X_test_scaled = scaler.transform(X_test)`
+                        },
+                        {
+                            id: 'pca',
+                            title: 'ACP (Réduction de Dimension)',
+                            description: 'Analyse en Composantes Principales.',
+                            level: 'advanced',
+                            tags: ['ml', 'preprocessing', 'pca', 'sklearn'],
+                            cells: [
+                                {
+                                    title: '1. Fit & Transform',
+                                    markdown: `### 📉 compresser l'information
+L'ACP crée de nouvelles variables (Composantes Principales/PC) qui sont des combinaisons linéaires des variables initiales.
+*   **But** : Garder le maximum de variance (information) dans un minimum de dimensions.
+*   ⚠️ **StandardScaler** : **OBLIGATOIRE**. L'ACP est très sensible aux échelles (la variance dépend de l'unité).
+
+**Paramètres \`PCA\` :**
+*   \`n_components\` :
+    *   **Entier (ex: 2)** : On veut exactement 2 axes (pour visualiser).
+    *   **Flottant (ex: 0.95)** : On veut garder 95% de la variance totale.`,
+                                    code: `from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+
+# 1. Standardiser (Indispensable)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 2. Définir l'ACP
+# On garde 2 axes pour la visualisation 2D
+pca = PCA(n_components=2) 
+
+# 3. Fit & Transform
+X_pca = pca.fit_transform(X_scaled)
+
+print(f"Forme originale : {X_scaled.shape}")
+print(f"Forme réduite : {X_pca.shape}")`
+                                },
+                                {
+                                    title: '2. Variance Expliquée (Scree Plot)',
+                                    markdown: `### 📊 Combien d'axes garder ?
+Le "Scree Plot" (Graphique des éboulis) montre la part d'information portée par chaque axe.
+On cherche le "coude" ou on s'arrête quand on a assez d'info (ex: > 80%).`,
+                                    code: `import matplotlib.pyplot as plt
+import numpy as np
+
+# Pour cet exemple, on refit une PCA complète
+pca_full = PCA().fit(X_scaled)
+
+# Variance expliquée par chaque axe
+explained_var = pca_full.explained_variance_ratio_
+cumulative_var = np.cumsum(explained_var)
+
+plt.figure(figsize=(10, 5))
+plt.plot(range(1, len(explained_var) + 1), cumulative_var, marker='o', linestyle='--')
+plt.axhline(y=0.95, color='r', linestyle=':', label='95% Variance')
+plt.xlabel('Nombre de Composantes')
+plt.ylabel('Variance Cumulée')
+plt.title('Scree Plot : Choisir le nombre de dimensions')
+plt.legend()
+plt.grid()
+plt.show()`
+                                },
+                                {
+                                    title: '3. Visualisation 2D',
+                                    markdown: `### 🗺️ Projection des Individus
+On projette nos données sur les 2 premiers axes (PC1 et PC2).
+Si ces 2 axes capturent beaucoup de variance (ex: > 60%), la carte est fidèle à la réalité.`,
+                                    code: `import seaborn as sns
+
+# Création d'un DataFrame pour la visu
+df_pca = pd.DataFrame(data=X_pca, columns=['PC1', 'PC2'])
+df_pca['Target'] = y.values # On rajoute la cible pour la couleur
+
+plt.figure(figsize=(10, 8))
+sns.scatterplot(
+    data=df_pca, x='PC1', y='PC2', 
+    hue='Target', 
+    palette='viridis', 
+    alpha=0.7
+)
+plt.title(f"Projection ACP (Var expliquée : {sum(pca.explained_variance_ratio_):.2%})")
+plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.2%})")
+plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.2%})")
+plt.show()`
+                                },
+                                {
+                                    title: '4. Cercle des Corrélations',
+                                    markdown: `### 🎡 Interprétation des Axes
+Que signifient PC1 et PC2 ? On regarde la corrélation entre les variables originales et les axes.
+*   **Variable proche du bord** : Bien représentée.
+*   **Proche d'un axe** : Très corrélée à cet axe.
+*   **Angle faible entre 2 flèches** : Variables corrélées positivement.`,
+                                    code: `import numpy as np
+
+# Coordonnées des variables (Composantes)
+# shape : (n_features, n_components)
+components = pca.components_.T 
+features = X.columns
+
+plt.figure(figsize=(8, 8))
+plt.circle((0,0), 1, color='gray', fill=False, linestyle='--')
+
+# Pour chaque feature, on trace une flèche
+for i, feature in enumerate(features):
+    x_coord = components[i, 0] # Contribution à PC1
+    y_coord = components[i, 1] # Contribution à PC2
+    
+    plt.arrow(0, 0, x_coord, y_coord, head_width=0.05, head_length=0.05, fc='r', ec='r')
+    plt.text(x_coord * 1.15, y_coord * 1.15, feature, color='r')
+
+plt.xlim(-1.1, 1.1)
+plt.ylim(-1.1, 1.1)
+plt.axhline(0, color='k', linestyle='-')
+plt.axvline(0, color='k', linestyle='-')
+plt.title("Cercle des Corrélations")
+plt.grid()
+plt.show()`
+                                },
+                                {
+                                    title: '5. Modélisation Post-ACP',
+                                    markdown: `### 🚀 Pourquoi faire ça ?
+Entraîner un modèle sur \`X_pca\` au lieu de \`X\` :
+1.  **Vitesse** : Moins de colonnes = Calculs plus rapides.
+2.  **Denoising** : On a supprimé le "bruit" (les petits axes inutiles).
+3.  **Visualisation** : On peut tracer les frontières de décision en 2D !`,
+                                    code: `from sklearn.linear_model import LogisticRegression
+
+# On entraîne sur les données RÉDUITES
+clf = LogisticRegression()
+clf.fit(X_pca, y)
+
+print(f"Score sur données réduites : {clf.score(X_pca, y):.3f}")
+
+# (Optionnel) Tracer la frontière de décision en 2D...`
+                                }
+                            ]
                         }
                     ]
                 },
@@ -924,48 +1232,246 @@ X_test_scaled = scaler.transform(X_test)`
                     id: 'supervised_classification',
                     title: '2. Classification Supervisée',
                     subCategory: 'Machine Learning',
+                    displayMode: 'list',
                     description: 'Apprendre à classer à partir d\'exemples étiquetés.',
                     snippets: [
                         {
-                            id: 'lda_qda_logistic',
-                            title: 'Discriminante & Logistique',
-                            description: 'Approches probabilistes.',
+                            id: 'logistic_regression',
+                            title: 'Régression Logistique',
+                            description: 'Malgré son nom, c\'est un classifieur !',
                             level: 'intermediate',
                             tags: ['ml', 'classification', 'linear', 'sklearn'],
-                            markdown: `### 📐 Formules & Concepts
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 📉 La Sigmoïde
+Elle estime la probabilité $P(Y=1|X)$ via une fonction sigmoïde.
+$$ P = \\frac{1}{1 + e^{-z}} $$
+*   **Linéaire** : La frontière de décision est une ligne (ou un hyperplan).
+*   ⚠️ **StandardScaler** : Obligatoire car la régularisation (L1/L2) dépend de l'échelle des poids.`,
+                                    code: `from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
-**1. Régression Logistique**
-Modélise la probabilité d'appartenance à la classe 1 via une sigmoïde.
-$$ P(Y=1|X) = \\frac{1}{1 + e^{-(\\beta_0 + \\beta_1 X)}} $$
-*   **Frontière** : Linéaire.
+# C : Inverse de la régularisation (Plus C est petit, plus on régularise/simplifie)
+# penalty : 'l2' (Ridge - defaut), 'l1' (Lasso - selection de variables), 'elasticnet'
+# solver : 'liblinear' (petits datasets), 'saga' (gros datasets + elasticnet)
+log_reg = make_pipeline(
+    StandardScaler(),
+    LogisticRegression(
+        C=1.0,               # Défaut. Essayer 0.1, 0.01 pour régulariser fort
+        penalty='l2',
+        solver='lbfgs',      # Bon standard
+        class_weight='balanced', # Si déséquilibre
+        random_state=42,
+        max_iter=1000        # Augmenter si le modèle ne converge pas
+    )
+)
+log_reg.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    code: `from sklearn.model_selection import GridSearchCV
 
-**2. Analyse Discriminante Linéaire (LDA)**
-Suppose que les classes suivent une loi Normale avec la **même covariance** (homoscédasticité).
-*   **Frontière** : Linéaire.
-*   **Projection** : Maximise la séparation entre les classes tout en minimisant la variance interne.
+param_grid = {
+    'logisticregression__C': [0.01, 0.1, 1, 10, 100],
+    'logisticregression__penalty': ['l2']
+    # Note: Pour tester L1, il faut changer le solver (ex: 'liblinear' ou 'saga')
+}
 
-**3. Analyse Discriminante Quadratique (QDA)**
-Comme la LDA, mais chaque classe a sa **propre covariance** (hétéroscédasticité).
-*   **Frontière** : Quadratique (Courbe).
+grid = GridSearchCV(
+    log_reg,
+    param_grid,
+    cv=5,
+    scoring='f1_macro',
+    n_jobs=-1
+)
+grid.fit(X_train, y_train)
 
----
-*   📍 **Situation** : Classification binaire ou multi-classes simple. LDA/QDA si les hypothèses de normalité sont respectées.
-*   ✅ **Qualité** : Probabilités bien calibrées, interprétable, rapide.
-*   ❌ **Défaut** : Hypothèses statistiques fortes (linéarité, normalité).`,
-                            code: `from sklearn.linear_model import LogisticRegression
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+print(f"Meilleurs Params : {grid.best_params_}")`
+                                },
+                                {
+                                    title: '3. Feature Importance (Coef)',
+                                    markdown: `### ⚖️ Poids des Coefficients
+Comme pour le Perceptron ou la Régression Linéaire, les coefficients $\\beta$ indiquent l'importance et la direction.
+*   **Signe +** : Favorise la classe 1.
+*   **Signe -** : Favorise la classe 0.`,
+                                    code: `import pandas as pd
+import matplotlib.pyplot as plt
 
-# 1. Logistique (Le standard)
-log_reg = LogisticRegression()
-log_reg.fit(X_train, y_train)
+model = grid.best_estimator_.named_steps['logisticregression']
+coeffs = pd.Series(model.coef_[0], index=X_train.columns)
 
-# 2. LDA (Si on suppose même variance)
-lda = LinearDiscriminantAnalysis()
-lda.fit(X_train, y_train)
+# Classement par amplitude absolue
+importance = coeffs.abs().sort_values(ascending=False)
 
-# 3. QDA (Si variances différentes)
-qda = QuadraticDiscriminantAnalysis()
-qda.fit(X_train, y_train)`
+plt.figure(figsize=(10, 6))
+coeffs.loc[importance.index].plot(kind='barh')
+plt.title("Importance des Coefficients (LogReg)")
+plt.axvline(x=0, color='.5')
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP (LinearExplainer)',
+                                    markdown: `### ⚡ SHAP Exact & Rapide
+La Régression Logistique est compatible avec \`LinearExplainer\`.`,
+                                    code: `import shap
+
+model = grid.best_estimator_.named_steps['logisticregression']
+X_train_scaled = grid.best_estimator_.named_steps['standardscaler'].transform(X_train)
+X_test_scaled = grid.best_estimator_.named_steps['standardscaler'].transform(X_test)
+
+explainer = shap.LinearExplainer(model, X_train_scaled)
+shap_values = explainer.shap_values(X_test_scaled)
+
+shap.summary_plot(shap_values, X_test_scaled, feature_names=X_test.columns)`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'knn',
+                            title: 'K-Nearest Neighbors (KNN)',
+                            description: '"Dis-moi qui sont tes voisins..."',
+                            level: 'beginner',
+                            tags: ['ml', 'classification', 'neighbors', 'sklearn'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 📍 Le Voisinage
+On classe un point selon la majorité de ses $k$ voisins.
+*   ⚠️ **StandardScaler** : **CRITIQUE**. KNN calcule des distances. Si une variable est en "millions" et l'autre en "0-1", la distance sera faussée.`,
+                                    code: `from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+# n_neighbors (k) : Nombre de voisins. Impair de préférence pour éviter les égalités.
+# weights : 'uniform' (défaut) ou 'distance' (les voisins proches comptent plus).
+# metric : 'minkowski' (défaut, euclidien si p=2), 'manhattan' (p=1).
+knn_pipe = make_pipeline(
+    StandardScaler(),
+    KNeighborsClassifier(
+        n_neighbors=5,
+        weights='uniform',
+        metric='minkowski',
+        p=2,
+        n_jobs=-1
+    )
+)
+knn_pipe.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    code: `from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'kneighborsclassifier__n_neighbors': [3, 5, 7, 9, 11],
+    'kneighborsclassifier__weights': ['uniform', 'distance'],
+    'kneighborsclassifier__p': [1, 2] # 1=Manhattan, 2=Euclidien
+}
+
+grid = GridSearchCV(
+    knn_pipe,
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+grid.fit(X_train, y_train)
+
+print(f"Meilleur K : {grid.best_params_}")`
+                                },
+                                {
+                                    title: '3. Feature Importance (Permutation)',
+                                    markdown: `### 🏳️ Pas de Feature Importance Native
+KNN n'a pas de coefficients ou d'arbres. Il utilise *toutes* les variables pour la distance.
+👉 Utilisez la **Permutation Importance** pour voir quelle variable casse le modèle si on la mélange.`,
+                                    code: `from sklearn.inspection import permutation_importance
+
+result = permutation_importance(
+    grid.best_estimator_, X_test, y_test, n_repeats=10, random_state=42
+)
+
+# Voir le snippet SVM pour le code d'affichage complet (Boxplot)`
+                                },
+                                {
+                                    title: '4. SHAP (KernelExplainer)',
+                                    markdown: `### 🐢 SHAP (Très Lent)
+KNN est une "boîte noire" non-linéaire pour SHAP. Il faut utiliser \`KernelExplainer\`.
+*   C'est souvent trop lent sur des gros datasets. Préférez KNN comme modèle "baseline" simple.`,
+                                    code: `import shap
+
+# On utilise un résumé (kmeans) pour le background
+X_summary = shap.kmeans(X_train, 10)
+model_knn = grid.best_estimator_.named_steps['kneighborsclassifier']
+
+# Fonction de prédiction proba (attention aux pipelines, il faut passer les données scalées)
+# Ici on simplifie en passant le pipeline entier si compatible, sinon manuellement
+explainer = shap.KernelExplainer(grid.best_estimator_.predict_proba, X_summary)
+
+shap_values = explainer.shap_values(X_test.iloc[:50]) # Sur un petit échantillon
+shap.summary_plot(shap_values[1], X_test.iloc[:50])`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'naive_bayes',
+                            title: 'Naïve Bayes',
+                            description: 'Probabilités & Théorème de Bayes.',
+                            level: 'intermediate',
+                            tags: ['ml', 'classification', 'probabilistic', 'sklearn'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 🎲 "Naïf" Pourquoi ?
+Il suppose que toutes les features sont **indépendantes** entre elles (ce qui est rarement vrai, mais ça marche quand même !).
+$$ P(Y|X) \\propto P(Y) \\prod P(X_i|Y) $$
+
+**Variantes :**
+*   **GaussianNB** : Pour données continues (suppose distribution normale).
+*   **MultinomialNB** : Pour compteurs (ex: Bag of Words en NLP).
+*   **BernoulliNB** : Pour données binaires.`,
+                                    code: `from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.preprocessing import PowerTransformer
+
+# GaussianNB n'a pas vraiment d'hyperparamètres majeurs.
+# var_smoothing : Ajoute de la stabilité (valeur minuscule par défaut 1e-9)
+nb_model = GaussianNB(var_smoothing=1e-9)
+
+# Astuce : GaussianNB aime les courbes en cloche.
+# PowerTransformer (Yeo-Johnson) peut aider à normaliser les features "tordues".
+from sklearn.pipeline import make_pipeline
+pipe_nb = make_pipeline(PowerTransformer(), GaussianNB())
+
+pipe_nb.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    markdown: `Pour **MultinomialNB** (Texte), on tune \`alpha\` (Lissage Laplace).`,
+                                    code: `import numpy as np
+from sklearn.model_selection import GridSearchCV
+
+# Exemple pour GaussianNB
+param_grid = {
+    'gaussiannb__var_smoothing': np.logspace(0, -9, num=10)
+}
+
+grid = GridSearchCV(pipe_nb, param_grid, cv=5)
+grid.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '3. Feature Importance',
+                                    markdown: `### 🏳️ Permutation Importance
+Comme KNN, pas d'importance native simple (sauf voir les moyennes par classe \`theta_\`). Utilisez Permutation Importance.`,
+                                    code: `# Voir snippet SVM`
+                                },
+                                {
+                                    title: '4. SHAP (KernelExplainer)',
+                                    description: 'Agnostique.',
+                                    code: `import shap
+# KernelExplainer requis.
+# Naive Bayes est très rapide, donc SHAP est raisonnablement rapide aussi.`
+                                }
+                            ]
                         },
                         {
                             id: 'decision_tree',
@@ -973,7 +1479,10 @@ qda.fit(X_train, y_train)`
                             description: 'Diviser pour mieux régner.',
                             level: 'intermediate',
                             tags: ['ml', 'classification', 'tree', 'sklearn'],
-                            markdown: `### 🌳 Critères de Split
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 🌳 Critères de Split
 
 L'arbre cherche la question qui sépare le mieux les données en minimisant l'impureté.
 
@@ -990,12 +1499,137 @@ $$ Entropie = - \\sum_{i=1}^{C} p_i \\log_2(p_i) $$
 *   📍 **Situation** : Besoin de règles claires ("Si Age > 25 alors...").
 *   ✅ **Qualité** : Explicabilité totale, pas besoin de scaling, gère mix numérique/catégoriel.
 *   ❌ **Défaut** : Instable (change si les données changent un peu), sur-apprentissage facile.`,
-                            code: `from sklearn.tree import DecisionTreeClassifier
+                                    code: `from sklearn.tree import DecisionTreeClassifier
+import pandas as pd
 
-# criterion='gini' (ou 'entropy')
-# max_depth=5 : Limite la profondeur pour éviter le sur-apprentissage
-tree = DecisionTreeClassifier(criterion='gini', max_depth=5)
-tree.fit(X_train, y_train)`
+# class_weight='balanced' : Indispensable si vos classes sont déséquilibrées (ex: 90% vs 10%)
+# ccp_alpha : Paramètre de post-élagage (pruning) pour réduire le sur-apprentissage
+tree_full = DecisionTreeClassifier(
+    criterion='gini',           # 'gini' ou 'entropy'
+    splitter='best',            # 'best' pour le meilleur split, 'random' pour de l'aléatoire
+    max_depth=None,             # Profondeur max (None = jusqu'à pureté, attention overfitting)
+    min_samples_split=2,        # Minimum d'échantillons pour diviser un noeud
+    min_samples_leaf=1,         # Minimum d'échantillons dans une feuille (fin de branche)
+    max_features=None,          # Nombre de features à considérer pour un split ('sqrt', 'log2')
+    random_state=42,            # Pour la reproductibilité
+    max_leaf_nodes=None,        # Nombre maximum de feuilles
+    min_impurity_decrease=0.0,  # Seuil de gain d'impureté pour splitter
+    class_weight='balanced',    # Ajuste les poids inversement prop. aux fréquences des classes
+    ccp_alpha=0.0               # Complexité pour le pruning (>= 0.0)
+)
+tree_full.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search (Optimisation)',
+                                    code: `from sklearn.model_selection import GridSearchCV
+
+# Dictionnaire des paramètres à tester
+param_grid = {
+    'criterion': ['gini', 'entropy'],
+    'max_depth': [5, 10, 20, None],
+    'min_samples_leaf': [1, 5, 10],
+    'class_weight': [None, 'balanced'],
+    'ccp_alpha': [0.0, 0.01, 0.1]
+}
+
+# cv=5 : Stratified K-Fold à 5 volets ( Validation Croisée )
+# scoring='f1_macro' : Métrique à optimiser (ici F1 Score moyen)
+grid = GridSearchCV(
+    DecisionTreeClassifier(random_state=42), 
+    param_grid, 
+    cv=5, 
+    scoring='f1_macro', 
+    n_jobs=-1  # Utilise tous les coeurs du CPU
+)
+grid.fit(X_train, y_train)
+
+print(f"Meilleurs paramètres : {grid.best_params_}")
+print(f"Meilleur score : {grid.best_score_}")
+
+# Récupérer le meilleur modèle ré-entraîné sur tout le train set
+best_model = grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance (Global)',
+                                    markdown: `### 📊 Feature Importance (Sklearn)
+C'est une métrique **Globale**. Elle répond à la question : *"Quelles variables ont été les plus utiles pour construire l'arbre ?"*
+
+*   **Calcul** : Somme des gains d'impureté (Gini/Entropy) apportés par la variable à chaque split, pondérée par le nombre d'échantillons.
+*   ⚠️ **Biais** : Elle a tendance à favoriser les variables à forte cardinalité (beaucoup de valeurs uniques, ex: ID client) et les variables continues.`,
+                                    code: `import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# A. Depuis l'arbre standard (défini à l'étape 1)
+# tree_full.feature_importances_ contient les importances
+imp_standard = pd.Series(
+    tree_full.feature_importances_, 
+    index=X.columns
+).sort_values(ascending=False)
+
+print("--- Importance (Arbre Standard) ---")
+print(imp_standard.head(5))
+
+# B. Depuis le Grid Search (on accède au meilleur modèle via .best_estimator_)
+best_model = grid.best_estimator_
+importances = best_model.feature_importances_
+
+# Création d'une Série Pandas pour manipulation facile
+feat_imp = pd.Series(importances, index=X.columns).sort_values(ascending=False)
+
+print("\\n--- Importance (Best Model GridSearch) ---")
+print(feat_imp.head(10))
+
+# Visualisation (Best Model)
+plt.figure(figsize=(10, 6))
+sns.barplot(x=feat_imp.head(15), y=feat_imp.head(15).index)
+plt.title("Importance des Variables (Gini Importance)")
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP Values (Local & Global)',
+                                    markdown: `### 🕵️‍♂️ SHAP (SHapley Additive exPlanations)
+Contrairement à la Feature Importance classique, SHAP permet une explicabilité **Locale** (Pourquoi CE client a un score de risque élevé ?).
+
+| Feature Importance (Sklearn) | SHAP Values |
+| :--- | :--- |
+| **Global** uniquement (Moyenne) | **Local** (Par individu) & **Global** (Agrégation) |
+| "Combien la variable est utilisée ?" | "Comment la variable pousse la prédiction (⬆️ ou ⬇️) ?" |
+| Biasée vers les variables cardinales | Mathématiquement équitable (Théorie des jeux) |
+| Toujours positive | Positive (pousse vers 1) ou Négative (pousse vers 0) |
+
+> **Le Beeswarm Plot (ci-dessous)** :
+> *   Chaque point est une ligne (un individu).
+> *   **Couleur** : Valeur de la variable (Rouge = Élevée, Bleu = Faible).
+> *   **Axe X** : Impact sur la prédiction (Droite = Augmente la proba, Gauche = Diminue).`,
+                                    code: `import shap
+
+# 1. Initialiser l'explainer (Pour les arbres : TreeExplainer)
+# Accepte: Decision Trees, Random Forests, XGBoost, LightGBM...
+explainer = shap.TreeExplainer(best_model)
+
+# 2. Calculer les valeurs SHAP (c'est parfois long !)
+shap_values = explainer.shap_values(X_test)
+
+# --- Visualisation 1 : Global (Beeswarm Plot) ---
+# Le graphique le plus riche : montre l'importance ET la direction de l'effet
+# (Note: shap_values[1] car on regarde la classe 1, ex: Fraude/Achat)
+shap.summary_plot(shap_values[1], X_test)
+
+# --- Visualisation 2 : Global (Bar Plot) ---
+# Équivalent "buxus" à feature_importances_, mais plus fiable
+# shap.summary_plot(shap_values[1], X_test, plot_type="bar")
+
+# --- Visualisation 3 : Local (Force Plot) ---
+# Expliquer UNE prédiction spécifique (ex: le premier client du test set)
+shap.initjs() # Nécessaire dans un notebook
+shap.force_plot(
+    explainer.expected_value[1], 
+    shap_values[1][0,:], 
+    X_test.iloc[0,:]
+)`
+                                }
+                            ]
                         },
                         {
                             id: 'random_forest',
@@ -1003,21 +1637,116 @@ tree.fit(X_train, y_train)`
                             description: 'Forêt Aléatoire (Ensemble de Bagging).',
                             level: 'intermediate',
                             tags: ['ml', 'classification', 'forest', 'sklearn'],
-                            code: `# Random forest
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 🌲 La Forêt Aléatoire (Bagging)
+Le principe est de créer une multitude d'arbres de décision, chacun entraîné sur une partie légèrement différente des données (**Bootstrap**). La décision finale est un vote majoritaire.
 
-# 1. Configuration du modèle
-# n_estimators=100 : Il va créer 100 arbres différents
-# max_depth=10 : On limite la profondeur pour éviter que ça prenne trop de mémoire/temps
-# n_jobs=-1 : Utilise toute la puissance de ton ordinateur (très important !)
-rf = RandomForestClassifier(
-    n_estimators=100, 
-    max_depth=10, 
-    criterion='gini', 
-    random_state=42, 
+*   ✅ **Robuste** : Réduit le sur-apprentissage (variance) par rapport à un arbre seul.
+*   ✅ **OOB Score** : Peut estimer son erreur sans validation croisée (grâce aux données non utilisées dans le bootstrap).`,
+                                    code: `from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
+
+# n_estimators=100 : Nombre d'arbres (plus = mieux, mais plus lent)
+# bootstrap=True : Chaque arbre voit un échantillon différent (avec remise)
+# oob_score=True : Utilise les données non-vues (Out-Of-Bag) pour valider
+rf_full = RandomForestClassifier(
+    n_estimators=100,        
+    criterion='gini',
+    max_depth=None,          # Laisser pousser les arbres (le bagging gère le sur-apprentissage)
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',     # nb features testées par split = racine carrée du total (Standard RF)
+    bootstrap=True,
+    oob_score=True,          # Métrique de validation "gratuite" interne
+    n_jobs=-1,               # Paralléliser sur tous les coeurs CPU
+    random_state=42,
+    class_weight='balanced'
+)
+rf_full.fit(X_train, y_train)
+
+print(f"OOB Score (Validation Interne) : {rf_full.oob_score_:.4f}")`
+                                },
+                                {
+                                    title: '2. Grid Search (Optimisation)',
+                                    description: 'Attention : le Grid Search sur RF peut être très long !',
+                                    code: `from sklearn.model_selection import GridSearchCV
+
+# Pour RF, on tune surtout le nombre d'arbres et leur profondeur
+param_grid = {
+    'n_estimators': [100, 200],      # Nombre d'arbres
+    'max_depth': [10, 20, None],     # Profondeur max
+    'min_samples_leaf': [1, 2, 4],   # Régularisation des feuilles
+    'max_features': ['sqrt', 'log2'] # Diversité des arbres
+}
+
+grid = GridSearchCV(
+    RandomForestClassifier(random_state=42, n_jobs=-1),
+    param_grid,
+    cv=3,                   # 3 folds suffisent souvent pour gagner du temps
+    scoring='f1_macro',
     n_jobs=-1
+)
+grid.fit(X_train, y_train)
+
+print(f"Meilleurs Params : {grid.best_params_}")
+print(f"Meilleur Score : {grid.best_score_}")
+
+best_rf = grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance',
+                                    markdown: `### 📊 Importance et Robustesse
+Avec une Random Forest, la Feature Importance est plus **fiable** que sur un arbre unique car moyennée sur des centaines d'arbres.`,
+                                    code: `import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# A. Depuis le modèle complet (Step 1)
+imp_full = pd.Series(rf_full.feature_importances_, index=X.columns).sort_values(ascending=False)
+
+# B. Depuis le meilleur modèle du Grid Search
+importances = best_rf.feature_importances_
+feat_imp = pd.Series(importances, index=X.columns).sort_values(ascending=False)
+
+print("--- Top 5 Variables (Best Model) ---")
+print(feat_imp.head(5))
+
+# Visualisation
+plt.figure(figsize=(10, 6))
+sns.barplot(x=feat_imp.head(15), y=feat_imp.head(15).index, palette="viridis")
+plt.title("Feature Importance (Random Forest - MDI)")
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP Values (Attention Temps Calcul)',
+                                    markdown: `### 🐢 SHAP & Random Forest
+Calculer les valeurs SHAP exactes sur une forêt aléatoire peut être **coûteux en temps** (car il faut traverser des centaines d'arbres).
+*   Astuce : Utilisez \`shap.TreeExplainer\` avec \`approximate=True\` ou sur un sous-ensemble de données si c'est trop lent.`,
+                                    code: `import shap
+
+# 1. Initialiser l'explainer
+# (Gère automatiquement l'ensemble des arbres via tree_limit ou interne)
+explainer = shap.TreeExplainer(best_rf)
+
+# 2. Calculer les SHAP Values
+# check_additivity=False : Parfois nécessaire pour les algo approximatifs ou complexes
+shap_values = explainer.shap_values(X_test, check_additivity=False)
+
+# --- Visualisation : Beeswarm ---
+# shap_values[1] pour la classe positive
+shap.summary_plot(shap_values[1], X_test)
+
+# --- Visualisation : Force Plot (Local) ---
+shap.initjs()
+shap.force_plot(
+    explainer.expected_value[1], 
+    shap_values[1][0,:], 
+    X_test.iloc[0,:]
 )`
+                                }
+                            ]
                         },
                         {
                             id: 'svm',
@@ -1025,65 +1754,427 @@ rf = RandomForestClassifier(
                             description: 'Maximiser la marge entre les classes.',
                             level: 'advanced',
                             tags: ['ml', 'classification', 'svm', 'sklearn'],
-                            markdown: `### ⚔️ L'Hyperplan
-Le SVM cherche la ligne (ou plan) qui sépare le mieux les classes avec la plus grande marge.
-\`\`\`mermaid
-graph LR
-    subgraph Classe A
-    A1((A))
-    A2((A))
-    end
-    subgraph Classe B
-    B1((B))
-    B2((B))
-    end
-    A2 --- Marge --- B1
-    style Marge stroke-dasharray: 5 5
-\`\`\`
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### ⚔️ L'Hyperplan & Kernels
+Le SVM cherche l'hyperplan qui sépare les classes avec la plus grande **marge** possible.
+*   ⚠️ **Important** : Les SVM sont très sensibles à l'échelle des données. **StandardScaler** est obligatoire avant !`,
+                                    code: `from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
-### 🛣️ Le Concept
+# C : Régularisation (C petit = Marge large/Plus d'erreurs tolérées, C grand = Marge étroite/Overfitting)
+# kernel : 'linear', 'poly', 'rbf' (Radial Basis Function - le plus courant), 'sigmoid'
+# gamma : Coefficient pour 'rbf'/'poly'. 'scale' (défaut) est souvent bon.
+# probability=True : Nécessaire si vous voulez predict_proba() ou du SHAP précis (mais ralentit)
+svm_full = make_pipeline(
+    StandardScaler(),
+    SVC(
+        C=1.0, 
+        kernel='rbf', 
+        gamma='scale', 
+        probability=True, 
+        random_state=42,
+        class_weight='balanced'
+    )
+)
+svm_full.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    code: `from sklearn.model_selection import GridSearchCV
 
-Le SVM cherche l'hyperplan qui sépare les classes avec la plus grande **marge** possible (la "rue" la plus large).
+# Note : On tune le SVC à l'intérieur du pipeline (d'où le "svc__" préfixe)
+param_grid = {
+    'svc__C': [0.1, 1, 10, 100],
+    'svc__kernel': ['linear', 'rbf'],
+    'svc__gamma': ['scale', 'auto', 0.1, 0.01]
+}
 
-**Les Noyaux (Kernels)**
-Si les données ne sont pas séparables linéairement, on les projette dans une dimension supérieure ("Kernel Trick").
-*   **Linéaire** : $$ K(x, x') = x \\cdot x' $$
-*   **Polynomial** : $$ K(x, x') = (\\gamma x \\cdot x' + r)^d $$
-*   **RBF (Radial Basis Function)** : Le plus utilisé.
-    $$ K(x, x') = e^{-\\gamma ||x - x'||^2} $$
+grid = GridSearchCV(
+    svm_full, 
+    param_grid, 
+    cv=3, 
+    scoring='f1_macro', 
+    n_jobs=-1
+)
+grid.fit(X_train, y_train)
 
----
-*   📍 **Situation** : Données complexes, haute dimension, pas trop de bruit.
-*   ✅ **Qualité** : Très performant en haute dimension, robuste si bien paramétré.
-*   ❌ **Défaut** : Lent sur grands datasets, sensible au bruit, "Boîte noire".`,
-                            code: `from sklearn.svm import SVC
+print(f"Meilleurs Params : {grid.best_params_}")
+best_svm = grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance (Permutation)',
+                                    markdown: `### 🏳️ Feature Importance & SVM
+*   **Kernel Linéaire** : On peut utiliser \`coef_\` pour voir les poids.
+*   **Kernel RBF/Poly** : **Pas de feature importance native !** L'espace est transformé de manière complexe.
+👉 **Solution** : Utiliser la **Permutation Importance**. On mélange une colonne et on regarde combien le score chute. Si le score chute beaucoup, la variable était importante.`,
+                                    code: `from sklearn.inspection import permutation_importance
+import matplotlib.pyplot as plt
 
-# C : Pénalité (Grand C = Marge étroite, risque d'overfitting / Petit C = Marge large)
-# kernel='rbf' : Pour les frontières non-linéaires
-svm = SVC(kernel='rbf', C=1.0)
-svm.fit(X_train_scaled, y_train) # SCALING OBLIGATOIRE !`
+# Calcul de l'importance par permutation (Modèle agnostique)
+# n_repeats=10 : On mélange 10 fois chaque variable pour être sûr
+perm_importance = permutation_importance(
+    best_svm, X_test, y_test, n_repeats=10, random_state=42
+)
+
+# Organisation des données
+sorted_idx = perm_importance.importances_mean.argsort()
+
+plt.figure(figsize=(10, 6))
+plt.boxplot(
+    perm_importance.importances[sorted_idx].T,
+    vert=False,
+    labels=X_test.columns[sorted_idx]
+)
+plt.title("Permutation Importance (Test Set)")
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP (KernelExplainer)',
+                                    markdown: `### 🐢 SHAP & SVM
+Le SVM n'étant pas un arbre, on doit utiliser \`KernelExplainer\`.
+*   ⚠️ **Très lent** : Il doit tester des milliers de combinaisons (coalitions) de variables.
+*   **Astuce** : Utilisez \`shap.kmeans(X_train, 10)\` pour résumer le background et accélérer.`,
+                                    code: `import shap
+
+# On utilise le modèle interne du pipeline (best_svm.steps[1][1] ou best_svm.named_steps['svc'])
+
+model_svc = best_svm.named_steps['svc']
+
+# Le KernelExplainer a besoin de données de référence pour comparer (Background)
+# On prend un résumé (KMeans) ou un échantillon (sample) du train set pour aller plus vite
+X_train_summary = shap.kmeans(X_train, 10) 
+
+# Le modèle doit prédire des probabilités (probability=True)
+explainer = shap.KernelExplainer(model_svc.predict_proba, X_train_summary)
+
+# Calcul (peut être long !)
+shap_values = explainer.shap_values(X_test)
+
+# Visualisation (Classe 1)
+shap.summary_plot(shap_values[1], X_test)`
+                                }
+                            ]
                         },
                         {
                             id: 'perceptron',
                             title: 'Perceptron',
-                            description: 'L\'ancêtre des réseaux de neurones.',
+                            description: 'L\'ancêtre des réseaux de neurones (Linéaire).',
                             level: 'intermediate',
                             tags: ['ml', 'classification', 'linear', 'sklearn'],
-                            markdown: `### 🧠 Neurone Artificiel Simple
-
-Le Perceptron est un classifieur linéaire simple.
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 🧠 Le Perceptron Simple
+Un classifieur linéaire simple qui apprend en ajustant ses poids erreur par erreur (SGD).
 $$ f(x) = \\begin{cases} 1 & \\text{si } w \\cdot x + b > 0 \\\\ 0 & \\text{sinon} \\end{cases} $$
+*   ⚠️ **Limitations** : Ne peut séparer que des problèmes *linéairement séparables* (pas de XOR). Pour des cas complexes, utilisez un **MLP (Multi-Layer Perceptron)**.`,
+                                    code: `from sklearn.linear_model import Perceptron
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
 
-Il met à jour ses poids $w$ uniquement quand il se trompe.
+# penalty : 'l2' (Ridge), 'l1' (Lasso), ou 'elasticnet' pour régulariser
+# alpha : force de la régularisation
+# max_iter : nombre de passes sur les données
+# tol : seuil d'arrêt si l'erreur ne diminue plus
+perc_full = make_pipeline(
+    StandardScaler(),
+    Perceptron(
+        penalty='l2',        
+        alpha=0.0001,
+        max_iter=1000,
+        tol=1e-3,
+        random_state=42,
+        class_weight='balanced',
+        eta0=1.0             # Learning rate initial
+    )
+)
+perc_full.fit(X_train, y_train)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    code: `from sklearn.model_selection import GridSearchCV
 
----
-*   📍 **Situation** : Historique ou problèmes linéairement séparables très simples.
-*   ✅ **Qualité** : Simple, base du Deep Learning.
-*   ❌ **Défaut** : Ne converge pas si les données ne sont pas linéairement séparables.`,
-                            code: `from sklearn.linear_model import Perceptron
+param_grid = {
+    'perceptron__penalty': ['l2', 'l1', 'elasticnet', None],
+    'perceptron__alpha': [0.0001, 0.001, 0.01, 0.1],
+    'perceptron__max_iter': [1000, 2000]
+}
 
-perc = Perceptron(tol=1e-3, random_state=0)
-perc.fit(X_train_scaled, y_train)`
+grid = GridSearchCV(
+    perc_full,
+    param_grid,
+    cv=5,
+    scoring='f1_macro',
+    n_jobs=-1
+)
+grid.fit(X_train, y_train)
+
+print(f"Meilleurs Params : {grid.best_params_}")
+best_perc = grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance (Poids)',
+                                    markdown: `### ⚖️ Poids des coefficients
+Le Perceptron étant un modèle linéaire, l'importance est directement liée à la valeur absolue des coefficients (si les données sont standardisées).`,
+                                    code: `import pandas as pd
+import matplotlib.pyplot as plt
+
+# Accès au modèle dans le pipeline
+model = best_perc.named_steps['perceptron']
+
+# Les coefficients sont dans model.coef_
+# (Pour une classification binaire, coef_ est de forme [1, n_features])
+coeffs = pd.Series(model.coef_[0], index=X_train.columns)
+
+# Importance = Valeur absolue (magnitude de l'impact)
+importance = coeffs.abs().sort_values(ascending=False)
+
+print(importance.head(5))
+
+# Visualisation (avec le signe pour voir la direction)
+plt.figure(figsize=(10, 6))
+coeffs.sort_values().plot(kind='barh')
+plt.title("Poids des Coefficients (Signe = Direction)")
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP (LinearExplainer)',
+                                    markdown: `### ⚡ SHAP & Modèles Linéaires
+Pour les modèles linéaires, on peut utiliser \`LinearExplainer\`.
+*   C'est très rapide et exact.
+*   Note : Souvent \`shap_values\` est directement proportionnel à \`coef_ * (x - mean)\`.`,
+                                    code: `import shap
+
+# Modèle linéaire + Données Standardisées
+model = best_perc.named_steps['perceptron']
+X_test_scaled = best_perc.named_steps['standardscaler'].transform(X_test)
+
+# LinearExplainer est optimisé pour ces modèles
+explainer = shap.LinearExplainer(model, X_train_scaled) # X_train_scaled si possible pour background
+
+shap_values = explainer.shap_values(X_test_scaled)
+
+# Beeswarm
+shap.summary_plot(shap_values, X_test_scaled, feature_names=X_test.columns)`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'xgboost',
+                            title: 'XGBoost (Gradient Boosting)',
+                            description: 'La star des compétitions Kaggle.',
+                            level: 'advanced',
+                            tags: ['ml', 'classification', 'boosting', 'xgboost'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres Complets',
+                                    markdown: `### 🚀 eXtreme Gradient Boosting
+Amélioration du Gradient Boosting (GBM). Il construit des arbres séquentiellement, chaque arbre corrigeant les erreurs des précédents.
+
+*   ✅ **Performance** : Souvent l'état de l'art sur données tabulaires.
+*   ✅ **Vitesse** : Optimisé (parallélisation, cache).
+*   ✅ **Régularisation** : Intègre L1/L2 pour éviter l'overfitting.`,
+                                    code: `from xgboost import XGBClassifier
+import pandas as pd
+
+# n_estimators : Nombre de boosts (arbres)
+# learning_rate (eta) : Réduit l'impact de chaque arbre (éviter overfitting)
+# max_depth : Profondeur des arbres (souvent faible pour le boosting, ex: 3-6)
+# subsample : % de lignes utilisées pour chaque arbre
+# colsample_bytree : % de colonnes utilisées pour chaque arbre
+# scale_pos_weight : Pour gérer le déséquilibre de classes (sum(neg) / sum(pos))
+xgb_full = XGBClassifier(
+    n_estimators=1000,
+    learning_rate=0.05,
+    max_depth=5,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    gamma=0,                # Réduction min de perte pour partitionner
+    reg_alpha=0,            # Régularisation L1
+    reg_lambda=1,           # Régularisation L2
+    objective='binary:logistic',
+    eval_metric='logloss',
+    early_stopping_rounds=50, # Arrête si le score validation ne monte plus
+    n_jobs=-1,
+    random_state=42,
+    scale_pos_weight=1      # Augmenter si classe 1 minoritaire
+)
+
+# Important : XGBoost a besoin d'un set de validation pour l'early_stopping
+xgb_full.fit(
+    X_train, y_train, 
+    eval_set=[(X_test, y_test)], 
+    verbose=False
+)`
+                                },
+                                {
+                                    title: '2. Grid Search (Optimisation)',
+                                    code: `from sklearn.model_selection import GridSearchCV
+
+# Paramètres à tuner en priorité
+param_grid = {
+    'n_estimators': [100, 500],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5, 7],
+    'subsample': [0.8, 1.0],
+    'colsample_bytree': [0.8, 1.0]
+}
+
+# Note : On désactive early_stopping_rounds ici pour simplifier scikit-learn grid search
+# ou on le passe dans fit_params si nécessaire via le pipeline
+xgb_grid = GridSearchCV(
+    XGBClassifier(random_state=42, n_jobs=-1, use_label_encoder=False, eval_metric='logloss'),
+    param_grid,
+    cv=3,
+    scoring='f1_macro',
+    n_jobs=-1
+)
+xgb_grid.fit(X_train, y_train)
+
+print(f"Meilleurs Params : {xgb_grid.best_params_}")
+best_xgb = xgb_grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance',
+                                    markdown: `### 📊 Importance (Gain/Poids)
+XGBoost offre plusieurs métriques d'importance.
+*   **Gain** : Amélioration moyenne de la précision apportée par la feature. (La meilleure par défaut).
+*   **Weight** : Nombre de fois où la feature est utilisée pour splitter.`,
+                                    code: `import xgboost as xgb
+import matplotlib.pyplot as plt
+
+# A. Via l'API Plotting de XGBoost (Très pratique)
+# importance_type='gain' (qualité) ou 'weight' (fréquence)
+xgb.plot_importance(best_xgb, importance_type='gain', max_num_features=10, height=0.5)
+plt.title("XGBoost Feature Importance (Gain)")
+plt.show()
+
+# B. Via Pandas
+imp_gain = best_xgb.get_booster().get_score(importance_type='gain')
+df_imp = pd.Series(imp_gain).sort_values(ascending=False)
+print(df_imp.head(5))`
+                                },
+                                {
+                                    title: '4. SHAP Values',
+                                    markdown: `### ⚡ SHAP & XGBoost
+XGBoost et SHAP sont parfaitement intégrés (TreeExplainer est optimisé pour XGBoost).
+C'est souvent le combo gagnant pour l'interprétabilité des "Black Boxes".`,
+                                    code: `import shap
+
+# 1. Explainer
+explainer = shap.TreeExplainer(best_xgb)
+
+# 2. SHAP Values
+shap_values = explainer.shap_values(X_test)
+
+# 3. Visualisation
+# Summary Plot
+shap.summary_plot(shap_values, X_test)`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'lightgbm',
+                            title: 'LightGBM (Microsoft)',
+                            description: 'Plus rapide et léger que XGBoost.',
+                            level: 'advanced',
+                            tags: ['ml', 'classification', 'boosting', 'lightgbm'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres & Différences',
+                                    markdown: `### 🍃 Leaf-wise vs Level-wise
+Contrairement à XGBoost (qui grandit par niveau/profondeur), LightGBM grandit par **feuille** (Leaf-wise).
+*   Il choisit la feuille qui réduit le plus la perte, quitte à faire un arbre asymétrique.
+*   🚀 **Avantage** : Beaucoup plus rapide (histogram-based) et souvent plus précis.
+*   ⚠️ **Risque** : Sur-apprentissage si on ne limite pas la profondeur (\`max_depth\`).`,
+                                    code: `from lightgbm import LGBMClassifier
+import pandas as pd
+
+# num_leaves : Paramètre PRINCIPAL (contrôle la complexité). ~ 2^max_depth.
+# max_depth : À limiter pour éviter l'overfitting (-1 = illimité).
+# learning_rate : Comme XGBoost.
+# min_child_samples : Minimum de data dans une feuille (pour éviter d'isoler des points uniques).
+lgbm = LGBMClassifier(
+    num_leaves=31,          # Standard par défaut
+    max_depth=-1,
+    learning_rate=0.05,
+    n_estimators=1000,
+    subsample=0.8,          # = bagging_fraction
+    colsample_bytree=0.8,   # = feature_fraction
+    random_state=42,
+    n_jobs=-1,
+    class_weight='balanced'
+)
+
+# Note: early_stopping_rounds est géré différemment selon version sklearn API
+lgbm.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    eval_metric='logloss'
+)`
+                                },
+                                {
+                                    title: '2. Grid Search',
+                                    code: `from sklearn.model_selection import GridSearchCV
+
+# LightGBM est très sensible à num_leaves et min_child_samples
+param_grid = {
+    'num_leaves': [20, 31, 50],
+    'max_depth': [-1, 10, 20],
+    'learning_rate': [0.01, 0.05, 0.1],
+    'min_child_samples': [20, 50]
+}
+
+grid = GridSearchCV(
+    LGBMClassifier(random_state=42, n_jobs=-1),
+    param_grid,
+    cv=3,
+    scoring='f1_macro'
+)
+grid.fit(X_train, y_train)
+
+print(f"Meilleurs Params : {grid.best_params_}")
+best_lgbm = grid.best_estimator_`
+                                },
+                                {
+                                    title: '3. Feature Importance (Split vs Gain)',
+                                    markdown: `### 📊 Split vs Gain
+LightGBM distingue clairement :
+*   **Split (défaut)** : Combien de fois la feature est utilisée.
+*   **Gain** : Combien d'information elle apporte (souvent plus pertinent).`,
+                                    code: `import lightgbm as lgb
+import matplotlib.pyplot as plt
+
+# Plot importance (par défaut split)
+lgb.plot_importance(best_lgbm, importance_type='split', title='Feature Importance (Split)', max_num_features=10)
+plt.show()
+
+# Plot importance (Gain)
+lgb.plot_importance(best_lgbm, importance_type='gain', title='Feature Importance (Gain)', max_num_features=10)
+plt.show()`
+                                },
+                                {
+                                    title: '4. SHAP (TreeExplainer)',
+                                    markdown: `### ⚡ SHAP Optimisé
+Comme XGBoost, LightGBM est compatible avec l'optimisation TreeExplainer.`,
+                                    code: `import shap
+
+explainer = shap.TreeExplainer(best_lgbm)
+shap_values = explainer.shap_values(X_test)
+
+# Attention : Pour la classification binaire, shap_values peut être une liste [class0, class1]
+# ou un tableau unique selon la version. Vérifiez la shape.
+if isinstance(shap_values, list):
+    vals = shap_values[1]
+else:
+    vals = shap_values
+
+shap.summary_plot(vals, X_test)`
+                                }
+                            ]
                         }
                     ]
                 },
@@ -1091,6 +2182,7 @@ perc.fit(X_train_scaled, y_train)`
                     id: 'unsupervised_classification',
                     title: '3. Classification Non Supervisée',
                     subCategory: 'Machine Learning',
+                    displayMode: 'list',
                     description: 'Regrouper des données sans étiquettes (Clustering).',
                     snippets: [
                         {
@@ -1121,40 +2213,98 @@ $$ d(A, B) = \\max_i |x_i - y_i| $$
 
 **5. Distance Cosinus**
 Mesure l'angle (indépendant de la magnitude). Utilisé en NLP.
-$$ d(A, B) = 1 - \\frac{A \\cdot B}{||A|| \\times ||B||} $$`
+$$ d(A, B) = 1 - \\frac{ A \\cdot B }{|| A || \\times || B ||} $$`
                         },
                         {
-                            id: 'kmeans_clouds',
-                            title: 'K-Moyennes & Nuées Dynamiques',
-                            description: 'Partitionnement itératif.',
+                            id: 'kmeans',
+                            title: 'K-Means (K-Moyennes)',
+                            description: 'Partitionnement itératif (Centroids).',
                             level: 'advanced',
                             tags: ['ml', 'clustering', 'kmeans', 'sklearn'],
-                            markdown: `### 🎯 K-Means
+                            cells: [
+                                {
+                                    title: '1. Paramètres & Algo',
+                                    markdown: `### 🎯 Trouver les Centres
+L'algorithme cherche à minimiser l' **Inertie Intra-Classe** (Variance au sein des clusters).
+$$ I = \\sum_{ k=1 } ^ { K } \\sum_{ x_i \\in C_k } || x_i - \\mu_k ||^ 2 $$
 
-L'algorithme cherche à minimiser l'**Inertie Intra-Classe** (Variance au sein des clusters).
-$$ I = \\sum_{k=1}^{K} \\sum_{x_i \\in C_k} ||x_i - \\mu_k||^2 $$
+*   \`n_clusters\` (K) : Nombre de groupes (indispensable !).
+*   \`n_init\` : Nombre de relances avec des centres différents (pour éviter les minima locaux).
+*   ⚠️ **Sensible** : Aux outliers et à l'échelle (StandardScaler obligatoire).`,
+                                    code: `from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
 
-**Paramètres Clés :**
-*   \`n_clusters\` (K) : Nombre de groupes (à définir a priori).
-*   \`init\` : Méthode d'initialisation ('k-means++' pour optimiser le départ).
+# StandardScaler est vital pour les distances euclidiennes
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-**Nuées Dynamiques** : C'est une généralisation du K-Means qui permet d'utiliser d'autres noyaux que la moyenne (ex: K-Medoids).
-
----
-*   📍 **Situation** : Gros volumes de données, on connait le nombre de clusters (ou on l'estime).
-*   ✅ **Qualité** : Rapide, scalable.
-*   ❌ **Défaut** : Sensible à l'initialisation, suppose des clusters sphériques, nécessite K.`,
-                            code: `from sklearn.cluster import KMeans
-
-# 1. Définir le modèle
-kmeans = KMeans(n_clusters=3, init='k-means++', random_state=42)
-
-# 2. Entraîner (Pas de y !)
+# n_init='auto' (ou 10) : Lance l'algo 10 fois et garde le meilleur résultat
+kmeans = KMeans(
+    n_clusters=3, 
+    init='k-means++', 
+    n_init=10, 
+    random_state=42
+)
 kmeans.fit(X_scaled)
 
-# 3. Récupérer les labels et les centres
+# Les labels (0, 1, 2...) pour chaque point
 labels = kmeans.labels_
-centres = kmeans.cluster_centers_`
+# Les coordonnées des centres
+centers = kmeans.cluster_centers_`
+                                },
+                                {
+                                    title: '2. Trouver K (Elbow)',
+                                    markdown: `### 🦾 La Méthode du Coude (Elbow)
+Comment choisir K ? On trace l'inertie en fonction de K.
+On cherche le point d'inflexion (le "coude") où le gain d'inertie commence à diminuer marginalement.`,
+                                    code: `import matplotlib.pyplot as plt
+
+inertias = []
+K_range = range(1, 10)
+
+for k in K_range:
+    model = KMeans(n_clusters=k, n_init=10, random_state=42)
+    model.fit(X_scaled)
+    inertias.append(model.inertia_)
+
+plt.figure(figsize=(8, 5))
+plt.plot(K_range, inertias, 'bo-')
+plt.xlabel('Nombre de Clusters K')
+plt.ylabel('Inertie (Distances au carré)')
+plt.title('Méthode du Coude (Elbow Method)')
+plt.show()`
+                                },
+                                {
+                                    title: '3. Silhouette Score',
+                                    markdown: `### 👤 Coefficient de Silhouette
+Mesure si un point est bien dans son cluster (proche de ses voisins) et loin des autres clusters.
+*   **+1** : Parfait.
+*   **0** : Frontière.
+*   **-1** : Mauvais cluster.`,
+                                    code: `from sklearn.metrics import silhouette_score
+
+# On calcule le score pour le K choisi (ex: 3)
+score = silhouette_score(X_scaled, kmeans.labels_)
+print(f"Silhouette Score (K=3) : {score:.3f}")`
+                                },
+                                {
+                                    title: '4. Visualisation',
+                                    code: `import seaborn as sns
+
+# On projette en 2D (si on a plus de 2 features, faire une PCA avant est mieux)
+# Ici on suppose X a 2 colonnes pour l'exemple simple
+X_df = pd.DataFrame(X_scaled, columns=['F1', 'F2'])
+X_df['Cluster'] = kmeans.labels_
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=X_df, x='F1', y='F2', hue='Cluster', palette='viridis')
+# Afficher les centres
+plt.scatter(centers[:, 0], centers[:, 1], c='red', s=200, marker='X', label='Centroids')
+plt.legend()
+plt.title("Visualisation K-Means")
+plt.show()`
+                                }
+                            ]
                         },
                         {
                             id: 'cah',
@@ -1162,73 +2312,185 @@ centres = kmeans.cluster_centers_`
                             description: 'Arbre de regroupement (Dendrogramme).',
                             level: 'advanced',
                             tags: ['ml', 'clustering', 'hierarchical', 'sklearn'],
-                            image: '/MemoCode/images/dendrogram.png',
-                            markdown: `### 🌳 Le Dendrogramme
-Visualisation de la hiérarchie des clusters.
-\`\`\`mermaid
-graph TD
-    A[Données] --> B[Cluster 1]
-    A --> C[Cluster 2]
-    B --> D[Point 1]
-    B --> E[Point 2]
-    C --> F[Point 3]
-    C --> G[Cluster 3]
-    G --> H[Point 4]
-    G --> I[Point 5]
-\`\`\`
-
-### 🌳 Agglomerative Clustering
-
-On part de N clusters (chaque point est seul) et on fusionne les plus proches itérativement.
+                            cells: [
+                                {
+                                    title: '1. Paramètres & Linkage',
+                                    markdown: `### 🌳 Agglomerative Clustering
+On part de N clusters (chaque point est seul) et on fusionne les plus proches.
 
 **Critères de Lien (Linkage) :**
-Comment calculer la distance entre deux clusters A et B ?
-*   **Ward** (Défaut) : Minimise l'augmentation de la variance interne. (Clusters compacts).
-*   **Single** (Saut minimum) : Distance entre les deux points les plus proches. (Effet chaîne).
-*   **Complete** (Saut maximum) : Distance entre les deux points les plus éloignés.
+*   **Ward** (Défaut) : Minimise la variance interne (Clusters compacts).
+*   **Single** : Distance min (Effet chaîne / serpent).
+*   **Complete** : Distance max (Clusters sphériques).`,
+                                    code: `from sklearn.cluster import AgglomerativeClustering
 
----
-*   📍 **Situation** : Petits datasets, besoin de visualiser la hiérarchie (Dendrogramme).
-*   ✅ **Qualité** : Pas besoin de choisir K au départ, visuel riche.
-*   ❌ **Défaut** : Très lent sur gros volumes (complexité cubique ou quadratique).`,
-                            code: `from sklearn.cluster import AgglomerativeClustering
-import scipy.cluster.hierarchy as sch
+# affinity='euclidean' (ou 'manhattan', 'cosine' si linkage!='ward')
+cah = AgglomerativeClustering(
+    n_clusters=3, 
+    metric='euclidean', # Remplace 'affinity' dans les versions récentes
+    linkage='ward'
+)
+labels = cah.fit_predict(X_scaled)`
+                                },
+                                {
+                                    title: '2. Dendrogramme',
+                                    markdown: `### 🧬 Le Dendrogramme
+Sert à visualiser la hiérarchie et **choisir le nombre de clusters** (en coupant l'arbre horizontalement).`,
+                                    code: `import scipy.cluster.hierarchy as sch
 import matplotlib.pyplot as plt
 
-# 1. Dendrogramme (Pour choisir le nombre de clusters)
-plt.figure(figsize=(10, 7))
+plt.figure(figsize=(12, 6))
+# 'ward' minimise la variance intra-cluster
 dendrogram = sch.dendrogram(sch.linkage(X_scaled, method='ward'))
-plt.show()
+plt.title('Dendrogramme')
+plt.xlabel('Points')
+plt.ylabel('Distance euclidienne')
+plt.axhline(y=10, color='r', linestyle='--') # Exemple de ligne de coupe
+plt.show()`
+                                },
+                                {
+                                    title: '3. Clusters vs KMeans',
+                                    markdown: `### 🆚 CAH vs K-Means
+*   **K-Means** : Rapide, mais aléatoire (besoin de n_init) et suppose des formes sphériques.
+*   **CAH** : Déterministe, pas besoin de K au départ (on le choisit après dendrogramme), mais très lent $O(N^3)$ sur gros datasets.`,
+                                    code: `# Pas de code spécifique, cf visualisation précédente`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'dbscan',
+                            title: 'DBSCAN (Densité)',
+                            description: 'Idéal pour le bruit et les formes complexes.',
+                            level: 'advanced',
+                            tags: ['ml', 'clustering', 'dbscan', 'sklearn'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres & Algo',
+                                    markdown: `### 🪐 Density-Based Spatial Clustering
+DBSCAN ne cherche pas des "boules" (comme K-Means) mais des zones de forte densité.
+Il propage les clusters tant qu'il y a assez de points voisins.
 
-# 2. Modèle
-cah = AgglomerativeClustering(n_clusters=3, linkage='ward')
-labels = cah.fit_predict(X_scaled)`
+*   **Avantages** :
+    *   Trouve le nombre de clusters tout seul.
+    *   Détecte le **Bruit** (points isolés = label -1).
+    *   Gère les formes en "banane" ou "cercle dans un cercle".
+
+**Paramètres Clés :**
+*   \`eps\` (Epsilon) : Rayon de voisinage (La distance max pour être voisin).
+*   \`min_samples\` : Nombre min de voisins dans ce rayon pour être un "cœur" (Core Point).`,
+                                    code: `from sklearn.cluster import DBSCAN
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+
+# eps est CRITIQUE. S'il est mal choisi -> Tout en bruit (-1) ou 1 seul cluster.
+# min_samples : Souvent 2 * nb_features
+db = DBSCAN(eps=0.5, min_samples=5)
+
+# Adapter aux données scalées !
+labels = db.fit_predict(X_scaled)
+
+# Compter les clusters (le bruit est -1)
+n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+n_noise = list(labels).count(-1)
+
+print(f"Clusters: {n_clusters}, Bruit: {n_noise}")`
+                                },
+                                {
+                                    title: '2. Trouver Epsilon (K-Dist)',
+                                    markdown: `### 📏 Méthode du K-Distance Graph
+Pour trouver le bon \`eps\`, on calcule la distance au k-ième voisin pour chaque point, on trie et on cherche le "coude".
+*   L'axe Y au niveau du coude donne une bonne valeur pour \`eps\`.`,
+                                    code: `import numpy as np
+
+# On prend k = min_samples
+neighbors = NearestNeighbors(n_neighbors=5)
+neighbors_fit = neighbors.fit(X_scaled)
+distances, indices = neighbors_fit.kneighbors(X_scaled)
+
+# On trie les distances (colonne des 5èmes voisins)
+distances = np.sort(distances[:, 4], axis=0)
+
+plt.figure(figsize=(10, 5))
+plt.plot(distances)
+plt.title("K-Distance Graph (Chercher le coude pour eps)")
+plt.xlabel("Points triés par distance")
+plt.ylabel("Epsilon (Distance au 5ème voisin)")
+plt.grid()
+plt.show()`
+                                },
+                                {
+                                    title: '3. Visualisation',
+                                    markdown: `### ⚫ Les Points Noirs (Bruit)
+DBSCAN est génial pour nettoyer un dataset en isolant les outliers avant une modélisation supervisée.`,
+                                    code: `import seaborn as sns
+
+# On visualise (le bruit est souvent en couleur distincte ou noir)
+X_df = pd.DataFrame(X_scaled, columns=['F1', 'F2'])
+X_df['Cluster'] = labels
+
+plt.figure(figsize=(10, 6))
+# Palette qualitative + couleur sombre pour -1 si possible
+sns.scatterplot(data=X_df, x='F1', y='F2', hue='Cluster', palette='tab10', style=(labels == -1))
+plt.title(f"DBSCAN : {n_clusters} Clusters + Bruit")
+plt.show()`
+                                }
+                            ]
                         },
                         {
                             id: 'kohonen',
                             title: 'Réseau de Kohonen (SOM)',
-                            description: 'Carte Auto-Organisatrice.',
-                            level: 'advanced',
-                            tags: ['ml', 'clustering', 'som'],
-                            markdown: `### 🗺️ Self-Organizing Map (SOM)
+                            description: 'Carte Auto-Organisatrice (MiniSom).',
+                            level: 'expert',
+                            tags: ['ml', 'clustering', 'som', 'neural-network'],
+                            cells: [
+                                {
+                                    title: '1. Paramètres & Concept',
+                                    markdown: `### 🗺️ Self-Organizing Map (SOM)
+Un réseau de neurones non supervisé qui projette des données de haute dimension sur une carte 2D (grille), en préservant la **topologie** (les voisins restent voisins).
 
-Un réseau de neurones non supervisé qui projette des données de haute dimension sur une carte 2D (grille de neurones), en préservant la **topologie** (les voisins restent voisins).
-
-**Concept :**
-Chaque neurone de la grille a un vecteur de poids. Le neurone le plus proche de la donnée d'entrée (Best Matching Unit) est "tiré" vers elle, entraînant ses voisins avec lui.
-
----
-*   📍 **Situation** : Visualisation de données complexes en 2D, réduction de dimension non-linéaire.
-*   ✅ **Qualité** : Préservation de la topologie, visualisation puissante.
-*   ❌ **Défaut** : Lent à entraîner, difficile à paramétrer.`,
-                            code: `# Nécessite une librairie externe comme 'minisom' ou 'sklearn-som'
-# pip install minisom
+*   **Learning Rate** : Vitesse d'adaptation (diminue avec le temps).
+*   **Sigma** : Rayon d'influence (diminue avec le temps).
+*   Nécessite souvent une librairie externe comme \`minisom\`.`,
+                                    code: `# pip install minisom
 from minisom import MiniSom
 
-# Grille 6x6, input_len = nb features
-som = MiniSom(x=6, y=6, input_len=X_scaled.shape[1], sigma=1.0, learning_rate=0.5)
+# Grille de 10x10 neurones
+# input_len = nombre de features (colonnes) de X
+som = MiniSom(x=10, y=10, input_len=X.shape[1], sigma=1.0, learning_rate=0.5)
+
+# Initialisation aléatoire
 som.random_weights_init(X_scaled)
-som.train_random(X_scaled, 100) # 100 itérations`
+
+# Entraînement (1000 itérations)
+print("Training...")
+som.train_random(X_scaled, 1000)`
+                                },
+                                {
+                                    title: '2. Visualisation (U-Matrix)',
+                                    markdown: `### 🏔️ U-Matrix (Unified Distance Matrix)
+Elle représente la distance moyenne entre chaque neurone et ses voisins.
+*   **Zones Claires** : Faible distance = Cluster dense (vallée).
+*   **Zones Sombres** : Forte distance = Frontière entre clusters (montagne).`,
+                                    code: `from pylab import bone, pcolor, colorbar, plot, show
+
+plt.figure(figsize=(10, 10))
+bone() # Fond blanc/gris
+pcolor(som.distance_map().T) # U-Matrix transposée
+colorbar() # Légende des distances
+
+# On peut ajouter les points par dessus pour voir où ils tombent
+# markers = ['o', 's'], colors = ['r', 'g'] (si on a des labels y pour vérifier)
+plt.title('Self-Organizing Map (U-Matrix)')
+show()`
+                                },
+                                {
+                                    title: '3. Winning Node',
+                                    markdown: `Chaque donnée "active" un neurone gagnant (BMU - Best Matching Unit).`,
+                                    code: `# Trouver les coordonnées du neurone gagnant pour la première donnée
+w_x, w_y = som.winner(X_scaled[0])
+print(f"La donnée 0 est mappée sur le neurone : ({w_x}, {w_y})")`
+                                }
+                            ]
                         }
                     ]
                 },
@@ -1452,18 +2714,63 @@ plt.show()`
                         {
                             id: 'roc_curve',
                             title: 'Courbe ROC & AUC',
-                            description: `Type : Classification Binaire
-                            Visuel : Courbe qui doit bomber vers le coin haut-gauche.`,
+                            description: 'Comprendre la performance binaire.',
                             level: 'advanced',
                             tags: ['ml', 'metrics', 'viz', 'sklearn'],
-                            code: `from sklearn.metrics import RocCurveDisplay
+                            cells: [
+                                {
+                                    title: '1. Concept : TPR vs FPR',
+                                    markdown: `### ⚖️ Le Compromis
+La courbe ROC visualise le compromis entre :
+*   **TPR (True Positive Rate)** : Capacité à trouver les coupables (Rappel).
+*   **FPR (False Positive Rate)** : Risque d'accuser des innocents (Fausses Alarmes).
+
+**Analogie Aéroport ✈️** :
+*   **Seuil bas (Laxiste)** : On ne fouille personne. TPR=0 (On rate les armes), FPR=0 (Personne n'est embêté).
+*   **Seuil haut (Parano)** : On fouille tout le monde. TPR=1 (On trouve tout), FPR=1 (Tout le monde est embêté).
+*   **La Courbe** : Montre comment le modèle évolue entre ces deux extrêmes. On veut que la courbe monte vite vers le haut (TPR augmente) sans aller vers la droite (FPR reste bas).`,
+                                    code: `from sklearn.metrics import RocCurveDisplay
+import matplotlib.pyplot as plt
 
 # Affiche la courbe ROC
-# Plus l'AUC (Area Under Curve) est proche de 1, meilleur est le modèle
+# Le modèle doit passer par .decision_function() ou .predict_proba()
 RocCurveDisplay.from_estimator(model, X_test, y_test)
-plt.title("Courbe ROC")
-plt.plot([0, 1], [0, 1], 'r--') # Ligne du hasard
+
+# La ligne rouge représente le hasard (AUC = 0.5)
+plt.plot([0, 1], [0, 1], 'r--', label='Hasard (Pile ou Face)')
+plt.title("Courbe ROC : Plus c'est bombé, mieux c'est !")
+plt.legend()
 plt.show()`
+                                },
+                                {
+                                    title: '2. Interprétation AUC',
+                                    markdown: `### 🏅 Le Score AUC (Area Under Curve)
+L'aire sous la courbe résume la performance en un seul chiffre.
+
+| Score AUC | Interprétation |
+| :--- | :--- |
+| **0.5** | 🎲 **Hasard complet**. Le modèle ne sert à rien. |
+| **0.6 - 0.7** | 😐 **Moyen**. Capte un signal faible. |
+| **0.7 - 0.8** | 🙂 **Bon**. Standard pour des données complexes. |
+| **0.8 - 0.9** | 🤩 **Excellent**. Très performant. |
+| **> 0.95** | 🚨 **Suspect**. Trop beau pour être vrai ? Vérifiez le Data Leakage ! |`,
+                                    code: `from sklearn.metrics import roc_auc_score
+
+# Calcul du score brut
+# Attention : on passe les PROBABILITÉS (colonne 1), pas les classes (0/1)
+y_prob = model.predict_proba(X_test)[:, 1]
+
+auc = roc_auc_score(y_test, y_prob)
+print(f"Score AUC : {auc:.3f}")
+
+if auc > 0.9:
+    print("Excellent modèle (ou fuite de données ?)")
+elif auc > 0.7:
+    print("Bon modèle.")
+else:
+    print("Modèle peu performant.")`
+                                }
+                            ]
                         },
                         {
                             id: 'feature_importance',
@@ -3168,7 +4475,7 @@ Une \`Session\` garde la connexion ouverte (Connection Pooling).
 graph LR
     A[Script] -->|Requete 1| S{Session}
     A -->|Requete 2| S
-    S -->|Connexion Persistante| B[Serveur]
+    S -->|Keep-Alive| B[Serveur]
 \`\`\``,
                             code: `import requests
 
@@ -3205,9 +4512,9 @@ FastAPI est devenu le standard moderne pour les APIs Python, remplaçant souvent
 
 \`\`\`mermaid
 graph LR
-    Client -->|Requete HTTP| FastAPI
-    FastAPI -->|Validation| Pydantic
-    Pydantic -->|Données propres| Route(Fonction)
+    Client -->|Requete| FastAPI
+    FastAPI -->|Check| Pydantic
+    Pydantic -->|OK| Route(Fonction)
     Route -->|JSON| Client
 \`\`\``,
                             code: `from fastapi import FastAPI
@@ -3241,17 +4548,17 @@ Vous définissez la **forme** de vos données (le Schéma), et FastAPI s'occupe 
 
 \`\`\`mermaid
 sequenceDiagram
-    participant Client
-    participant FastAPI
-    participant Pydantic
+    participant C as Client
+    participant F as FastAPI
+    participant P as Pydantic
     
-    Client->>FastAPI: POST /items (JSON)
-    FastAPI->>Pydantic: Valider le JSON
+    C->>F: POST /items
+    F->>P: Valider
     alt Invalide
-        Pydantic-->>Client: 422 Unprocessable Entity
+        P-->>C: 422 Error
     else Valide
-        Pydantic->>FastAPI: Objet Python typé
-        FastAPI->>Client: 200 OK
+        P->>F: Data OK
+        F-->>C: 200 OK
     end
 \`\`\``,
                             code: `from pydantic import BaseModel
@@ -3351,3 +4658,4 @@ except ValidationError as e:
         }
     ]
 };
+

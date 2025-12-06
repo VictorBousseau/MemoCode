@@ -46,10 +46,21 @@ export default function MermaidDiagram({ chart }) {
         );
     }
 
+    // Use inline styles to ensure they're not overridden and the diagram displays properly
     return (
         <div
-            className="mermaid my-4 flex justify-center bg-zinc-900/50 p-4 rounded-lg border border-zinc-800 overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: svg }}
-        />
+            className="my-4 bg-zinc-900/50 rounded-lg border border-zinc-800"
+            style={{ overflowX: 'auto' }}
+        >
+            <div
+                className="p-4"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    minWidth: 'max-content'
+                }}
+                dangerouslySetInnerHTML={{ __html: svg }}
+            />
+        </div>
     );
 }

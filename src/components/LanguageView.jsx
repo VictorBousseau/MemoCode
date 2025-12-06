@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
 import FilterPanel from './FilterPanel';
-import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star, Filter } from 'lucide-react';
+import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star, Filter, ArrowLeft } from 'lucide-react';
 import { useFavorites } from '../hooks/useFavorites';
 import { useHistory } from '../hooks/useHistory';
 import { useNotes } from '../hooks/useNotes';
@@ -78,6 +78,12 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
     );
     const [activeCategoryId, setActiveCategoryId] = useState(content.themes[0]?.categories[0]?.id);
     const [sortBy, setSortBy] = useState('manual'); // 'manual' | 'priority'
+    const [selectedSnippetId, setSelectedSnippetId] = useState(null);
+
+    // Reset selection when category changes
+    useEffect(() => {
+        setSelectedSnippetId(null);
+    }, [activeCategoryId]);
 
     // Filter State
     const [showFilters, setShowFilters] = useState(false);
@@ -532,8 +538,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                 )}
                             </div>
                         </>
-                    ) : activeCategory ? (
-                        /* Regular Category View */
+                    ) : activeCategory && (!activeCategory.displayMode || activeCategory.displayMode === 'grid') ? (
+                        /* Regular Category View (Grid) */
                         <>
                             <div className="mb-8 border-b border-zinc-800 pb-6 flex justify-between items-end">
                                 <div>
@@ -613,6 +619,73 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                 </DragOverlay>
                             </DndContext>
                         </>
+                    ) : activeCategory && activeCategory.displayMode === 'list' ? (
+                        /* List Mode (Menu View) */
+                        !selectedSnippetId ? (
+                            <div className="space-y-6">
+                                <div className="mb-8 border-b border-zinc-800 pb-6">
+                                    <h2 className="text-2xl font-bold text-white mb-2">
+                                        {activeCategory.title}
+                                    </h2>
+                                    <p className="text-zinc-400">
+                                        {activeCategory.description}
+                                    </p>
+                                </div>
+                                <div className="grid gap-4">
+                                    {sortedSnippets.map((snippet) => (
+                                        <button
+                                            key={snippet.id}
+                                            onClick={() => setSelectedSnippetId(snippet.id)}
+                                            className="w-full text-left p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl hover:bg-zinc-900 hover:border-zinc-700 hover:scale-[1.01] transition-all duration-300 group"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors mb-2">
+                                                        {snippet.title}
+                                                    </h3>
+                                                    <p className="text-zinc-400">
+                                                        {snippet.description}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            /* Detail View for List Mode */
+                            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <button
+                                    onClick={() => setSelectedSnippetId(null)}
+                                    className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors group mb-4"
+                                >
+                                    <div className="p-2 rounded-lg bg-zinc-800/50 group-hover:bg-zinc-800 border border-zinc-700/50 group-hover:border-zinc-700 transition-all">
+                                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                                    </div>
+                                    <span>Retour au menu</span>
+                                </button>
+
+                                {(() => {
+                                    const snippet = sortedSnippets.find(s => s.id === selectedSnippetId);
+                                    if (!snippet) return null;
+                                    return (
+                                        <CodeCard
+                                            snippet={snippet}
+                                            language={snippet.language || language}
+                                            isFavorite={isFavorite(snippet.id)}
+                                            onToggleFavorite={() => toggleFavorite(snippet)}
+                                            onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
+                                            note={getNote(snippet.id)}
+                                            onNoteChange={(text) => setNote(snippet.id, text)}
+                                            theme={activeTheme.title}
+                                            priority={getPriority(snippet.id)}
+                                            onPriorityChange={(level) => setPriority(snippet.id, level)}
+                                        />
+                                    );
+                                })()}
+                            </div>
+                        )
                     ) : (
                         <div className="text-zinc-500">Sélectionnez une catégorie.</div>
                     )}
