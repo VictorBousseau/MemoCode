@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Layout from './components/Layout';
 import LanguageView from './components/LanguageView';
+import { NavigationContext } from './context/NavigationContext';
 import { pythonContent } from './data/pythonContent';
 import { sqlContent } from './data/sqlContent';
 import { gitContent } from './data/gitContent';
@@ -13,6 +14,9 @@ import { mContent } from './data/mContent';
 import { nosqlContent } from './data/nosqlContent';
 import Overview from './components/Overview';
 import CodeGenerator from './components/CodeGenerator';
+import QuizList from './components/QuizList';
+import FlashcardDeck from './components/FlashcardDeck';
+import CodePlayground from './components/CodePlayground';
 
 export default function App() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
@@ -72,52 +76,94 @@ export default function App() {
     }
   };
 
+  const [navigationParams, setNavigationParams] = useState(null);
+
+  const navigate = (view, params = null) => {
+    setSelectedLanguage(view);
+    setNavigationParams(params);
+  };
+
   return (
-    <Layout
-      selectedLanguage={selectedLanguage}
-      onSelectLanguage={setSelectedLanguage}
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-    >
-      <AnimatePresence mode="wait">
-        {selectedLanguage === 'Overview' && !searchQuery ? (
-          <motion.div
-            key="overview"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Overview onNavigate={setSelectedLanguage} />
-          </motion.div>
-        ) : selectedLanguage === 'CodeCreation' ? (
-          <motion.div
-            key="code-generator"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <CodeGenerator />
-          </motion.div>
-        ) : (
-          <motion.div
-            key={selectedLanguage}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <LanguageView
-              content={getContent()}
-              searchQuery={searchQuery}
-              languageName={selectedLanguage}
-              onNavigate={setSelectedLanguage}
-              onSearch={setSearchQuery}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Layout>
+    <NavigationContext.Provider value={{ currentView: selectedLanguage, navigate }}>
+      <Layout
+        selectedLanguage={selectedLanguage}
+        onSelectLanguage={setSelectedLanguage}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      >
+        <AnimatePresence mode="wait">
+          {selectedLanguage === 'Overview' && !searchQuery ? (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Overview onNavigate={setSelectedLanguage} />
+            </motion.div>
+          ) : selectedLanguage === 'CodeCreation' ? (
+            <motion.div
+              key="code-generator"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CodeGenerator />
+            </motion.div>
+          ) : selectedLanguage === 'Quiz' ? (
+            <motion.div
+              key="quiz"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <QuizList />
+            </motion.div>
+          ) : selectedLanguage === 'Flashcards' ? (
+            <motion.div
+              key="flashcards"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FlashcardDeck />
+            </motion.div>
+          ) : selectedLanguage === 'Playground' ? (
+            <motion.div
+              key="playground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CodePlayground
+                initialCode={navigationParams?.code}
+                initialLanguage={navigationParams?.language}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={selectedLanguage}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LanguageView
+                content={getContent()}
+                searchQuery={searchQuery}
+                languageName={selectedLanguage}
+                onNavigate={setSelectedLanguage}
+                onSearch={setSearchQuery}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Layout>
+    </NavigationContext.Provider>
   );
 }

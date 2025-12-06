@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import CodeCard from './CodeCard';
 import FilterPanel from './FilterPanel';
+import TagHierarchy from './TagHierarchy';
+import TagFilter from './TagFilter';
 import { ChevronRight, Layers, BarChart, BrainCircuit, FileCode, Lightbulb, Settings, Zap, Table, Code, Binary, TrendingUp, Layout, Terminal, Star, Filter, ArrowLeft } from 'lucide-react';
 import { useFavorites } from '../hooks/useFavorites';
 import { useHistory } from '../hooks/useHistory';
 import { useNotes } from '../hooks/useNotes';
 import { useUserData } from '../hooks/useUserData';
+import { useTagFilter } from '../hooks/useTagFilter';
+import { countSnippetsByTag } from '../data/tagHierarchy';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -61,6 +65,28 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
     const { getNote, setNote } = useNotes();
     const { getPriority, setPriority, getSortOrder, updateSortOrder } = useUserData();
 
+    // Tag filtering system
+    const {
+        selectedTags,
+        filterMode,
+        expandedNodes,
+        toggleTag,
+        clearTags,
+        toggleFilterMode,
+        toggleNode,
+        filterSnippets,
+        hasActiveFilters: hasTagFilters
+    } = useTagFilter();
+
+    // Compute tag counts for badges
+    const tagCounts = React.useMemo(() => {
+        const allSnippets = content.themes.flatMap(theme =>
+            theme.categories.flatMap(category => category.snippets)
+        );
+        return countSnippetsByTag(allSnippets);
+    }, [content]);
+
+
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -114,9 +140,28 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
 
     // Sort snippets based on saved order or priority
     const sortedSnippets = React.useMemo(() => {
-        if (!activeCategory) return [];
+        let snippets = [];
 
-        let snippets = [...activeCategory.snippets];
+        // If tag filters are active, show ALL matching snippets from ALL categories
+        if (hasTagFilters) {
+            // Collect all snippets from all categories
+            const allSnippets = content.themes.flatMap(theme =>
+                theme.categories.flatMap(category =>
+                    category.snippets.map(snippet => ({
+                        ...snippet,
+                        themeTitle: theme.title,
+                        categoryTitle: category.title
+                    }))
+                )
+            );
+
+            // Apply tag filters
+            snippets = filterSnippets(allSnippets);
+        } else {
+            // No filters: show only current category snippets
+            if (!activeCategory) return [];
+            snippets = [...activeCategory.snippets];
+        }
 
         // 1. Apply Priority Sort if active
         if (sortBy === 'priority') {
@@ -124,26 +169,28 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                 const pA = getPriority(a.id);
                 const pB = getPriority(b.id);
                 if (pA !== pB) return pB - pA; // Descending priority
-                // Secondary sort: keep original order or alphabetical
                 return 0;
             });
         }
 
-        // 2. Apply Manual Sort (default)
-        const savedOrder = getSortOrder(activeCategory.id);
-        if (!savedOrder) return snippets;
+        // 2. Apply Manual Sort (default) - only for non-filtered view
+        if (!hasTagFilters && activeCategory) {
+            const savedOrder = getSortOrder(activeCategory.id);
+            if (savedOrder) {
+                const snippetMap = new Map(snippets.map(s => [s.id, s]));
+                const sorted = savedOrder
+                    .map(id => snippetMap.get(id))
+                    .filter(s => s !== undefined);
 
-        const snippetMap = new Map(snippets.map(s => [s.id, s]));
-        const sorted = savedOrder
-            .map(id => snippetMap.get(id))
-            .filter(s => s !== undefined);
+                const savedIds = new Set(savedOrder);
+                const newSnippets = snippets.filter(s => !savedIds.has(s.id));
 
-        // Add any new snippets that weren't in the saved order
-        const savedIds = new Set(savedOrder);
-        const newSnippets = snippets.filter(s => !savedIds.has(s.id));
+                return [...sorted, ...newSnippets];
+            }
+        }
 
-        return [...sorted, ...newSnippets];
-    }, [activeCategory, getSortOrder, sortBy, getPriority]);
+        return snippets;
+    }, [activeCategory, content, getSortOrder, sortBy, getPriority, filterSnippets, hasTagFilters]);
 
     const handleDragEnd = (event) => {
         const { active, over } = event;
@@ -390,7 +437,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
             <div className="flex gap-8 items-start">
                 {/* Category Sidebar (Left Navigation) - Hidden for Favorites and History */}
                 {activeThemeId !== FAVORITES_ID && activeThemeId !== HISTORY_ID && (
-                    <div className="w-64 flex-shrink-0 sticky top-8">
+                    <div className="w-64 flex-shrink-0 sticky top-8 space-y-6">
+                        {/* Categories */}
                         <div className="space-y-1">
                             <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
                                 {activeTheme?.title}
@@ -410,6 +458,32 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                     )}
                                 </button>
                             ))}
+                        </div>
+
+                        {/* Tag Filters Section */}
+                        <div className="space-y-3">
+                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-3">
+                                Filtres par tags
+                            </h3>
+
+                            {/* Active Filters Display */}
+                            <TagFilter
+                                selectedTags={selectedTags}
+                                filterMode={filterMode}
+                                onClearTags={clearTags}
+                                onToggleMode={toggleFilterMode}
+                            />
+
+                            {/* Tag Hierarchy Tree */}
+                            <div className="bg-zinc-900/30 border border-zinc-800 rounded-lg p-3 max-h-96 overflow-y-auto">
+                                <TagHierarchy
+                                    selectedTags={selectedTags}
+                                    expandedNodes={expandedNodes}
+                                    onToggleTag={toggleTag}
+                                    onToggleNode={toggleNode}
+                                    tagCounts={tagCounts}
+                                />
+                            </div>
                         </div>
                     </div>
                 )}
@@ -589,19 +663,29 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                                     )}
                                                     <SortableItem id={snippet.id}>
                                                         {(dragHandleProps) => (
-                                                            <CodeCard
-                                                                snippet={snippet}
-                                                                language={snippet.language || language}
-                                                                isFavorite={isFavorite(snippet.id)}
-                                                                onToggleFavorite={() => toggleFavorite(snippet)}
-                                                                onClick={() => addToHistory(snippet, activeTheme.title, activeCategory.title)}
-                                                                note={getNote(snippet.id)}
-                                                                onNoteChange={(text) => setNote(snippet.id, text)}
-                                                                theme={activeTheme.title}
-                                                                priority={getPriority(snippet.id)}
-                                                                onPriorityChange={(level) => setPriority(snippet.id, level)}
-                                                                dragHandleProps={sortBy === 'manual' ? dragHandleProps : undefined}
-                                                            />
+                                                            <>
+                                                                {/* Show breadcrumb when filters are active */}
+                                                                {hasTagFilters && snippet.themeTitle && snippet.categoryTitle && (
+                                                                    <div className="text-xs text-zinc-500 mb-2 flex items-center gap-2">
+                                                                        <span>{snippet.themeTitle}</span>
+                                                                        <ChevronRight className="w-3 h-3" />
+                                                                        <span>{snippet.categoryTitle}</span>
+                                                                    </div>
+                                                                )}
+                                                                <CodeCard
+                                                                    snippet={snippet}
+                                                                    language={snippet.language || language}
+                                                                    isFavorite={isFavorite(snippet.id)}
+                                                                    onToggleFavorite={() => toggleFavorite(snippet)}
+                                                                    onClick={() => addToHistory(snippet, snippet.themeTitle || activeTheme?.title, snippet.categoryTitle || activeCategory?.title)}
+                                                                    note={getNote(snippet.id)}
+                                                                    onNoteChange={(text) => setNote(snippet.id, text)}
+                                                                    theme={snippet.themeTitle || activeTheme?.title}
+                                                                    priority={getPriority(snippet.id)}
+                                                                    onPriorityChange={(level) => setPriority(snippet.id, level)}
+                                                                    dragHandleProps={sortBy === 'manual' && !hasTagFilters ? dragHandleProps : undefined}
+                                                                />
+                                                            </>
                                                         )}
                                                     </SortableItem>
                                                 </React.Fragment>

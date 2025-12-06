@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2 } from 'lucide-react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2, Brain, BookMarked, Code2 } from 'lucide-react';
 import DataSettings from './DataSettings';
 
 const languages = [
@@ -61,6 +61,39 @@ export default function Sidebar({ selectedLanguage, onSelectLanguage, onClose })
                 >
                     <Wand2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                     <span className="font-medium">Création de code</span>
+                </button>
+
+                <button
+                    onClick={() => onSelectLanguage('Quiz')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'Quiz'
+                        ? 'bg-green-600/10 text-green-400 border border-green-600/20'
+                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        }`}
+                >
+                    <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Quiz & Exercices</span>
+                </button>
+
+                <button
+                    onClick={() => onSelectLanguage('Flashcards')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'Flashcards'
+                        ? 'bg-orange-600/10 text-orange-400 border border-orange-600/20'
+                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        }`}
+                >
+                    <BookMarked className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Flashcards</span>
+                </button>
+
+                <button
+                    onClick={() => onSelectLanguage('Playground')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'Playground'
+                        ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
+                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                        }`}
+                >
+                    <Code2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-medium">Playground</span>
                 </button>
 
                 <div className="h-px bg-zinc-800 my-2 mx-2" />
