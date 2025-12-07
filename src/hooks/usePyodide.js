@@ -8,6 +8,7 @@ export function usePyodide() {
     const [isReady, setIsReady] = useState(false);
     const [error, setError] = useState(null);
     const [output, setOutput] = useState('');
+    const [plot, setPlot] = useState(null);
     const [isExecuting, setIsExecuting] = useState(false);
 
     const pyodideRef = useRef(null);
@@ -29,8 +30,30 @@ export function usePyodide() {
                     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
                 });
 
-                // Load pandas
-                await pyodide.loadPackage(['pandas', 'numpy']);
+                // Load basic packages
+                await pyodide.loadPackage(['pandas', 'numpy', 'matplotlib', 'micropip']);
+
+                // Install complex packages via micropip
+                const micropip = pyodide.pyimport("micropip");
+                await micropip.install(['seaborn', 'plotly', 'scikit-learn', 'statsmodels']);
+
+                // Monkey-patch plotly.show to return JSON
+                await pyodide.runPythonAsync(`
+import plotly.graph_objects as go
+import plotly.io as pio
+import json
+import sys
+
+def custom_show(self, *args, **kwargs):
+    # Print a magic string that we can capture in JS
+    print("##PLOTLY_JSON_START##")
+    print(self.to_json())
+    print("##PLOTLY_JSON_END##")
+
+# Patch the method
+go.Figure.show = custom_show
+                `);
+
 
                 if (mounted) {
                     pyodideRef.current = pyodide;
@@ -62,6 +85,7 @@ export function usePyodide() {
 
         setIsExecuting(true);
         setError(null);
+        setPlot(null);
         stdoutRef.current = [];
 
         try {
@@ -87,11 +111,28 @@ sys.stdout = StringIO()
 sys.stdout = StringIO()
             `);
 
-            // Format output
+            // Format output & Parse Plotly JSON
             let outputText = '';
+            let plotData = null;
 
             if (stdout) {
-                outputText += stdout;
+                const plotStart = stdout.indexOf('##PLOTLY_JSON_START##');
+                const plotEnd = stdout.indexOf('##PLOTLY_JSON_END##');
+
+                if (plotStart !== -1 && plotEnd !== -1) {
+                    // Extract JSON
+                    const jsonString = stdout.substring(plotStart + 21, plotEnd).trim();
+                    try {
+                        plotData = JSON.parse(jsonString);
+                    } catch (e) {
+                        console.error("Failed to parse Plotly JSON", e);
+                    }
+
+                    // Remove plot data from visible output
+                    outputText = stdout.substring(0, plotStart) + stdout.substring(plotEnd + 19);
+                } else {
+                    outputText = stdout;
+                }
             }
 
             // If there's a result (last expression), show it
@@ -112,14 +153,16 @@ else:
                 }
             }
 
-            setOutput(outputText || '✅ Code exécuté avec succès (pas de sortie)');
+            setOutput(outputText || (plotData ? '✅ Graphique généré' : '✅ Code exécuté avec succès (pas de sortie)'));
+            setPlot(plotData);
             setIsExecuting(false);
 
             return {
                 success: true,
                 output: outputText,
                 executionTime,
-                result
+                result,
+                plot: plotData
             };
 
         } catch (err) {
@@ -148,6 +191,7 @@ else:
     const clearOutput = useCallback(() => {
         setOutput('');
         setError(null);
+        setPlot(null);
     }, []);
 
     return {
@@ -156,6 +200,7 @@ else:
         isExecuting,
         error,
         output,
+        plot,
         runPython,
         clearOutput
     };

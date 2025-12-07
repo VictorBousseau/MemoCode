@@ -18,10 +18,10 @@ FROM employees;`,
 
     where_clause: {
         title: 'WHERE - Filtrer les données',
-        code: `-- Employés du département IT
-SELECT name, department, salary
+        code: `-- Employés avec un salaire > 60000
+SELECT name, salary, hire_date
 FROM employees
-WHERE department = 'IT';`,
+WHERE salary > 60000;`,
         description: 'Filtrer avec WHERE'
     },
 
@@ -48,13 +48,14 @@ FROM employees;`,
 
     group_by: {
         title: 'GROUP BY - Grouper les données',
-        code: `-- Nombre d'employés par département
+        code: `-- Nombre d'employés par département (avec Jointure)
 SELECT 
-    department,
-    COUNT(*) as nombre,
-    AVG(salary) as salaire_moyen
-FROM employees
-GROUP BY department
+    d.name as department,
+    COUNT(e.id) as nombre,
+    AVG(e.salary) as salaire_moyen
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+GROUP BY d.name
 ORDER BY nombre DESC;`,
         description: 'Grouper et agréger'
     },
@@ -63,7 +64,7 @@ ORDER BY nombre DESC;`,
         title: 'JOIN - Joindre des tables',
         code: `-- Ventes avec nom de l'employé
 SELECT 
-    e.name,
+    e.name as employee,
     s.product,
     s.amount,
     s.sale_date
@@ -75,15 +76,16 @@ ORDER BY s.sale_date DESC;`,
 
     join_aggregate: {
         title: 'JOIN + GROUP BY',
-        code: `-- Total des ventes par employé
+        code: `-- Total des ventes par employé et département
 SELECT 
     e.name,
-    e.department,
+    d.name as department,
     COUNT(s.id) as nombre_ventes,
     SUM(s.amount) as total_ventes
 FROM employees e
-LEFT JOIN sales s ON e.employee_id = s.id
-GROUP BY e.id, e.name, e.department
+JOIN departments d ON e.department_id = d.id
+LEFT JOIN sales s ON e.id = s.employee_id
+GROUP BY e.id, e.name, d.name
 ORDER BY total_ventes DESC;`,
         description: 'Jointure avec agrégation'
     },
@@ -105,12 +107,13 @@ ORDER BY salary DESC;`,
         title: 'HAVING - Filtrer les groupes',
         code: `-- Départements avec salaire moyen > 60000
 SELECT 
-    department,
-    COUNT(*) as nombre,
-    AVG(salary) as salaire_moyen
-FROM employees
-GROUP BY department
-HAVING AVG(salary) > 60000;`,
+    d.name as department,
+    COUNT(e.id) as nombre,
+    AVG(e.salary) as salaire_moyen
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+GROUP BY d.name
+HAVING AVG(e.salary) > 60000;`,
         description: 'Filtrer après GROUP BY'
     }
 };

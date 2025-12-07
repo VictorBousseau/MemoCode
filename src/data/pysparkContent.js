@@ -17,6 +17,7 @@ export const pysparkContent = {
                             title: 'Créer une SparkSession',
                             description: 'Le point d\'entrée de toute application Spark.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'session', 'setup'],
                             code: `from pyspark.sql import SparkSession
 
@@ -32,6 +33,7 @@ print(spark.version)`
                             title: 'Lire un CSV',
                             description: 'Charger un fichier avec inférence de schéma.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'read', 'csv'],
                             code: `df = spark.read.csv(
     "data.csv",
@@ -47,6 +49,7 @@ df.printSchema()`
                             title: 'Lire du Parquet',
                             description: 'Le format optimisé pour Spark.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'read', 'parquet'],
                             code: `df = spark.read.parquet("data.parquet")
 
@@ -64,6 +67,7 @@ df.printSchema()`
                             title: 'Sélectionner et Filtrer',
                             description: 'Les bases du DataFrame API.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'select', 'filter'],
                             code: `from pyspark.sql.functions import col
 
@@ -80,6 +84,7 @@ df.where("age > 18").show()`
                             title: 'Ajouter une colonne (withColumn)',
                             description: 'Créer ou modifier une colonne.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'with-column', 'transform'],
                             code: `from pyspark.sql.functions import lit
 
@@ -94,6 +99,7 @@ df = df.withColumn("age_double", col("age") * 2)`
                             title: 'Supprimer une colonne',
                             description: 'Nettoyer le DataFrame.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['pyspark', 'drop', 'transform'],
                             code: `df = df.drop("age_double")`
                         }
@@ -116,6 +122,7 @@ df = df.withColumn("age_double", col("age") * 2)`
                             title: 'Agrégations',
                             description: 'Compter, Sommer, Moyenne.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['pyspark', 'group-by', 'aggregation'],
                             code: `from pyspark.sql.functions import count, avg, max
 
@@ -132,6 +139,7 @@ df.groupBy("department") \\
                             title: 'Jointures',
                             description: 'Combiner deux DataFrames.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['pyspark', 'join', 'merge'],
                             code: `# Inner Join
 df_joined = df1.join(df2, on="id", how="inner")
@@ -144,6 +152,7 @@ df_joined = df1.join(df2, df1.id == df2.user_id, how="left")`
                             title: 'Window Functions',
                             description: 'Calculs sur des fenêtres glissantes.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['pyspark', 'window', 'advanced'],
                             code: `from pyspark.sql.window import Window
 from pyspark.sql.functions import row_number, rank
@@ -164,6 +173,7 @@ df.withColumn("rank", rank().over(windowSpec)).show()`
                             title: 'Cache & Persist',
                             description: 'Garder les données en mémoire.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['pyspark', 'cache', 'performance'],
                             code: `# Mettre en cache (Mémoire seulement)
 df.cache()
@@ -179,6 +189,7 @@ df.unpersist()`
                             title: 'Repartition & Coalesce',
                             description: 'Gérer le parallélisme.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['pyspark', 'partition', 'performance'],
                             code: `# Augmenter le nombre de partitions (Shuffle)
 df = df.repartition(100)
@@ -205,6 +216,7 @@ df = df.coalesce(1)`
                             title: 'UDF Standard (Lent)',
                             description: 'À éviter sur gros volumes (sérialisation Python).',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['pyspark', 'udf', 'python'],
                             code: `from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
@@ -221,6 +233,7 @@ df.withColumn("upper_name", upper_udf(col("name"))).show()`
                             title: 'Pandas UDF (Rapide)',
                             description: 'Utilise Arrow pour la performance.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['pyspark', 'pandas-udf', 'performance'],
                             code: `from pyspark.sql.functions import pandas_udf
 import pandas as pd
@@ -243,6 +256,7 @@ df.withColumn("age_plus_one", plus_one(col("age"))).show()`
                             title: 'Lire un Stream',
                             description: 'Surveiller un dossier.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['pyspark', 'streaming', 'read'],
                             code: `df_stream = spark.readStream \\
     .schema(schema) \\
@@ -253,6 +267,7 @@ df.withColumn("age_plus_one", plus_one(col("age"))).show()`
                             title: 'Écrire un Stream',
                             description: 'Démarrer le traitement.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['pyspark', 'streaming', 'write'],
                             code: `query = df_stream.writeStream \\
     .outputMode("append") \\

@@ -950,10 +950,10 @@ plt.show()`
 
 Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traitement des données jusqu'au modèle final.
 
-** Pourquoi est - ce indispensable ?**
-                    1. ** Zéro Fuite de Données(Data Leakage) ** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises * uniquement * sur le train set et appliquées aveuglément sur le test set.
-2. ** Reproductibilité ** : Tout le processus est contenu dans un seul objet.
-3. ** Simplicité ** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
+**Pourquoi est-ce indispensable ?**
+1. **Zéro Fuite de Données (Data Leakage)** : Le pipeline s'assure que les transformations (ex: moyenne pour l'imputation) sont apprises *uniquement* sur le train set et appliquées aveuglément sur le test set.
+2. **Reproductibilité** : Tout le processus est contenu dans un seul objet.
+3. **Simplicité** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
 
 #### 📝 En Résumé
 \`\`\`text

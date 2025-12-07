@@ -5,6 +5,7 @@ import { usePyodide } from '../hooks/usePyodide';
 import { useSqlJs } from '../hooks/useSqlJs';
 import { getPythonExample, getPythonExamplesList } from '../utils/pythonExamples';
 import { getSqlExample, getSqlExamplesList } from '../utils/sqlExamples';
+import Plot from 'react-plotly.js';
 
 export default function CodePlayground({ initialCode, initialLanguage }) {
     const [language, setLanguage] = useState(initialLanguage || 'python');
@@ -283,7 +284,7 @@ export default function CodePlayground({ initialCode, initialLanguage }) {
                     </div>
 
                     {/* Results Panel */}
-                    {(output || results || error) && (
+                    {(output || results || error || (isPython && pyodide.plot)) && (
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
                             <div className={`px-4 py-2 border-b flex items-center gap-2 ${error
                                 ? 'bg-red-600/20 border-red-500/30'
@@ -302,6 +303,24 @@ export default function CodePlayground({ initialCode, initialLanguage }) {
                                 )}
                             </div>
                             <div className="p-6">
+                                {isPython && pyodide.plot && (
+                                    <div className="mb-6 bg-white rounded-lg p-2 overflow-hidden">
+                                        <Plot
+                                            data={pyodide.plot.data}
+                                            layout={{
+                                                ...pyodide.plot.layout,
+                                                autosize: true,
+                                                width: undefined, // Let it fill container
+                                                height: undefined,
+                                                margin: { t: 40, r: 20, l: 40, b: 40 }
+                                            }}
+                                            useResizeHandler={true}
+                                            style={{ width: '100%', height: '500px' }}
+                                            config={{ responsive: true, displayModeBar: true }}
+                                        />
+                                    </div>
+                                )}
+
                                 {error ? (
                                     <pre className="text-red-300 font-mono text-sm whitespace-pre-wrap">{error}</pre>
                                 ) : isPython ? (

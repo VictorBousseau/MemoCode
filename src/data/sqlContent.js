@@ -20,15 +20,15 @@ export const sqlContent = {
                             tags: ['sql', 'select', 'basics'],
                             code: `-- Sélectionner toutes les colonnes (*)
 SELECT * 
-FROM users 
-LIMIT 10; -- Toujours limiter pour explorer !
+FROM employees 
+LIMIT 5; -- Toujours limiter pour explorer !
 
 -- Sélectionner des colonnes spécifiques (Recommandé)
 SELECT 
     id, 
     name, 
-    country 
-FROM users;`
+    salary 
+FROM employees;`
                         },
                         {
                             id: 'filtering',
@@ -37,15 +37,15 @@ FROM users;`
                             level: 'beginner',
                             tags: ['sql', 'where', 'filter'],
                             code: `SELECT * 
-FROM orders 
-WHERE status = 'completed' 
-  AND amount > 50 -- Condition ET
-  AND (country = 'France' OR country = 'Germany'); -- Parenthèses importantes pour le OU
+FROM sales 
+WHERE amount > 100 
+  AND product = 'Laptop' -- Condition ET
+  AND (employee_id = 2 OR employee_id = 5); -- Parenthèses importantes pour le OU
 
 -- Utilisation de IN pour une liste de valeurs
 SELECT * 
-FROM users 
-WHERE country IN ('France', 'Belgium', 'Switzerland');`
+FROM departments 
+WHERE location IN ('Paris', 'Lyon');`
                         },
                         {
                             id: 'null_handling',
@@ -53,16 +53,16 @@ WHERE country IN ('France', 'Belgium', 'Switzerland');`
                             description: 'Attention : NULL n\'est pas égal à 0 ou vide.',
                             level: 'beginner',
                             tags: ['sql', 'null', 'basics'],
-                            code: `-- ❌ NE PAS FAIRE : status = NULL (ne marche jamais)
+                            code: `-- ❌ NE PAS FAIRE : column = NULL (ne marche jamais)
 -- ✅ FAIRE : IS NULL ou IS NOT NULL
 
 SELECT * 
-FROM users 
-WHERE signup_date IS NULL; -- Utilisateurs sans date d'inscription
+FROM sales 
+WHERE employee_id IS NULL; -- Ventes sans vendeur assigné (si possible)
 
 SELECT * 
-FROM orders 
-WHERE status IS NOT NULL; -- Commandes avec un statut défini`
+FROM employees 
+WHERE department_id IS NOT NULL; -- Employés affectés à un département`
                         },
                         {
                             id: 'sorting_dedup',
@@ -72,12 +72,12 @@ WHERE status IS NOT NULL; -- Commandes avec un statut défini`
                             tags: ['sql', 'order-by', 'distinct'],
                             code: `-- Trier les résultats
 SELECT * 
-FROM orders 
-ORDER BY created_at DESC; -- Du plus récent au plus ancien (ASC pour croissant)
+FROM sales 
+ORDER BY amount DESC; -- Du plus grand au plus petit (ASC pour croissant)
 
 -- Supprimer les doublons
-SELECT DISTINCT country 
-FROM users; -- Liste unique des pays`
+SELECT DISTINCT location 
+FROM departments; -- Liste unique des lieux`
                         },
                         {
                             id: 'execution_order',
@@ -113,11 +113,11 @@ FROM users; -- Liste unique des pays`
                             level: 'beginner',
                             tags: ['sql', 'aggregation', 'count', 'sum'],
                             code: `SELECT 
-    COUNT(*) AS total_orders,       -- Compte toutes les lignes
-    COUNT(user_id) AS active_users, -- Compte les valeurs non-NULL
-    SUM(amount) AS total_revenue,   -- Somme
-    AVG(amount) AS average_basket   -- Moyenne
-FROM orders;`
+    COUNT(*) AS total_sales,        -- Compte toutes les ventes
+    COUNT(employee_id) AS assigned_sales, -- Compte les non-NULL
+    SUM(amount) AS total_revenue,   -- Somme des montants
+    AVG(amount) AS average_basket   -- Panier moyen
+FROM sales;`
                         },
                         {
                             id: 'group_by',
@@ -126,10 +126,11 @@ FROM orders;`
                             level: 'beginner',
                             tags: ['sql', 'group-by', 'aggregation'],
                             code: `SELECT 
-    country,                -- Colonne de groupement
-    COUNT(id) AS user_count -- Fonction d'agrégation
-FROM users 
-GROUP BY country; -- OBLIGATOIRE si on sélectionne 'country'
+    product,                -- Colonne de groupement
+    COUNT(id) AS sales_count, -- Nombre de ventes
+    SUM(amount) as revenue    -- CA par produit
+FROM sales 
+GROUP BY product; -- OBLIGATOIRE si on sélectionne 'product'
 
 -- Erreur classique : Oublier le GROUP BY ou une colonne dedans`
                         },
@@ -140,11 +141,11 @@ GROUP BY country; -- OBLIGATOIRE si on sélectionne 'country'
                             level: 'beginner',
                             tags: ['sql', 'having', 'filter'],
                             code: `SELECT 
-    user_id, 
-    COUNT(id) AS order_count 
-FROM orders 
-GROUP BY user_id 
-HAVING COUNT(id) > 5; -- Garder uniquement les gros acheteurs
+    product, 
+    SUM(amount) AS total_revenue 
+FROM sales 
+GROUP BY product 
+HAVING SUM(amount) > 1000; -- Garder uniquement les produits best-sellers
 
 -- Ordre d'exécution : FROM -> WHERE -> GROUP BY -> HAVING -> SELECT`
                         }
@@ -161,16 +162,16 @@ HAVING COUNT(id) > 5; -- Garder uniquement les gros acheteurs
                             description: 'Garder tout ce qui est à gauche (table principale).',
                             level: 'intermediate',
                             tags: ['sql', 'join', 'left-join'],
-                            code: `-- Objectif : Avoir tous les utilisateurs, et leurs commandes s'ils en ont
+                            code: `-- Objectif : Avoir TOUS les employés, et leurs ventes s'ils en ont
 SELECT 
-    u.name, 
-    o.amount, 
-    o.created_at 
-FROM users u              -- Table de gauche (Tout est gardé)
-LEFT JOIN orders o        -- Table de droite (Match ou NULL)
-    ON u.id = o.user_id;  -- Clé de jointure
+    e.name, 
+    s.product, 
+    s.amount 
+FROM employees e          -- Table de gauche (Tout est gardé)
+LEFT JOIN sales s         -- Table de droite (Match ou NULL)
+    ON e.id = s.employee_id; -- Clé de jointure
 
--- Si un user n'a pas de commande, amount sera NULL`
+-- Si un employé n'a rien vendu, product/amount seront NULL`
                         },
                         {
                             id: 'inner_join',
@@ -178,15 +179,31 @@ LEFT JOIN orders o        -- Table de droite (Match ou NULL)
                             description: 'Garder uniquement l\'intersection.',
                             level: 'intermediate',
                             tags: ['sql', 'join', 'inner-join'],
-                            code: `-- Objectif : Avoir uniquement les utilisateurs QUI ONT commandé
+                            code: `-- Objectif : Avoir la liste des ventes avec le nom de l'employé
 SELECT 
-    u.name, 
-    o.amount 
-FROM users u 
-INNER JOIN orders o 
-    ON u.id = o.user_id;
+    e.name, 
+    s.product, 
+    s.amount 
+FROM employees e 
+INNER JOIN sales s 
+    ON e.id = s.employee_id;
 
--- Les utilisateurs sans commande sont exclus`
+-- Les employés sans ventes sont exclus`
+                        },
+                        {
+                            id: 'join_departments',
+                            title: 'JOIN avec 3 tables',
+                            description: 'Lier Employé, Département et Ventes.',
+                            level: 'intermediate',
+                            tags: ['sql', 'join', 'multi-join'],
+                            code: `SELECT 
+    d.name as department,
+    e.name as employee,
+    s.amount
+FROM departments d
+INNER JOIN employees e ON d.id = e.department_id
+INNER JOIN sales s ON e.id = s.employee_id
+ORDER BY d.name;`
                         }
                     ]
                 },
@@ -201,20 +218,19 @@ INNER JOIN orders o
                             description: 'Préparer les données avant l\'analyse.',
                             level: 'intermediate',
                             tags: ['sql', 'cte', 'with', 'cleaning'],
-                            code: `WITH clean_orders AS (
-    -- Étape 1 : On filtre et on nettoie d'abord
+                            code: `WITH big_sales AS (
+    -- Étape 1 : On filtre les grosses ventes
     SELECT * 
-    FROM orders 
-    WHERE status = 'completed' 
-      AND created_at >= '2023-01-01'
+    FROM sales 
+    WHERE amount >= 500
 )
 
--- Étape 2 : On fait notre analyse sur la donnée propre
+-- Étape 2 : On fait notre analyse sur la donnée filtrée
 SELECT 
-    user_id, 
-    SUM(amount) as total 
-FROM clean_orders 
-GROUP BY user_id;`
+    product, 
+    COUNT(*) as count 
+FROM big_sales 
+GROUP BY product;`
                         },
                         {
                             id: 'cte_chaining',
@@ -222,21 +238,21 @@ GROUP BY user_id;`
                             description: 'Décomposer un problème complexe.',
                             level: 'intermediate',
                             tags: ['sql', 'cte', 'advanced'],
-                            code: `WITH active_users AS (
-    SELECT id, name FROM users WHERE country = 'France'
+                            code: `WITH paris_employees AS (
+    SELECT id, name FROM employees WHERE department_id = 1 -- Suppose ID 1 is IT in Paris
 ),
 
-high_value_orders AS (
-    SELECT user_id, amount FROM orders WHERE amount > 100
+laptop_sales AS (
+    SELECT employee_id, amount FROM sales WHERE product = 'Laptop'
 )
 
 -- Jointure finale entre nos deux briques logiques
 SELECT 
-    u.name, 
-    o.amount 
-FROM active_users u 
-INNER JOIN high_value_orders o 
-    ON u.id = o.user_id;`
+    pe.name, 
+    ls.amount 
+FROM paris_employees pe 
+INNER JOIN laptop_sales ls 
+    ON pe.id = ls.employee_id;`
                         },
                         {
                             id: 'cte_agg_join',
@@ -244,25 +260,24 @@ INNER JOIN high_value_orders o
                             description: 'Best Practice : Éviter de dupliquer les lignes.',
                             level: 'intermediate',
                             tags: ['sql', 'cte', 'join', 'aggregation'],
-                            code: `WITH user_sales AS (
-    -- On calcule d'abord le total par user (1 ligne par user)
+                            code: `WITH sales_per_emp AS (
+    -- On calcule d'abord le total par employé (1 ligne par employé)
     SELECT 
-        user_id, 
-        SUM(amount) as total_spent 
-    FROM orders 
-    GROUP BY user_id
+        employee_id, 
+        SUM(amount) as total_sold 
+    FROM sales 
+    GROUP BY employee_id
 )
 
 SELECT 
-    u.name, 
-    u.country, 
-    COALESCE(s.total_spent, 0) as total_spent -- 0 si pas de commande
-FROM users u 
-LEFT JOIN user_sales s 
-    ON u.id = s.user_id;
+    e.name, 
+    d.name as dept, 
+    COALESCE(s.total_sold, 0) as total_sold -- 0 si pas de vente
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id
+LEFT JOIN sales_per_emp s ON e.id = s.employee_id;
 
--- Si on avait fait le JOIN avant le GROUP BY sur une grosse table, 
--- ça aurait été beaucoup plus lent et risqué (doublons).`
+-- Beaucoup plus performant que de tout joindre puis grouper !`
                         }
                     ]
                 },
@@ -273,17 +288,17 @@ LEFT JOIN user_sales s
                     snippets: [
                         {
                             id: 'dates',
-                            title: 'Manipulation de Dates',
+                            title: 'Manipulation de Dates (SQLite)',
                             description: 'Grouper par mois/année.',
                             level: 'advanced',
-                            tags: ['sql', 'date', 'time'],
-                            code: `-- DATE_TRUNC (PostgreSQL/BigQuery)
--- Ramène la date au premier jour du mois/année
+                            tags: ['sql', 'date', 'time', 'sqlite'],
+                            code: `-- SQLite n'a pas DATE_TRUNC, on utilise strftime
+-- %Y-%m : Année-Mois
 SELECT 
-    DATE_TRUNC('month', created_at) as sales_month, 
+    strftime('%Y-%m', sale_date) as sales_month, 
     SUM(amount) as revenue 
-FROM orders 
-GROUP BY 1 -- Groupe par la 1ère colonne sélectionnée
+FROM sales 
+GROUP BY 1 
 ORDER BY 1;`
                         },
                         {
@@ -296,220 +311,25 @@ ORDER BY 1;`
     id, 
     amount,
     CASE 
-        WHEN amount > 100 THEN 'VIP'
-        WHEN amount > 50 THEN 'Standard'
-        ELSE 'Petit Panier' 
-    END AS segment_client 
-FROM orders;`
+        WHEN amount >= 1000 THEN 'High Value'
+        WHEN amount >= 100 THEN 'Medium'
+        ELSE 'Low' 
+    END AS category
+FROM sales;`
                         },
                         {
                             id: 'window_functions',
-                            title: 'Window Functions (ROW_NUMBER & RANK)',
-                            description: 'Calculer sans écraser les lignes.',
+                            title: 'Window Functions (OVER)',
+                            description: 'Calculs sans réduire le nombre de lignes.',
                             level: 'advanced',
-                            tags: ['sql', 'window-function', 'row-number', 'rank'],
-                            code: `-- Objectif : Trouver la DERNIÈRE commande de chaque user
-WITH ranked_orders AS (
-    SELECT 
-        *,
-        -- ROW_NUMBER: 1, 2, 3, 4 (Unique même si égalité)
-        ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY created_at DESC) as rn,
-        -- RANK: 1, 1, 3, 4 (Saut de rang si égalité)
-        RANK() OVER(PARTITION BY user_id ORDER BY amount DESC) as rk
-    FROM orders
-)
-
-SELECT * 
-FROM ranked_orders 
-WHERE rn = 1; -- On ne garde que la plus récente`
-                        },
-                        {
-                            id: 'lag_lead',
-                            title: 'LAG & LEAD',
-                            description: 'Comparer avec la ligne précédente/suivante.',
-                            level: 'advanced',
-                            tags: ['sql', 'window-function', 'lag', 'lead'],
-                            code: `SELECT 
-    month,
-    revenue,
-    -- LAG(col, 1) : Valeur de la ligne précédente
-    LAG(revenue, 1) OVER(ORDER BY month) as prev_month_revenue,
-    
-    -- Calcul de la croissance (Growth Rate)
-    (revenue - LAG(revenue, 1) OVER(ORDER BY month)) / LAG(revenue, 1) OVER(ORDER BY month) as growth
-FROM monthly_sales;`
-                        },
-                        {
-                            id: 'regex',
-                            title: 'Expressions Régulières (REGEXP)',
-                            description: 'Filtrage de texte avancé.',
-                            level: 'advanced',
-                            tags: ['sql', 'regex', 'text'],
-                            code: `-- Trouver les emails gmail ou hotmail
-SELECT * 
-FROM users 
-WHERE email ~* '@(gmail|hotmail)\\.com'; -- ~* = Regex insensible à la casse (Postgres)
-
--- Sur BigQuery / MySQL :
--- WHERE REGEXP_CONTAINS(email, r'@(gmail|hotmail)\\.com')`
-                        }
-                    ]
-                }
-
-            ]
-        },
-        {
-            id: 'sql_expert',
-            title: 'SQL Expert & Performance',
-            description: 'Manipulation avancée et Optimisation.',
-            categories: [
-                {
-                    id: 'text_manipulation',
-                    title: '1. Manipulation de Texte',
-                    description: 'Nettoyer et transformer les chaînes.',
-                    snippets: [
-                        {
-                            id: 'concat_substring',
-                            title: 'Concaténer et Extraire',
-                            description: 'CONCAT, ||, SUBSTRING.',
-                            level: 'advanced',
-                            tags: ['sql', 'text', 'string'],
-                            code: `-- Concaténation (Standard SQL: ||)
-SELECT first_name || ' ' || last_name as full_name
-FROM users;
-
--- Sur MySQL/SQL Server : CONCAT(first_name, ' ', last_name)
-
--- Extraire une partie (SUBSTRING)
--- Ex: Extraire l'année "2023" de "2023-01-01" (si c'est du texte)
-SELECT SUBSTRING('2023-01-01', 1, 4); -- Commence à 1, longueur 4`
-                        },
-                        {
-                            id: 'trim_coalesce',
-                            title: 'Nettoyer et Gérer les NULL',
-                            description: 'TRIM et COALESCE.',
-                            level: 'advanced',
-                            tags: ['sql', 'text', 'null', 'coalesce'],
-                            code: `-- TRIM : Enlever les espaces inutiles
-SELECT TRIM(email) FROM users;
-
--- COALESCE : Remplacer NULL par une valeur par défaut
--- Très utile pour l'affichage ou les calculs
+                            tags: ['sql', 'window', 'rank'],
+                            code: `-- Comparer chaque vente à la moyenne du produit
 SELECT 
-    product_name,
-    COALESCE(description, 'Pas de description') as desc_safe,
-    COALESCE(discount_rate, 0) as discount_safe -- Évite les erreurs de calcul
-FROM products;`
-                        }
-                    ]
-                },
-                {
-                    id: 'json_handling',
-                    title: '2. Gestion du JSON',
-                    description: 'Requêter des données semi-structurées.',
-                    snippets: [
-                        {
-                            id: 'json_extract',
-                            title: 'Lire du JSON (PostgreSQL/BigQuery)',
-                            description: 'Accéder aux clés d\'un objet JSON stocké en texte.',
-                            level: 'advanced',
-                            tags: ['sql', 'json', 'postgres', 'bigquery'],
-                            code: `-- Supposons une colonne 'metadata' : {"browser": "Chrome", "clicks": 12}
-
--- PostgreSQL
-SELECT 
-    metadata->>'browser' as browser_name, -- ->> renvoie du texte
-    (metadata->>'clicks')::int as clicks -- Cast en entier
-FROM events;
-
--- BigQuery
-SELECT 
-    JSON_EXTRACT_SCALAR(metadata, '$.browser') as browser_name
-FROM events;`
-                        }
-                    ]
-                },
-                {
-                    id: 'performance',
-                    title: '3. Performance & Index',
-                    description: 'Pourquoi ma requête est lente ?',
-                    snippets: [
-                        {
-                            id: 'explain_analyze',
-                            title: 'Comprendre le Plan (EXPLAIN)',
-                            description: 'Voir comment le moteur exécute la requête.',
-                            level: 'advanced',
-                            tags: ['sql', 'performance', 'explain'],
-                            code: `-- Ajoutez EXPLAIN devant votre requête pour voir le plan
-EXPLAIN SELECT * FROM orders WHERE user_id = 123;
-
--- Recherchez :
--- "Seq Scan" (Scan complet de la table) -> ❌ LENT sur grosse table
--- "Index Scan" (Utilisation de l'index) -> ✅ RAPIDE`
-                        },
-                        {
-                            id: 'exists_vs_in',
-                            title: 'EXISTS vs IN',
-                            description: 'Optimisation de sous-requêtes.',
-                            level: 'advanced',
-                            tags: ['sql', 'performance', 'optimization'],
-                            code: `-- ❌ IN : Souvent moins performant si la sous-requête est grosse
--- Le moteur peut charger toute la liste en mémoire.
-SELECT * FROM orders 
-WHERE user_id IN (SELECT id FROM users WHERE country = 'FR');
-
--- ✅ EXISTS : S'arrête dès qu'il trouve une correspondance
--- Souvent plus rapide sur les gros volumes.
-SELECT * FROM orders o
-WHERE EXISTS (
-    SELECT 1 FROM users u 
-    WHERE u.id = o.user_id AND u.country = 'FR'
-);`
-                        },
-                        {
-                            id: 'indexes',
-                            title: 'Les Index',
-                            description: 'Le sommaire du livre.',
-                            level: 'advanced',
-                            tags: ['sql', 'performance', 'index'],
-                            markdown: `🚀 **Le concept**
-Sans index, la base doit lire **toutes les pages** du livre pour trouver "Harry Potter".
-Avec un index, elle va à la fin, trouve "H", et va directement à la page.
-
-**Quand créer un index ?**
-Sur les colonnes souvent utilisées dans le **WHERE** ou le **JOIN** (ex: \`user_id\`, \`email\`, \`created_at\`).`
-                        }
-                    ]
-                },
-                {
-                    id: 'pivot_unpivot',
-                    title: '4. Pivot & Unpivot',
-                    description: 'Changer la forme des données.',
-                    snippets: [
-                        {
-                            id: 'sql_pivot',
-                            title: 'Pivot (Lignes -> Colonnes)',
-                            description: 'Créer un tableau croisé avec CASE WHEN.',
-                            level: 'advanced',
-                            tags: ['sql', 'pivot', 'transform'],
-                            code: `-- Objectif : Une colonne par année
-SELECT 
-    product_id,
-    SUM(CASE WHEN year = 2022 THEN amount ELSE 0 END) as sales_2022,
-    SUM(CASE WHEN year = 2023 THEN amount ELSE 0 END) as sales_2023
-FROM sales
-GROUP BY product_id;`
-                        },
-                        {
-                            id: 'sql_unpivot',
-                            title: 'Unpivot (Colonnes -> Lignes)',
-                            description: 'Aplatir un tableau avec UNION ALL.',
-                            level: 'advanced',
-                            tags: ['sql', 'unpivot', 'transform'],
-                            code: `-- Objectif : Transformer sales_2022 et sales_2023 en une colonne 'year'
-SELECT product_id, 2022 as year, sales_2022 as amount FROM sales
-UNION ALL
-SELECT product_id, 2023 as year, sales_2023 as amount FROM sales;`
+    product,
+    amount,
+    AVG(amount) OVER (PARTITION BY product) as avg_product_price,
+    amount - AVG(amount) OVER (PARTITION BY product) as diff_vs_avg
+FROM sales;`
                         }
                     ]
                 }

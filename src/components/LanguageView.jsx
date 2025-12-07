@@ -211,12 +211,18 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         language = 'sql';
     } else if (content.themes.some(t => t.id === 'git_basics')) {
         language = 'bash';
-    } else if (content.themes.some(t => t.id === 'dax_basics' || t.id === 'dax_mastery')) {
+    } else if (content.themes.some(t => t.id === 'dax_basics' || t.id === 'dax_mastery' || t.id === 'dax_essentials')) {
         language = 'dax';
     } else if (content.themes.some(t => t.id === 'power_query_ui')) {
         language = 'powerquery';
     } else if (content.themes.some(t => t.id === 'r_basics')) {
         language = 'r';
+    } else if (content.themes.some(t => t.id === 'pyspark_basics')) {
+        language = 'pyspark';
+    } else if (content.themes.some(t => t.id === 'nosql_concepts')) {
+        language = 'nosql';
+    } else if (content.themes.some(t => t.id === 'simulation' || t.id === 'optimisation')) {
+        language = 'python-examples'; // Exclude from 'python' run button check
     }
 
     // Reset state when content changes (i.e., when language changes)

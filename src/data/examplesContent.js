@@ -18,6 +18,7 @@ export const examplesContent = {
                             title: 'Méthode d\'Euler (Ordre 1)',
                             description: 'La méthode la plus simple et intuitive.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['math', 'ode', 'euler', 'python'],
                             code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -54,6 +55,7 @@ def euler_method(f, y0, t0, tf, h):
                             title: 'Runge-Kutta 2 (RK2 / Point Milieu)',
                             description: 'Plus précis qu\'Euler, moins coûteux que RK4.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['math', 'ode', 'rk2', 'python'],
                             code: `def runge_kutta_2(f, y0, t0, tf, h):
     """
@@ -96,6 +98,7 @@ def euler_method(f, y0, t0, tf, h):
                             title: 'Runge-Kutta 4 (RK4)',
                             description: 'Méthode standard pour résoudre les équations différentielles.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['math', 'ode', 'rk4', 'python'],
                             code: `import numpy as np
 import matplotlib.pyplot as plt
@@ -190,6 +193,7 @@ plt.legend(); plt.show()`
                             title: 'Problème du Sac à Dos (Knapsack)',
                             description: 'Maximiser la valeur des objets dans un sac de capacité limitée.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['optimization', 'gurobi', 'knapsack', 'python'],
                             code: `import numpy as np
 import gurobipy as gp
@@ -235,6 +239,7 @@ solve_knapsack_model(*data)`
                             title: 'Lot Sizing (Planification de Production)',
                             description: 'Minimiser les coûts de production, stock et setup.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['optimization', 'gurobi', 'production', 'python'],
                             code: `import json
 import gurobipy as gp
@@ -331,6 +336,7 @@ with gp.Env() as env, gp.Model(name, env=env) as model:
                             title: '1. Exploration des Données (EDA)',
                             description: 'Chargement, analyse de la target et corrélations. [Télécharger le dataset](/MemoCode/data/online_shoppers_intention.csv)',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['data-science', 'eda', 'pandas', 'seaborn'],
                             code: `import pandas as pd
 import matplotlib.pyplot as plt
@@ -360,6 +366,7 @@ plt.show()`
                             title: '2. Preprocessing & Feature Engineering',
                             description: 'Encodage, gestion des valeurs manquantes et SMOTE.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['data-science', 'preprocessing', 'sklearn', 'python'],
                             code: `from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
@@ -398,6 +405,7 @@ print(f"Taille originale : {X.shape}, Taille après SMOTE : {X_resampled.shape}"
                             title: '3. Modélisation & Évaluation',
                             description: 'Entraînement d\'un modèle et analyse des performances.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['data-science', 'modeling', 'sklearn', 'python'],
                             code: `from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -436,6 +444,7 @@ plt.show()`
                             title: 'Segmentation RFM',
                             description: 'Segmenter les clients par Récence, Fréquence et Montant.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['marketing', 'rfm', 'segmentation', 'python'],
                             markdown: `### 🎯 Objectif de la Segmentation RFM
 
@@ -535,6 +544,7 @@ print(rfm['Segment_Label'].value_counts())`
                             title: 'Pipeline Sklearn Custom',
                             description: 'Créer un Transformer personnalisé pour nettoyer et enrichir les données.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['mlops', 'sklearn', 'pipeline', 'python'],
                             markdown: `### 🔧 Objectif : Pipeline de Preprocessing Robuste
 
@@ -682,6 +692,7 @@ print(df_transformed)
                             title: 'Calendrier Français (Fériés & Ponts)',
                             description: 'Détecter les jours fériés, les ponts et les retours de vacances.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['python', 'dates', 'holidays', 'pandas'],
                             code: `import pandas as pd
 import holidays
@@ -738,6 +749,7 @@ print(df[['date', 'jour_nom', 'jour_ferie', 'jour_ouvre', 'jour_ouvre_lendemain_
                             title: 'Vacances Scolaires - Référentiel Complet',
                             description: 'Générer un calendrier par département sur une période donnée.',
                             level: 'advanced',
+                            runnable: false,
                             tags: ['python', 'dates', 'api', 'pandas'],
                             markdown: `### 📚 Objectif de cette Fonction
 
@@ -927,6 +939,7 @@ if not df_referentiel.empty:
                             title: 'Copier/Coller & Presse-papiers',
                             description: 'Manipulation du texte et du contenu.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['tips', 'windows', 'shortcuts', 'clipboard'],
                             markdown: `### 📋 Presse-papiers
 
@@ -950,6 +963,7 @@ if not df_referentiel.empty:
                             title: 'Navigation & Recherche',
                             description: 'Se déplacer efficacement.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['tips', 'windows', 'shortcuts', 'navigation'],
                             markdown: `### 🔍 Navigation Rapide
 
@@ -978,6 +992,7 @@ if not df_referentiel.empty:
                             title: 'Gestion de Fichiers',
                             description: 'Fichiers et dossiers.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['tips', 'windows', 'shortcuts', 'files'],
                             markdown: `### 📁 Fichiers & Dossiers
 
@@ -1006,6 +1021,7 @@ if not df_referentiel.empty:
                             title: 'Gestion des Fenêtres',
                             description: 'Organiser l\'espace de travail.',
                             level: 'beginner',
+                            runnable: false,
                             tags: ['tips', 'windows', 'shortcuts', 'multitasking'],
                             markdown: `### 🪟 Multi-fenêtrage
 
@@ -1040,6 +1056,7 @@ if not df_referentiel.empty:
                             title: 'Navigation Ultra-Rapide',
                             description: 'Se déplacer dans de grandes tables.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['tips', 'excel', 'shortcuts', 'navigation'],
                             markdown: `### ⚡ Navigation Express dans Excel
 
@@ -1065,6 +1082,7 @@ if not df_referentiel.empty:
                             title: 'Édition & Formules',
                             description: 'Éditer efficacement.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['tips', 'excel', 'shortcuts', 'editing'],
                             markdown: `### ✏️ Édition Rapide
 
@@ -1097,6 +1115,7 @@ if not df_referentiel.empty:
                             title: 'Formatage Rapide',
                             description: 'Mettre en forme sans la souris.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['tips', 'excel', 'shortcuts', 'formatting'],
                             markdown: `### 🎨 Formatage Express
 
@@ -1135,6 +1154,7 @@ if not df_referentiel.empty:
                             title: 'Raccourcis Essentiels VS Code',
                             description: 'Les indispensables pour développer.',
                             level: 'intermediate',
+                            runnable: false,
                             tags: ['tips', 'vscode', 'shortcuts', 'coding'],
                             markdown: `### 💻 VS Code - Les Must-Have
 
