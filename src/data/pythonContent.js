@@ -3943,8 +3943,594 @@ import mon_module_perso
                     ]
                 },
                 {
+                    id: 'examples',
+                    title: '10. Exemples',
+                    subCategory: 'Astuces',
+                    description: 'Fonctions utiles pour des tâches courantes.',
+                    language: 'python',
+                    snippets: [
+                        {
+                            language: 'python',
+                            id: 'remove_accents',
+                            title: 'Supprimer les Accents',
+                            description: 'Supprimer les accents d\'une chaîne de caractères.',
+                            level: 'intermediate',
+                            tags: ['string', 'text', 'unicode'],
+                            code: `import unicodedata
+
+def remove_accents(text):
+    """
+    Supprime les accents d'une chaîne de caractères.
+    
+    Args:
+        text (str): Le texte à traiter.
+    
+    Returns:
+        str: Le texte sans accents.
+    """
+    # Normalise en NFD (décompose les caractères accentués)
+    text_nfd = unicodedata.normalize('NFD', text)
+    # Filtre les caractères de combinaison (accents)
+    return ''.join(char for char in text_nfd if unicodedata.category(char) != 'Mn')
+
+# Exemple
+print(remove_accents("Éléphant"))  # "Elephant"
+print(remove_accents("Café crème"))  # "Cafe creme"`
+                        },
+                        {
+                            language: 'python',
+                            id: 'remove_duplicates_preserve_order',
+                            title: 'Supprimer Doublons (Ordre Préservé)',
+                            description: 'Supprimer les doublons en gardant l\'ordre d\'apparition.',
+                            level: 'intermediate',
+                            tags: ['list', 'collections', 'duplicates'],
+                            code: `def remove_duplicates_preserve_order(items):
+    """
+    Supprime les doublons d'une liste en préservant l'ordre.
+    
+    Args:
+        items (list): La liste à traiter.
+    
+    Returns:
+        list: Liste sans doublons.
+    """
+    seen = set()
+    result = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
+
+# Exemple
+nombres = [1, 2, 2, 3, 1, 4, 3, 5]
+print(remove_duplicates_preserve_order(nombres))  # [1, 2, 3, 4, 5]`
+                        },
+                        {
+                            language: 'python',
+                            id: 'find_common_elements',
+                            title: 'Éléments Communs',
+                            description: 'Trouver les éléments communs entre plusieurs listes.',
+                            level: 'beginner',
+                            tags: ['list', 'set', 'intersection'],
+                            code: `def find_common_elements(*lists):
+    """
+    Trouve les éléments communs à toutes les listes.
+    
+    Args:
+        *lists: Nombre variable de listes.
+    
+    Returns:
+        set: Ensemble des éléments communs.
+    """
+    if not lists:
+        return set()
+    
+    # Commence avec la première liste convertie en set
+    common = set(lists[0])
+    
+    # Intersection avec chaque liste suivante
+    for lst in lists[1:]:
+        common &= set(lst)
+    
+    return common
+
+# Exemple
+liste1 = [1, 2, 3, 4, 5]
+liste2 = [3, 4, 5, 6, 7]
+liste3 = [4, 5, 6, 8]
+print(find_common_elements(liste1, liste2, liste3))  # {4, 5}`
+                        },
+                        {
+                            language: 'python',
+                            id: 'days_between_dates',
+                            title: 'Jours Entre Deux Dates',
+                            description: 'Calculer le nombre de jours entre deux dates.',
+                            level: 'beginner',
+                            tags: ['datetime', 'dates', 'calculation'],
+                            code: `from datetime import datetime
+
+def days_between_dates(date1, date2):
+    """
+    Calcule le nombre de jours entre deux dates.
+    
+    Args:
+        date1 (str ou datetime): Première date.
+        date2 (str ou datetime): Deuxième date.
+    
+    Returns:
+        int: Nombre de jours (absolu).
+    """
+    # Convertir en datetime si nécessaire
+    if isinstance(date1, str):
+        date1 = datetime.strptime(date1, "%Y-%m-%d")
+    if isinstance(date2, str):
+        date2 = datetime.strptime(date2, "%Y-%m-%d")
+    
+    return abs((date2 - date1).days)
+
+# Exemple
+print(days_between_dates("2024-01-01", "2024-12-31"))  # 365
+print(days_between_dates(datetime(2024, 1, 1), datetime(2024, 1, 15)))  # 14`
+                        },
+                        {
+                            language: 'python',
+                            id: 'is_weekend',
+                            title: 'Vérifier Weekend',
+                            description: 'Vérifier si une date est un weekend.',
+                            level: 'beginner',
+                            tags: ['datetime', 'dates', 'validation'],
+                            code: `from datetime import datetime
+
+def is_weekend(date):
+    """
+    Vérifie si une date tombe un weekend (samedi ou dimanche).
+    
+    Args:
+        date (str ou datetime): La date à vérifier.
+    
+    Returns:
+        bool: True si weekend, False sinon.
+    """
+    if isinstance(date, str):
+        date = datetime.strptime(date, "%Y-%m-%d")
+    
+    # weekday(): 0=Lundi, ..., 5=Samedi, 6=Dimanche
+    return date.weekday() >= 5
+
+# Exemple
+print(is_weekend("2024-12-07"))  # Samedi -> True
+print(is_weekend("2024-12-09"))  # Lundi -> False`
+                        },
+                        {
+                            language: 'python',
+                            id: 'get_next_business_day',
+                            title: 'Prochain Jour Ouvrable',
+                            description: 'Obtenir le prochain jour ouvrable (lundi-vendredi).',
+                            level: 'intermediate',
+                            tags: ['datetime', 'dates', 'business'],
+                            code: `from datetime import datetime, timedelta
+
+def get_next_business_day(date=None):
+    """
+    Obtient le prochain jour ouvrable.
+    
+    Args:
+        date (datetime, optional): Date de départ. Par défaut aujourd'hui.
+    
+    Returns:
+        datetime: Prochain jour ouvrable.
+    """
+    if date is None:
+        date = datetime.now()
+    
+    # Ajouter 1 jour
+    next_day = date + timedelta(days=1)
+    
+    # Si c'est samedi (5) ou dimanche (6), sauter au lundi
+    while next_day.weekday() >= 5:
+        next_day += timedelta(days=1)
+    
+    return next_day
+
+# Exemple
+vendredi = datetime(2024, 12, 6)  # Vendredi
+print(get_next_business_day(vendredi))  # Lundi 2024-12-09`
+                        },
+                        {
+                            language: 'python',
+                            id: 'format_relative_time',
+                            title: 'Temps Relatif',
+                            description: 'Formater un temps relatif ("il y a 2 heures").',
+                            level: 'intermediate',
+                            tags: ['datetime', 'formatting', 'humanize'],
+                            code: `from datetime import datetime, timedelta
+
+def format_relative_time(date):
+    """
+    Formate une date en temps relatif.
+    
+    Args:
+        date (datetime): La date à formater.
+    
+    Returns:
+        str: Temps relatif (ex: "il y a 2 heures").
+    """
+    now = datetime.now()
+    diff = now - date
+    
+    seconds = diff.total_seconds()
+    
+    if seconds < 60:
+        return "à l'instant"
+    elif seconds < 3600:
+        minutes = int(seconds / 60)
+        return f"il y a {minutes} minute{'s' if minutes > 1 else ''}"
+    elif seconds < 86400:
+        hours = int(seconds / 3600)
+        return f"il y a {hours} heure{'s' if hours > 1 else ''}"
+    elif seconds < 604800:
+        days = int(seconds / 86400)
+        return f"il y a {days} jour{'s' if days > 1 else ''}"
+    else:
+        return date.strftime("%d/%m/%Y")
+
+# Exemple
+print(format_relative_time(datetime.now() - timedelta(minutes=30)))  # "il y a 30 minutes"
+print(format_relative_time(datetime.now() - timedelta(hours=3)))  # "il y a 3 heures"`
+                        },
+                        {
+                            language: 'python',
+                            id: 'is_valid_email',
+                            title: 'Valider Email',
+                            description: 'Valider une adresse email (regex simple).',
+                            level: 'intermediate',
+                            tags: ['validation', 'regex', 'email'],
+                            code: `import re
+
+def is_valid_email(email):
+    """
+    Valide une adresse email avec une regex simple.
+    
+    Args:
+        email (str): L'adresse email à valider.
+    
+    Returns:
+        bool: True si valide, False sinon.
+    """
+    # Regex simple pour email
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+# Exemple
+print(is_valid_email("user@example.com"))  # True
+print(is_valid_email("invalid.email"))  # False
+print(is_valid_email("test@domain"))  # False`
+                        },
+                        {
+                            language: 'python',
+                            id: 'is_valid_phone',
+                            title: 'Valider Téléphone',
+                            description: 'Valider un numéro de téléphone français.',
+                            level: 'intermediate',
+                            tags: ['validation', 'regex', 'phone'],
+                            code: `import re
+
+def is_valid_phone(phone):
+    """
+    Valide un numéro de téléphone français.
+    
+    Args:
+        phone (str): Le numéro à valider.
+    
+    Returns:
+        bool: True si valide, False sinon.
+    """
+    # Regex pour numéros français (format 06/07 ou 01-05 + 8 chiffres)
+    pattern = r'^0[1-7]([\\s.-]?\\d{2}){4}$'
+    return re.match(pattern, phone) is not None
+
+# Exemple
+print(is_valid_phone("06 12 34 56 78"))  # True
+print(is_valid_phone("01.23.45.67.89"))  # True
+print(is_valid_phone("0612345678"))  # True
+print(is_valid_phone("1234567890"))  # False`
+                        },
+                        {
+                            language: 'python',
+                            id: 'check_password_strength',
+                            title: 'Force Mot de Passe',
+                            description: 'Évaluer la force d\'un mot de passe.',
+                            level: 'intermediate',
+                            tags: ['validation', 'security', 'password'],
+                            code: `import re
+
+def check_password_strength(password):
+    """
+    Évalue la force d'un mot de passe.
+    
+    Args:
+        password (str): Le mot de passe à évaluer.
+    
+    Returns:
+        dict: Score et critères (longueur, majuscules, chiffres, symboles).
+    """
+    score = 0
+    feedback = []
+    
+    if len(password) >= 8:
+        score += 1
+    else:
+        feedback.append("Au moins 8 caractères requis")
+    
+    if re.search(r'[A-Z]', password):
+        score += 1
+    else:
+        feedback.append("Ajouter des majuscules")
+    
+    if re.search(r'[a-z]', password):
+        score += 1
+    else:
+        feedback.append("Ajouter des minuscules")
+    
+    if re.search(r'\\d', password):
+        score += 1
+    else:
+        feedback.append("Ajouter des chiffres")
+    
+    if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        score += 1
+    else:
+        feedback.append("Ajouter des symboles")
+    
+    strength = ["Très faible", "Faible", "Moyen", "Fort", "Très fort"][min(score, 4)]
+    
+    return {"score": score, "strength": strength, "feedback": feedback}
+
+# Exemple
+print(check_password_strength("motdepasse"))  # Faible
+print(check_password_strength("MotDePasse123!"))  # Très fort`
+                        },
+                        {
+                            language: 'python',
+                            id: 'calculate_percentage',
+                            title: 'Calculer Pourcentage',
+                            description: 'Calculer un pourcentage avec gestion des erreurs.',
+                            level: 'beginner',
+                            tags: ['math', 'calculation', 'percentage'],
+                            code: `def calculate_percentage(part, total, decimals=2):
+    """
+    Calcule un pourcentage.
+    
+    Args:
+        part (float): La partie.
+        total (float): Le total.
+        decimals (int): Nombre de décimales.
+    
+    Returns:
+        float: Le pourcentage ou 0 si total est 0.
+    """
+    if total == 0:
+        return 0.0
+    
+    return round((part / total) * 100, decimals)
+
+# Exemple
+print(calculate_percentage(25, 100))  # 25.0
+print(calculate_percentage(3, 7, 1))  # 42.9
+print(calculate_percentage(10, 0))  # 0.0 (évite division par zéro)`
+                        },
+                        {
+                            language: 'python',
+                            id: 'round_to_nearest',
+                            title: 'Arrondir au Plus Proche',
+                            description: 'Arrondir à la valeur la plus proche (5, 10, etc.).',
+                            level: 'beginner',
+                            tags: ['math', 'rounding', 'calculation'],
+                            code: `def round_to_nearest(value, base):
+    """
+    Arrondit une valeur au multiple le plus proche.
+    
+    Args:
+        value (float): La valeur à arrondir.
+        base (int): Le multiple (ex: 5, 10, 100).
+    
+    Returns:
+        int: Valeur arrondie.
+    """
+    return int(base * round(value / base))
+
+# Exemple
+print(round_to_nearest(23, 5))  # 25
+print(round_to_nearest(127, 10))  # 130
+print(round_to_nearest(1234, 100))  # 1200`
+                        },
+                        {
+                            language: 'python',
+                            id: 'clamp',
+                            title: 'Limiter Valeur (Clamp)',
+                            description: 'Limiter une valeur entre min et max.',
+                            level: 'beginner',
+                            tags: ['math', 'constraint', 'range'],
+                            code: `def clamp(value, min_val, max_val):
+    """
+    Limite une valeur entre min et max.
+    
+    Args:
+        value: La valeur à limiter.
+        min_val: Valeur minimale.
+        max_val: Valeur maximale.
+    
+    Returns:
+        La valeur limitée.
+    """
+    return max(min_val, min(value, max_val))
+
+# Exemple
+print(clamp(5, 0, 10))  # 5
+print(clamp(-5, 0, 10))  # 0
+print(clamp(15, 0, 10))  # 10`
+                        },
+                        {
+                            language: 'python',
+                            id: 'calculate_average',
+                            title: 'Moyenne Sécurisée',
+                            description: 'Calculer une moyenne avec gestion des erreurs.',
+                            level: 'beginner',
+                            tags: ['math', 'statistics', 'average'],
+                            code: `def calculate_average(numbers):
+    """
+    Calcule la moyenne d'une liste de nombres.
+    
+    Args:
+        numbers (list): Liste de nombres.
+    
+    Returns:
+        float: La moyenne ou None si liste vide.
+    """
+    if not numbers:
+        return None
+    
+    # Filtrer les valeurs non numériques
+    valid_numbers = [n for n in numbers if isinstance(n, (int, float))]
+    
+    if not valid_numbers:
+        return None
+    
+    return sum(valid_numbers) / len(valid_numbers)
+
+# Exemple
+print(calculate_average([10, 20, 30]))  # 20.0
+print(calculate_average([]))  # None
+print(calculate_average([5, "texte", 15]))  # 10.0 (ignore "texte")`
+                        },
+                        {
+                            language: 'python',
+                            id: 'retry_on_failure',
+                            title: 'Décorateur Retry',
+                            description: 'Décorateur pour réessayer une fonction en cas d\'échec.',
+                            level: 'advanced',
+                            tags: ['decorator', 'error-handling', 'retry'],
+                            code: `import time
+from functools import wraps
+
+def retry_on_failure(max_attempts=3, delay=1):
+    """
+    Décorateur pour réessayer une fonction en cas d'échec.
+    
+    Args:
+        max_attempts (int): Nombre maximum de tentatives.
+        delay (int): Délai entre les tentatives (secondes).
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    print(f"Tentative {attempt}/{max_attempts} échouée: {e}")
+                    
+                    if attempt < max_attempts:
+                        time.sleep(delay)
+            
+            print(f"Échec après {max_attempts} tentatives")
+            raise last_exception
+        
+        return wrapper
+    return decorator
+
+# Exemple
+@retry_on_failure(max_attempts=3, delay=2)
+def fonction_instable():
+    import random
+    if random.random() < 0.7:
+        raise ValueError("Erreur aléatoire")
+    return "Succès !"
+
+# fonction_instable()  # Réessaiera jusqu'à 3 fois`
+                        },
+                        {
+                            language: 'python',
+                            id: 'generate_random_string',
+                            title: 'Chaîne Aléatoire Sécurisée',
+                            description: 'Générer une chaîne aléatoire sécurisée.',
+                            level: 'intermediate',
+                            tags: ['random', 'security', 'string'],
+                            code: `import secrets
+import string
+
+def generate_random_string(length=16, use_digits=True, use_punctuation=False):
+    """
+    Génère une chaîne aléatoire sécurisée.
+    
+    Args:
+        length (int): Longueur de la chaîne.
+        use_digits (bool): Inclure des chiffres.
+        use_punctuation (bool): Inclure des symboles.
+    
+    Returns:
+        str: Chaîne aléatoire.
+    """
+    alphabet = string.ascii_letters  # a-z, A-Z
+    
+    if use_digits:
+        alphabet += string.digits  # 0-9
+    
+    if use_punctuation:
+        alphabet += string.punctuation  # !@#$...
+    
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
+# Exemple
+print(generate_random_string())  # "aB3xY9mK2pL7qN4t"
+print(generate_random_string(8, use_punctuation=True))  # "aB3!x@9m"`
+                        },
+                        {
+                            language: 'python',
+                            id: 'celsius_to_fahrenheit',
+                            title: 'Conversion Température',
+                            description: 'Convertir Celsius en Fahrenheit et vice-versa.',
+                            level: 'beginner',
+                            tags: ['conversion', 'temperature', 'math'],
+                            code: `def celsius_to_fahrenheit(celsius):
+    """
+    Convertit des degrés Celsius en Fahrenheit.
+    
+    Args:
+        celsius (float): Température en Celsius.
+    
+    Returns:
+        float: Température en Fahrenheit.
+    """
+    return (celsius * 9/5) + 32
+
+def fahrenheit_to_celsius(fahrenheit):
+    """
+    Convertit des degrés Fahrenheit en Celsius.
+    
+    Args:
+        fahrenheit (float): Température en Fahrenheit.
+    
+    Returns:
+        float: Température en Celsius.
+    """
+    return (fahrenheit - 32) * 5/9
+
+# Exemple
+print(celsius_to_fahrenheit(0))  # 32.0
+print(celsius_to_fahrenheit(100))  # 212.0
+print(fahrenheit_to_celsius(32))  # 0.0
+print(fahrenheit_to_celsius(98.6))  # 37.0`
+                        }
+                    ]
+                },
+                {
                     id: 'arrays',
-                    title: '10. Tableaux (Arrays)',
+                    title: '11. Tableaux (Arrays)',
                     subCategory: 'Calcul Numérique',
                     description: 'Création et manipulation.',
                     snippets: [
@@ -3985,7 +4571,7 @@ flat = mat.flatten()`
                 },
                 {
                     id: 'math_ops',
-                    title: '11. Opérations Mathématiques',
+                    title: '12. Opérations Mathématiques',
                     subCategory: 'Calcul Numérique',
                     description: 'Calculs vectorisés.',
                     snippets: [

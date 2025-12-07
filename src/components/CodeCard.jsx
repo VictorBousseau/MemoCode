@@ -65,6 +65,8 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
         if (onTagClick) onTagClick(tag);
     };
 
+    const syntaxLanguage = language === 'python-examples' ? 'python' : language;
+
     return (
         <motion.div
             onClick={onClick}
@@ -266,7 +268,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                         </button>
                                     </div>
                                     <SyntaxHighlighter
-                                        language={language}
+                                        language={syntaxLanguage}
                                         style={currentTheme === 'light' ? vs : vscDarkPlus}
                                         customStyle={{
                                             margin: 0,
@@ -324,7 +326,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                     {snippet.code && (
                         <div className="relative group rounded-b-xl">
                             <SyntaxHighlighter
-                                language={language}
+                                language={syntaxLanguage}
                                 style={currentTheme === 'light' ? vs : vscDarkPlus}
                                 customStyle={{
                                     margin: 0,
