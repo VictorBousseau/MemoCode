@@ -955,32 +955,6 @@ Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traiteme
 2. ** Reproductibilité ** : Tout le processus est contenu dans un seul objet.
 3. ** Simplicité ** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
 
-\`\`\`mermaid
-graph TD
-    %% Nodes
-    A[Données Brutes] --> B(Preprocessing)
-    B --> C{Modèle}
-    C --> D[Prédiction]
-    
-    %% Subgraph
-    subgraph Pipeline [Pipeline Scikit-Learn]
-        direction TB
-        B -- Scaling / Encodage --> C
-    end
-    
-    %% Styles
-    classDef default fill:#27272a,stroke:#52525b,stroke-width:1px,color:#f4f4f5;
-    classDef input fill:#3f3f46,stroke:#71717a,color:#fff,stroke-width:2px;
-    classDef output fill:#059669,stroke:#10b981,color:#fff,stroke-width:2px;
-    classDef process fill:#2563eb,stroke:#3b82f6,color:#fff,stroke-width:2px;
-    
-    class A input;
-    class D output;
-    class B,C process;
-    
-    style Pipeline fill:none,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5,color:#93c5fd
-\`\`\`
-
 #### 📝 En Résumé
 \`\`\`text
 📄 Données Brutes
