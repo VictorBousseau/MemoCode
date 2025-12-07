@@ -1225,6 +1225,81 @@ print(f"Score sur données réduites : {clf.score(X_pca, y):.3f}")
 # (Optionnel) Tracer la frontière de décision en 2D...`
                                 }
                             ]
+                        },
+                        {
+                            id: 'imbalanced_data',
+                            title: 'Données Déséquilibrées',
+                            level: 'advanced',
+                            description: 'Gérer les classes 80/20 (Poids, Resampling).',
+                            tags: ['preprocessing', 'imbalanced', 'sampling'],
+                            cells: [
+                                {
+                                    title: '1. Le Problème (80/20)',
+                                    markdown: `### ⚖️ Pourquoi c'est grave ?
+Si vous avez **80% de "Non"** et **20% de "Oui"** :
+*   Un modèle "fainéant" peut prédire "Non" tout le temps et avoir **80% de réussite (Accuracy)**.
+*   Mais il ne sert à rien ! (Rappel = 0%).
+
+**Solution 1 : Class Weights (La plus simple)** ⚡
+On dit au modèle : *"Chaque erreur sur la classe rare coûte 4 fois plus cher"*.
+La plupart des modèles Scikit-Learn (\`LogisticRegression\`, \`SVM\`, \`RandomForest\`) ont un paramètre \`class_weight='balanced'\`.`,
+                                    code: `from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+# 1. Sans gestion du déséquilibre
+clf_bad = LogisticRegression()
+# clf_bad.fit(X, y) -> Risque de tout prédire en "Classe Majoritaire"
+
+# 2. Avec class_weight='balanced'
+# Le modèle ajuste automatiquement les pénalités
+# Poids = n_samples / (n_classes * np.bincount(y))
+clf_balanced = LogisticRegression(class_weight='balanced')
+clf_balanced.fit(X_train, y_train)
+
+print("-- Rapport avec Poids Équilibrés --")
+# On devrait voir un meilleur Rappel (Recall) pour la classe 1
+print(classification_report(y_test, clf_balanced.predict(X_test)))`
+                                },
+                                {
+                                    title: '2. Re-sampling (Upsampling)',
+                                    markdown: `### 🔄 Solution 2 : Modifier les Données
+Si le modèle n'a pas de paramètre \`class_weight\` (ex: certains réseaux de neurones simples), on peut équilibrer le dataset manuellement.
+
+**Upsampling (Sur-échantillonnage)** : On duplique les exemples de la classe rare jusqu'à atteindre 50/50.`,
+                                    code: `from sklearn.utils import resample
+import pandas as pd
+
+# Supposons qu'on a un DataFrame df avec une colonne 'target'
+# Séparer les classes
+df_maj = df[df.target == 0]
+df_min = df[df.target == 1]
+
+# Upsampling de la classe minoritaire
+df_min_upsampled = resample(
+    df_min, 
+    replace=True,     # On autorise la duplication
+    n_samples=len(df_maj), # On vise la même taille que la classe majoritaire
+    random_state=42
+)
+
+# Combiner
+df_balanced = pd.concat([df_maj, df_min_upsampled])
+
+print(f"Avant : {df.target.value_counts()}")
+print(f"Après : {df_balanced.target.value_counts()}") 
+# Maintenant c'est 50/50 !`
+                                },
+                                {
+                                    title: '3. Attention à la Métrique',
+                                    markdown: `### ⚠️ Le Piège de l'Accuracy
+Sur des données déséquilibrées, **NE JAMAIS REGARDER L'ACCURACY SEULE**.
+
+Regardez toujours :
+1.  **F1-Score** : Moyenne harmonique (Précision & Rappel).
+2.  **AUC (Area Under Curve)** : Capacité globale de distinction.
+3.  **Confusion Matrix** : Pour voir les Faux Négatifs.`
+                                }
+                            ]
                         }
                     ]
                 },
@@ -1325,6 +1400,19 @@ explainer = shap.LinearExplainer(model, X_train_scaled)
 shap_values = explainer.shap_values(X_test_scaled)
 
 shap.summary_plot(shap_values, X_test_scaled, feature_names=X_test.columns)`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités (Confiance)
+Au lieu de prédire juste 0 ou 1, on veut savoir si le modèle est sûr à 51% ou à 99%.`,
+                                    code: `# predict_proba renvoie une matrice (N_samples, N_classes)
+# Pour une classification binaire, c'est souvent [Prob_Classe_0, Prob_Classe_1]
+
+probs = grid.best_estimator_.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités LogReg (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1410,6 +1498,17 @@ explainer = shap.KernelExplainer(grid.best_estimator_.predict_proba, X_summary)
 
 shap_values = explainer.shap_values(X_test.iloc[:50]) # Sur un petit échantillon
 shap.summary_plot(shap_values[1], X_test.iloc[:50])`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités KNN
+KNN estime la probabilité comme la fraction des voisins de cette classe.
+Ex: Si K=5 et qu'il y a 4 voisins "Rouge" et 1 "Bleu", Proba(Rouge) = 4/5 = 0.8.`,
+                                    code: `probs = grid.best_estimator_.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités KNN (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1470,6 +1569,17 @@ Comme KNN, pas d'importance native simple (sauf voir les moyennes par classe \`t
                                     code: `import shap
 # KernelExplainer requis.
 # Naive Bayes est très rapide, donc SHAP est raisonnablement rapide aussi.`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités Naive Bayes
+Naive Bayes produit des probabilités (c'est sa nature), mais elles sont souvent **extrêmes** (trop proche de 0 ou 1) car il suppose l'indépendance des features.
+*   Utilisez \`CalibratedClassifierCV\` pour recaler les probas si besoin.`,
+                                    code: `probs = pipe_nb.predict_proba(X_test) # ou grid.best_estimator_
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités Naive Bayes (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1628,6 +1738,39 @@ shap.force_plot(
     shap_values[1][0,:], 
     X_test.iloc[0,:]
 )`
+                                },
+                                {
+                                    title: '5. Visualisation & Probabilités',
+                                    markdown: `### 🌳 Voir l'arbre et les Scores
+1. **Visualisation** : \`plot_tree\` permet de voir les règles décisions.
+2. **Probabilités** : \`predict_proba\` donne le score de confiance (ex: 80% Fraude) au lieu de juste la classe (0 ou 1).`,
+                                    code: `from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+# 1. Visualiser l'arbre (Top 3 niveaux pour lisibilité)
+plt.figure(figsize=(20, 10))
+plot_tree(
+    best_model, 
+    max_depth=3, 
+    feature_names=X_test.columns, 
+    class_names=['Sain', 'Fraude'], # Adapter selon vos classes
+    filled=True, 
+    rounded=True, 
+    fontsize=10
+)
+plt.title("Arbre de Décision (Top 3 Niveaux)")
+plt.show()
+
+# 2. Obtenir les Probabilités
+# predict() -> [0, 1, 0...]
+# predict_proba() -> [[0.9, 0.1], [0.2, 0.8]...]
+probs = best_model.predict_proba(X_test)
+
+# Probabilité d'être classe 1 (ex: Fraude)
+probs_classe_1 = probs[:, 1]
+
+print("--- Premières Probabilités ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1745,6 +1888,17 @@ shap.force_plot(
     shap_values[1][0,:], 
     X_test.iloc[0,:]
 )`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités & Vote
+Une forêt aléatoire calcule la probabilité en faisant voter tous ses arbres.
+Si 80 arbres sur 100 disent "Classe 1", la probabilité est 0.8.`,
+                                    code: `probs = best_rf.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités Random Forest (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1855,6 +2009,17 @@ shap_values = explainer.shap_values(X_test)
 
 # Visualisation (Classe 1)
 shap.summary_plot(shap_values[1], X_test)`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités SVM
+Par défaut, le SVM ne donne qu'une distance (hyperplan).
+Avec \`probability=True\`, il utilise une calibration interne (Platt Scaling) pour estimer une probabilité.`,
+                                    code: `probs = best_svm.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités SVM (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -1959,6 +2124,19 @@ shap_values = explainer.shap_values(X_test_scaled)
 
 # Beeswarm
 shap.summary_plot(shap_values, X_test_scaled, feature_names=X_test.columns)`
+                                },
+                                {
+                                    title: '5. Probabilités (Note)',
+                                    markdown: `### ⚠️ Pas de predict_proba natif
+Le Perceptron standard est un classifieur binaire strict (0 ou 1) basé sur le signe.
+Il ne produit pas de probabilités fiables.
+On peut regarder la **fonction de décision** (Distance à l'hyperplan).`,
+                                    code: `# Pas de predict_proba() sur Perceptron standard sauf si calibré
+# On regarde la distance signée (plus c'est grand, plus c'est confiant)
+scores = best_perc.decision_function(X_test)
+
+print("--- Scores de Décision (Distance) ---")
+print(scores[:5])`
                                 }
                             ]
                         },
@@ -2073,6 +2251,27 @@ shap_values = explainer.shap_values(X_test)
 # 3. Visualisation
 # Summary Plot
 shap.summary_plot(shap_values, X_test)`
+                                },
+                                {
+                                    title: '5. Visualisation & Probabilités',
+                                    markdown: `### 🌳 Voir l'arbre XGBoost
+XGBoost possède sa propre fonction \`plot_tree\` optimisée.`,
+                                    code: `import xgboost as xgb
+import matplotlib.pyplot as plt
+
+# 1. Visualiser le premier arbre du boosting
+# num_trees=0 (Le premier arbre), 1, 2...
+plt.figure(figsize=(20, 10))
+xgb.plot_tree(best_xgb, num_trees=0, rankdir='LR') # LR = Left-Right
+plt.title("Premier Arbre du XGBoost")
+plt.show()
+
+# 2. Probabilités
+probs = best_xgb.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Score de Confiance (Probabilités) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         },
@@ -2173,6 +2372,16 @@ else:
     vals = shap_values
 
 shap.summary_plot(vals, X_test)`
+                                },
+                                {
+                                    title: '5. Probabilités',
+                                    markdown: `### 🎯 Probabilités LightGBM
+Comme XGBoost, LightGBM fournit des scores de confiance très précis.`,
+                                    code: `probs = best_lgbm.predict_proba(X_test)
+probs_classe_1 = probs[:, 1]
+
+print("--- Probabilités LightGBM (Classe 1) ---")
+print(probs_classe_1[:5])`
                                 }
                             ]
                         }
@@ -2698,11 +2907,23 @@ print(f"R2: {r2}")     # Qualité de l'ajustement (proche de 1 = parfait)`
                         {
                             id: 'confusion_matrix',
                             title: 'Matrice de Confusion',
-                            description: `Type : Classification
-                            Visuel : Diagonale foncée = Bonnes prédictions.`,
+                            description: 'Visualiser les erreurs (TP et FP).',
                             level: 'advanced',
                             tags: ['ml', 'metrics', 'viz', 'sklearn'],
-                            code: `from sklearn.metrics import ConfusionMatrixDisplay
+                            cells: [
+                                {
+                                    title: '1. Comprendre la Matrice',
+                                    markdown: `### 🚦 Diagonale et Erreurs
+Elle compare les prédictions (Colonnes) à la réalité (Lignes).
+
+| | **Prédit NON** (0) | **Prédit OUI** (1) |
+| :--- | :--- | :--- |
+| **Réel NON** (0) | **TN** (Vrai Négatif) <br> *Silence radio.* ✅ | **FP** (Faux Positif) <br> *Alarme pour rien.* 😱 |
+| **Réel OUI** (1) | **FN** (Faux Négatif) <br> *Danger non détecté.* ☠️ | **TP** (Vrai Positif) <br> *Danger détecté.* ✅ |
+
+*   **Précision** (La qualité des alarmes) : $TP / (TP + FP)$
+*   **Rappel** (La quantité de dangers trouvés) : $TP / (TP + FN)$`,
+                                    code: `from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 # Affiche la matrice de confusion
@@ -2710,6 +2931,8 @@ import matplotlib.pyplot as plt
 ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, cmap='Blues')
 plt.title("Matrice de Confusion")
 plt.show()`
+                                }
+                            ]
                         },
                         {
                             id: 'roc_curve',
@@ -2795,6 +3018,118 @@ plt.figure(figsize=(10, 6))
 sns.barplot(data=df_imp, x='importance', y='feature')
 plt.title("Importance des Variables (Feature Importance)")
 plt.show()`
+                        },
+                        {
+                            id: 'regression_metrics_details',
+                            title: 'Métriques de Régression',
+                            level: 'advanced',
+                            description: 'MAE, MSE, RMSE, R2.',
+                            tags: ['ml', 'metrics', 'regression'],
+                            cells: [
+                                {
+                                    title: '1. Les Formules',
+                                    markdown: `### 📉 Évaluer une prédiction continue
+Contrairement à la classification (Juste/Faux), en régression on mesure la **distance** de l'erreur.
+
+#### 1. MAE (Mean Absolute Error)
+$$ MAE = \\frac{1}{n} \\sum |y_{pred} - y_{true}| $$
+*   La moyenne des erreurs brutes. Facile à interpréter (ex: "Je me trompe de 50€ en moyenne").
+
+#### 2. MSE (Mean Squared Error)
+$$ MSE = \\frac{1}{n} \\sum (y_{pred} - y_{true})^2 $$
+*   Pénalise fortement les grosses erreurs (car mises au carré).
+
+#### 3. RMSE (Root Mean Squared Error)
+$$ RMSE = \\sqrt{MSE} $$
+*   Comme la MSE, mais ramenée à l'unité d'origine (Euros, Mètres...). C'est la métrique standard.
+
+#### 4. $R^2$ (Coefficient de Détermination)
+$$ R^2 = 1 - \\frac{SSR}{SST} $$
+*   Représente la **variance expliquée** par le modèle.
+*   **1** = Parfait.
+*   **0** = Aussi nul que de prédire la moyenne pour tout le monde.`
+                                },
+                                {
+                                    title: '2. Code Scikit-Learn',
+                                    code: `from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import numpy as np
+
+# Exemple de calcul
+y_true = [100, 200, 300]
+y_pred = [110, 190, 320]
+
+mae = mean_absolute_error(y_true, y_pred)
+mse = mean_squared_error(y_true, y_pred)
+rmse = np.sqrt(mse) # ou squared=False dans les versions récentes de sklearn
+r2 = r2_score(y_true, y_pred)
+
+print(f"MAE  : {mae:.2f}")
+print(f"RMSE : {rmse:.2f}")
+print(f"R2   : {r2:.4f}")`
+                                }
+                            ]
+                        },
+                        {
+                            id: 'bias_variance',
+                            title: 'Biais vs Variance',
+                            level: 'expert',
+                            description: 'Le compromis fondamental du ML.',
+                            tags: ['ml', 'theory', 'bias-variance'],
+                            cells: [
+                                {
+                                    title: '1. Théorie',
+                                    markdown: `### 🎯 La Cible (Underfitting vs Overfitting)
+
+L'erreur totale d'un modèle se décompose en 3 parties :
+$$ Erreur = Biais^2 + Variance + Bruit $$
+
+#### 1. Biais (Underfitting) 🐢
+Le modèle est **trop simple**. Il rate la cible.
+*   *Symptôme* : Mauvais score en Train ET en Test.
+*   *Solution* : Modèle plus complexe, plus de features.
+
+#### 2. Variance (Overfitting) 🐰
+Le modèle est **trop complexe**. Il apprend le bruit par cœur.
+*   *Symptôme* : Excellent score en Train, mais mauvais en Test.
+*   *Solution* : Simplifier le modèle, Régularisation (L1/L2), Plus de données.
+
+#### 3. L'Optimum
+On cherche le point d'équilibre où l'erreur totale (Test) est minimale.`
+                                },
+                                {
+                                    title: '2. Learning Curve',
+                                    code: `import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import learning_curve
+from sklearn.tree import DecisionTreeClassifier
+
+# Visualiser la courbe d'apprentissage (Learning Curve)
+# Permet de diagnostiquer Biais vs Variance
+# (Note: X et y doivent être définis)
+train_sizes, train_scores, test_scores = learning_curve(
+    DecisionTreeClassifier(max_depth=5), # Essayer max_depth=1 (Biais) vs 20 (Variance)
+    X, y, 
+    cv=5, 
+    scoring='accuracy',
+    n_jobs=-1,
+    train_sizes=np.linspace(0.1, 1.0, 5)
+)
+
+# Moyennes et écarts-types
+train_mean = np.mean(train_scores, axis=1)
+test_mean = np.mean(test_scores, axis=1)
+
+plt.figure(figsize=(8, 5))
+plt.plot(train_sizes, train_mean, 'o-', color="r", label="Score Train")
+plt.plot(train_sizes, test_mean, 'o-', color="g", label="Score Validation")
+plt.title("Courbe d'Apprentissage (Learning Curve)")
+plt.xlabel("Taille du Dataset")
+plt.ylabel("Accuracy")
+plt.legend(loc="best")
+plt.grid()
+plt.show()`
+                                }
+                            ]
                         }
                     ]
                 },
