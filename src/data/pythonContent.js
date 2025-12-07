@@ -956,7 +956,7 @@ Un Pipeline permet d'enchaîner séquentiellement toutes les étapes de traiteme
 3. ** Simplicité ** : On appelle \`fit()\` et \`predict()\` une seule fois pour tout le flux.
 
 \`\`\`mermaid
-graph LR
+graph TD
     %% Nodes
     A[Données Brutes] --> B(Preprocessing)
     B --> C{Modèle}
@@ -964,7 +964,7 @@ graph LR
     
     %% Subgraph
     subgraph Pipeline [Pipeline Scikit-Learn]
-        direction LR
+        direction TB
         B -- Scaling / Encodage --> C
     end
     
@@ -979,6 +979,17 @@ graph LR
     class B,C process;
     
     style Pipeline fill:none,stroke:#3b82f6,stroke-width:2px,stroke-dasharray: 5 5,color:#93c5fd
+\`\`\`
+
+#### 📝 En Résumé
+\`\`\`text
+📄 Données Brutes
+       ⬇️
+⚙️ Pipeline Scikit-Learn
+   ├── 🧹 Preprocessing (Scaling, Encodage)
+   └── 🧠 Modèle (Fit/Predict)
+       ⬇️
+🎯 Prédiction Finale
 \`\`\`
 `
                         },

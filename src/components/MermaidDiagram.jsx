@@ -49,18 +49,12 @@ export default function MermaidDiagram({ chart }) {
     // Use inline styles to ensure they're not overridden and the diagram displays properly
     return (
         <div
-            className="my-4 bg-zinc-900/50 rounded-lg border border-zinc-800"
-            style={{ overflowX: 'auto' }}
-        >
-            <div
-                className="p-4"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    minWidth: 'max-content'
-                }}
-                dangerouslySetInnerHTML={{ __html: svg }}
-            />
-        </div>
+            className="my-4 bg-zinc-900/50 rounded-lg border border-zinc-800 p-4"
+            style={{
+                overflowX: 'auto',
+                overflowY: 'hidden'
+            }}
+            dangerouslySetInnerHTML={{ __html: svg }}
+        />
     );
 }
