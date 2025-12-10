@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { Play, Clock, Target, ChevronRight, BookMarked } from 'lucide-react';
-import { getAllQuizzes, getAllQuestionsFromBank } from '../data/quizData';
+import { getAllQuizzes, getAllQuestionsFromBank, QUIZ_CATEGORIES, getQuizzesByCategory } from '../data/quizData';
 import { useFlashcards } from '../hooks/useFlashcards';
 import QuizSession from './QuizSession';
 
 export default function QuizList() {
     const [selectedQuizId, setSelectedQuizId] = useState(null);
     const [filterDifficulty, setFilterDifficulty] = useState('all');
+    const [filterCategory, setFilterCategory] = useState('all');
     const { addMultipleFlashcards } = useFlashcards();
 
-    const allQuizzes = getAllQuizzes();
-
+    // Apply both category and difficulty filters
+    const categoryFiltered = getQuizzesByCategory(filterCategory);
     const filteredQuizzes = filterDifficulty === 'all'
-        ? allQuizzes
-        : allQuizzes.filter(q => q.difficulty === filterDifficulty);
+        ? categoryFiltered
+        : categoryFiltered.filter(q => q.difficulty === filterDifficulty);
 
     if (selectedQuizId) {
         return <QuizSession quizId={selectedQuizId} onExit={() => setSelectedQuizId(null)} />;
@@ -27,7 +28,32 @@ export default function QuizList() {
                 <p className="text-zinc-400">Testez vos connaissances et progressez</p>
             </div>
 
-            {/* Filters */}
+            {/* Category Filters */}
+            <div className="flex flex-wrap gap-2 justify-center mb-4">
+                <button
+                    onClick={() => setFilterCategory('all')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${filterCategory === 'all'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                        }`}
+                >
+                    🌐 Tous
+                </button>
+                {Object.values(QUIZ_CATEGORIES).map((cat) => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setFilterCategory(cat.id)}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${filterCategory === cat.id
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                            }`}
+                    >
+                        {cat.icon} {cat.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Difficulty Filters */}
             <div className="flex gap-3 justify-center">
                 {[
                     { value: 'all', label: 'Tous' },
@@ -132,7 +158,7 @@ export default function QuizList() {
 
             {filteredQuizzes.length === 0 && (
                 <div className="text-center py-16">
-                    <p className="text-zinc-500">Aucun quiz disponible pour ce niveau</p>
+                    <p className="text-zinc-500">Aucun quiz disponible pour ces filtres</p>
                 </div>
             )}
         </div>

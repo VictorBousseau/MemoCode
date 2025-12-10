@@ -65,7 +65,11 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
         if (onTagClick) onTagClick(tag);
     };
 
-    const syntaxLanguage = language === 'python-examples' ? 'python' : language;
+    const syntaxLanguage = ['python-examples', 'pyspark'].includes(language)
+        ? 'python'
+        : ['nosql', 'mongodb'].includes(language)
+            ? 'javascript'
+            : language;
 
     return (
         <motion.div
