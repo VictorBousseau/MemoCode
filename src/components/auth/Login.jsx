@@ -21,7 +21,7 @@ export default function Login() {
             if (error) {
                 setError(error.message);
             } else {
-                navigate('/learn/quiz');
+                navigate('/');
             }
         } catch (err) {
             setError('Une erreur est survenue. Veuillez réessayer.');

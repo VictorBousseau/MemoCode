@@ -20,7 +20,7 @@ import FlashcardDeck from './components/FlashcardDeck';
 import CodePlayground from './components/CodePlayground';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
-import ProtectedRoute from './components/ProtectedRoute';
+import ConditionalAccess from './components/ConditionalAccess';
 import { useAuth } from './context/AuthContext';
 
 function PublicApp() {
@@ -153,8 +153,12 @@ function PublicApp() {
   );
 }
 
-function PrivateApp() {
-  const [selectedView, setSelectedView] = useState('Quiz');
+function PrivateApp({ initialSection = 'quiz' }) {
+  const [selectedView, setSelectedView] = useState(
+    initialSection === 'quiz' ? 'Quiz' :
+      initialSection === 'flashcards' ? 'Flashcards' :
+        initialSection === 'playground' ? 'Playground' : 'Quiz'
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -180,6 +184,16 @@ function PrivateApp() {
             >
               <FlashcardDeck />
             </motion.div>
+          ) : selectedView === 'Playground' ? (
+            <motion.div
+              key="playground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CodePlayground />
+            </motion.div>
           ) : null}
         </AnimatePresence>
       </div>
@@ -187,20 +201,26 @@ function PrivateApp() {
   );
 }
 
+// Wrapper components with ConditionalAccess for Learning Zone
+const QuizPage = () => (
+  <ConditionalAccess featureName="les quiz et exercices">
+    <PrivateApp initialSection="quiz" />
+  </ConditionalAccess>
+);
+
+const FlashcardsPage = () => (
+  <ConditionalAccess featureName="les flashcards">
+    <PrivateApp initialSection="flashcards" />
+  </ConditionalAccess>
+);
+
+const PlaygroundPage = () => (
+  <ConditionalAccess featureName="le playground">
+    <PrivateApp initialSection="playground" />
+  </ConditionalAccess>
+);
+
 export default function App() {
-  const { loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <Router basename="/MemoCode">
       <Routes>
@@ -209,12 +229,11 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Routes */}
-        <Route path="/learn/*" element={<ProtectedRoute />}>
-          <Route index element={<Navigate to="/learn/quiz" replace />} />
-          <Route path="quiz" element={<PrivateApp />} />
-          <Route path="flashcards" element={<PrivateApp />} />
-        </Route>
+        {/* Learning Zone Routes - Now accessible to all with conditional content */}
+        <Route path="/learn/quiz" element={<QuizPage />} />
+        <Route path="/learn/flashcards" element={<FlashcardsPage />} />
+        <Route path="/learn/playground" element={<PlaygroundPage />} />
+        <Route path="/learn" element={<Navigate to="/learn/quiz" replace />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -60,8 +60,8 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                         to="/"
                         onClick={() => { onSelectLanguage?.('Overview'); onClose?.(); }}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${(selectedLanguage === 'Overview' && !isInLearningZone)
-                                ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
-                                : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                             }`}
                     >
                         <LayoutGrid className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -73,8 +73,8 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                             <button
                                 onClick={() => onSelectLanguage('CodeCreation')}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'CodeCreation'
-                                        ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
-                                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                                    ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
+                                    : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                                     }`}
                             >
                                 <Wand2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -88,8 +88,8 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                                     key={lang.name}
                                     onClick={() => onSelectLanguage(lang.name)}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === lang.name
-                                            ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
-                                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                                        ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+                                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
                                         }`}
                                 >
                                     <lang.icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -112,58 +112,45 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                         )}
                     </div>
 
-                    {user ? (
-                        // User is logged in - show active links
-                        <>
-                            <Link
-                                to="/learn/quiz"
-                                onClick={onClose}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/learn/quiz'
-                                        ? 'bg-green-600/10 text-green-400 border border-green-600/20'
-                                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                                    }`}
-                            >
-                                <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                <span className="font-medium">Quiz & Exercices</span>
-                            </Link>
+                    {/* Learning Zone links - Always visible */}
+                    <Link
+                        to="/learn/quiz"
+                        onClick={onClose}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/learn/quiz'
+                            ? 'bg-green-600/10 text-green-400 border border-green-600/20'
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            }`}
+                    >
+                        <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span className="font-medium">Quiz & Exercices</span>
+                        {!user && <Lock className="w-4 h-4 ml-auto text-zinc-600" />}
+                    </Link>
 
-                            <Link
-                                to="/learn/flashcards"
-                                onClick={onClose}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/learn/flashcards'
-                                        ? 'bg-orange-600/10 text-orange-400 border border-orange-600/20'
-                                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                                    }`}
-                            >
-                                <BookMarked className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                <span className="font-medium">Flashcards</span>
-                            </Link>
+                    <Link
+                        to="/learn/flashcards"
+                        onClick={onClose}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/learn/flashcards'
+                            ? 'bg-orange-600/10 text-orange-400 border border-orange-600/20'
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            }`}
+                    >
+                        <BookMarked className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span className="font-medium">Flashcards</span>
+                        {!user && <Lock className="w-4 h-4 ml-auto text-zinc-600" />}
+                    </Link>
 
-                            {onSelectLanguage && (
-                                <button
-                                    onClick={() => { onSelectLanguage('Playground'); onClose?.(); }}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${selectedLanguage === 'Playground'
-                                            ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
-                                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                                        }`}
-                                >
-                                    <Code2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                    <span className="font-medium">Playground</span>
-                                </button>
-                            )}
-                        </>
-                    ) : (
-                        // User not logged in - show locked state
-                        <div className="space-y-1">
-                            <Link
-                                to="/login"
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-500 hover:bg-zinc-800/50 transition-all duration-200 group"
-                            >
-                                <Lock className="w-5 h-5" />
-                                <span className="font-medium text-sm">Connectez-vous pour accéder</span>
-                            </Link>
-                        </div>
-                    )}
+                    <Link
+                        to="/learn/playground"
+                        onClick={onClose}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === '/learn/playground'
+                            ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
+                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                            }`}
+                    >
+                        <Code2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span className="font-medium">Playground</span>
+                        {!user && <Lock className="w-4 h-4 ml-auto text-zinc-600" />}
+                    </Link>
                 </div>
             </nav>
 
