@@ -44,28 +44,51 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        let isMounted = true;
+
+        // Set a timeout to prevent infinite loading (3 seconds max)
+        const loadingTimeout = setTimeout(() => {
+            if (isMounted && loading) {
+                console.warn('Auth loading timeout - setting loading to false');
+                setLoading(false);
+            }
+        }, 3000);
+
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                fetchUserRole(session.user.id);
+            if (isMounted) {
+                setUser(session?.user ?? null);
+                if (session?.user) {
+                    fetchUserRole(session.user.id);
+                }
+                setLoading(false);
             }
-            setLoading(false);
+        }).catch((error) => {
+            console.error('Error getting session:', error);
+            if (isMounted) {
+                setLoading(false);
+            }
         });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                await fetchUserRole(session.user.id);
-            } else {
-                setUserRole(null);
-                setPermissions({});
+            if (isMounted) {
+                setUser(session?.user ?? null);
+                if (session?.user) {
+                    await fetchUserRole(session.user.id);
+                } else {
+                    setUserRole(null);
+                    setPermissions({});
+                }
+                setLoading(false);
             }
-            setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            isMounted = false;
+            clearTimeout(loadingTimeout);
+            subscription.unsubscribe();
+        };
     }, []);
 
     const signUp = async (email, password) => {

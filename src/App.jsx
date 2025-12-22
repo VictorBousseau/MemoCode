@@ -20,7 +20,10 @@ import FlashcardDeck from './components/FlashcardDeck';
 import CodePlayground from './components/CodePlayground';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
+import Profile from './components/auth/Profile';
 import ConditionalAccess from './components/ConditionalAccess';
+import LearningLayout from './components/LearningLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
 
 function PublicApp() {
@@ -203,21 +206,27 @@ function PrivateApp({ initialSection = 'quiz' }) {
 
 // Wrapper components with ConditionalAccess for Learning Zone
 const QuizPage = () => (
-  <ConditionalAccess featureName="les quiz et exercices">
-    <PrivateApp initialSection="quiz" />
-  </ConditionalAccess>
+  <LearningLayout>
+    <ConditionalAccess featureName="les quiz et exercices">
+      <QuizList />
+    </ConditionalAccess>
+  </LearningLayout>
 );
 
 const FlashcardsPage = () => (
-  <ConditionalAccess featureName="les flashcards">
-    <PrivateApp initialSection="flashcards" />
-  </ConditionalAccess>
+  <LearningLayout>
+    <ConditionalAccess featureName="les flashcards">
+      <FlashcardDeck />
+    </ConditionalAccess>
+  </LearningLayout>
 );
 
 const PlaygroundPage = () => (
-  <ConditionalAccess featureName="le playground">
-    <PrivateApp initialSection="playground" />
-  </ConditionalAccess>
+  <LearningLayout>
+    <ConditionalAccess featureName="le playground">
+      <CodePlayground />
+    </ConditionalAccess>
+  </LearningLayout>
 );
 
 export default function App() {
@@ -234,6 +243,9 @@ export default function App() {
         <Route path="/learn/flashcards" element={<FlashcardsPage />} />
         <Route path="/learn/playground" element={<PlaygroundPage />} />
         <Route path="/learn" element={<Navigate to="/learn/quiz" replace />} />
+
+        {/* Protected Routes */}
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

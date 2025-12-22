@@ -7,6 +7,7 @@ import ThemeSelector from './ThemeSelector';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { drawer, modalBackdrop } from '../utils/animations';
 import { useAuth } from '../context/AuthContext';
+import FeedbackWidget from './FeedbackWidget';
 
 export default function Layout({ children, selectedLanguage, onSelectLanguage, searchQuery, setSearchQuery }) {
     const searchInputRef = React.useRef(null);
@@ -107,18 +108,18 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
                         <div className="flex items-center gap-2 sm:gap-4">
                             {/* Auth Buttons */}
                             {user ? (
-                                // Logged in - Show My Space + Logout
+                                // Logged in - Show Profile + Logout
                                 <div className="flex items-center gap-2">
                                     <Link
-                                        to="/"
+                                        to="/profile"
                                         className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
                                     >
-                                        <GraduationCap className="w-4 h-4" />
-                                        Mon Espace
+                                        <User className="w-4 h-4" />
+                                        Mon Profil
                                     </Link>
                                     <button
                                         onClick={handleSignOut}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors text-sm"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors text-sm cursor-pointer"
                                         title="Se déconnecter"
                                     >
                                         <LogOut className="w-4 h-4" />
@@ -143,6 +144,9 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
                                     </Link>
                                 </div>
                             )}
+
+                            {/* Feedback Widget */}
+                            <FeedbackWidget />
 
                             {/* Theme Selector */}
                             <ThemeSelector />
