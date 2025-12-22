@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Layout from './components/Layout';
 import LanguageView from './components/LanguageView';
@@ -17,8 +18,12 @@ import CodeGenerator from './components/CodeGenerator';
 import QuizList from './components/QuizList';
 import FlashcardDeck from './components/FlashcardDeck';
 import CodePlayground from './components/CodePlayground';
+import Login from './components/auth/Login';
+import Signup from './components/auth/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './context/AuthContext';
 
-export default function App() {
+function PublicApp() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -42,9 +47,9 @@ export default function App() {
         ...addLang(pysparkContent, 'python', 'PySpark').themes,
         ...addLang(daxContent, 'dax', 'DAX').themes,
         ...addLang(mContent, 'powerquery', 'Power Query (M)').themes,
-        ...addLang(nosqlContent, 'javascript', 'NoSQL').themes, // NoSQL often uses JS/JSON
+        ...addLang(nosqlContent, 'javascript', 'NoSQL').themes,
         ...addLang(rContent, 'r', 'R').themes,
-        ...addLang(examplesContent, 'python', 'Exemples').themes // Examples are mostly Python
+        ...addLang(examplesContent, 'python', 'Exemples').themes
       ]
     };
   }, []);
@@ -112,26 +117,6 @@ export default function App() {
             >
               <CodeGenerator />
             </motion.div>
-          ) : selectedLanguage === 'Quiz' ? (
-            <motion.div
-              key="quiz"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <QuizList />
-            </motion.div>
-          ) : selectedLanguage === 'Flashcards' ? (
-            <motion.div
-              key="flashcards"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <FlashcardDeck />
-            </motion.div>
           ) : selectedLanguage === 'Playground' ? (
             <motion.div
               key="playground"
@@ -165,5 +150,75 @@ export default function App() {
         </AnimatePresence>
       </Layout>
     </NavigationContext.Provider>
+  );
+}
+
+function PrivateApp() {
+  const [selectedView, setSelectedView] = useState('Quiz');
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        <AnimatePresence mode="wait">
+          {selectedView === 'Quiz' ? (
+            <motion.div
+              key="quiz"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <QuizList />
+            </motion.div>
+          ) : selectedView === 'Flashcards' ? (
+            <motion.div
+              key="flashcards"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FlashcardDeck />
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Router basename="/MemoCode">
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<PublicApp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected Routes */}
+        <Route path="/learn/*" element={<ProtectedRoute />}>
+          <Route index element={<Navigate to="/learn/quiz" replace />} />
+          <Route path="quiz" element={<PrivateApp />} />
+          <Route path="flashcards" element={<PrivateApp />} />
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
