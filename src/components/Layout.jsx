@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import UnifiedSidebar from './UnifiedSidebar';
 import { Search, Menu, X, User, LogOut, GraduationCap } from 'lucide-react';
 import ThemeSelector from './ThemeSelector';
 import { useIsMobile } from '../hooks/useMediaQuery';
@@ -73,7 +73,7 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
                             h-full
                         `}
                     >
-                        <Sidebar
+                        <UnifiedSidebar
                             selectedLanguage={selectedLanguage}
                             onSelectLanguage={handleSelectLanguage}
                             onClose={isMobile ? () => setIsSidebarOpen(false) : undefined}
