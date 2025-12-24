@@ -465,32 +465,6 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                 </button>
                             ))}
                         </div>
-
-                        {/* Tag Filters Section */}
-                        <div className="space-y-3">
-                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-3">
-                                Filtres par tags
-                            </h3>
-
-                            {/* Active Filters Display */}
-                            <TagFilter
-                                selectedTags={selectedTags}
-                                filterMode={filterMode}
-                                onClearTags={clearTags}
-                                onToggleMode={toggleFilterMode}
-                            />
-
-                            {/* Tag Hierarchy Tree */}
-                            <div className="bg-zinc-900/30 border border-zinc-800 rounded-lg p-3 max-h-96 overflow-y-auto">
-                                <TagHierarchy
-                                    selectedTags={selectedTags}
-                                    expandedNodes={expandedNodes}
-                                    onToggleTag={toggleTag}
-                                    onToggleNode={toggleNode}
-                                    tagCounts={tagCounts}
-                                />
-                            </div>
-                        </div>
                     </div>
                 )}
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getQuizById } from '../data/quizData';
+import { useQuizSync } from './useQuizSync';
 
 const STORAGE_KEY = 'memocode_quiz_progress';
 
@@ -13,6 +14,9 @@ export function useQuizProgress(quizId) {
     const [showFeedback, setShowFeedback] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
     const [startTime, setStartTime] = useState(null);
+
+    // Supabase sync hook
+    const { saveQuizResult: syncToSupabase } = useQuizSync();
 
     // Load quiz data
     useEffect(() => {
@@ -126,25 +130,22 @@ export function useQuizProgress(quizId) {
         return { score: correct, total, percentage };
     }, [quiz, answers]);
 
-    // Save quiz result to history
-    const saveQuizResult = useCallback(() => {
+    // Save quiz result to history (syncs to Supabase if logged in)
+    const saveQuizResult = useCallback(async () => {
         const result = calculateScore();
         const timeSpent = startTime ? Math.round((Date.now() - startTime) / 1000) : 0;
 
-        const stored = localStorage.getItem('memocode_quiz_history');
-        const history = stored ? JSON.parse(stored) : [];
-
-        history.push({
+        const quizResult = {
             quizId,
             quizTitle: quiz?.title,
             ...result,
             timeSpent,
-            completedAt: Date.now(),
             answers
-        });
+        };
 
-        localStorage.setItem('memocode_quiz_history', JSON.stringify(history));
-    }, [quizId, quiz, calculateScore, startTime, answers]);
+        // Sync to Supabase (handles localStorage fallback internally)
+        await syncToSupabase(quizResult);
+    }, [quizId, quiz, calculateScore, startTime, answers, syncToSupabase]);
 
     // Reset quiz
     const resetQuiz = useCallback(() => {

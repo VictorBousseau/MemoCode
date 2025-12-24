@@ -152,28 +152,6 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                 <Star className={`w-4 h-4 ${isFavorite ? 'fill-yellow-400 text-yellow-400' : ''}`} />
                             </button>
                         )}
-                        {/* Test Button */}
-                        {(snippet.code || snippet.cells) &&
-                            ['python', 'sql'].includes(language.toLowerCase()) &&
-                            snippet.runnable !== false && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const codeToPlay = snippet.code || (snippet.cells ? snippet.cells.map(c => c.code).filter(Boolean).join('\n\n# Cell separation\n') : '');
-                                        if (codeToPlay) {
-                                            navigate('Playground', {
-                                                code: codeToPlay,
-                                                language: language.toLowerCase() === 'sql' ? 'sql' : 'python'
-                                            });
-                                        }
-                                    }}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg transition-colors text-sm text-green-400 hover:text-green-300"
-                                    title="Tester dans le Playground"
-                                >
-                                    <Play className="w-3 h-3 fill-green-400/20" />
-                                    Tester le code
-                                </button>
-                            )}
                         {snippet.code && (
                             <div className="relative">
                                 <button
