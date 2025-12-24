@@ -18,8 +18,14 @@ export default function LearningLayout({ children }) {
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
-        await signOut();
-        navigate('/');
+        console.log('handleSignOut called in LearningLayout');
+        try {
+            await signOut();
+            console.log('signOut completed successfully');
+            navigate('/');
+        } catch (error) {
+            console.error('signOut error:', error);
+        }
     };
 
     const navItems = [
