@@ -57,6 +57,10 @@ export default function FeedbackWidget() {
             from_email: email || 'Non fourni',
             page_url: window.location.href,
             user_agent: navigator.userAgent,
+            date: new Date().toLocaleString('fr-FR', {
+                dateStyle: 'full',
+                timeStyle: 'short'
+            }),
         };
 
         try {
@@ -157,8 +161,8 @@ export default function FeedbackWidget() {
                                                         type="button"
                                                         onClick={() => setFeedbackType(type.id)}
                                                         className={`flex flex-col items-center gap-1 p-3 rounded-lg border transition-all cursor-pointer ${isSelected
-                                                                ? `border-${type.color}-500 bg-${type.color}-500/10 text-${type.color}-400`
-                                                                : 'border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800'
+                                                            ? `border-${type.color}-500 bg-${type.color}-500/10 text-${type.color}-400`
+                                                            : 'border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800'
                                                             }`}
                                                     >
                                                         <Icon className="w-5 h-5" />
