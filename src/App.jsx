@@ -24,6 +24,8 @@ import Profile from './components/auth/Profile';
 import ConditionalAccess from './components/ConditionalAccess';
 import LearningLayout from './components/LearningLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './components/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 
 function PublicApp() {
@@ -246,6 +248,9 @@ export default function App() {
 
         {/* Protected Routes */}
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

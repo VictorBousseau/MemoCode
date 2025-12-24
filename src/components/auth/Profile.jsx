@@ -6,6 +6,7 @@ import {
     User, Mail, Shield, Key, Save, AlertCircle, CheckCircle,
     ChevronLeft, LogOut, Loader2, Eye, EyeOff
 } from 'lucide-react';
+import StatsSection from '../StatsSection';
 
 export default function Profile() {
     const { user, userRole, signOut, updatePassword } = useAuth();
@@ -266,15 +267,8 @@ export default function Profile() {
                         )}
                     </div>
 
-                    {/* Future: Statistics Card (placeholder) */}
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 opacity-50">
-                        <h2 className="text-lg font-semibold text-white mb-4">
-                            📊 Statistiques
-                        </h2>
-                        <p className="text-zinc-500 text-sm">
-                            Vos statistiques d'apprentissage seront disponibles prochainement !
-                        </p>
-                    </div>
+                    {/* Statistics Section */}
+                    <StatsSection />
                 </motion.div>
             </main>
         </div>
