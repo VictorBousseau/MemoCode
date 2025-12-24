@@ -26,8 +26,8 @@ export function useFlashcardsSync() {
     const loadFlashcards = useCallback(async () => {
         setLoading(true);
 
-        if (user) {
-            try {
+        try {
+            if (user) {
                 const { data, error } = await supabase
                     .from('user_flashcards')
                     .select('*')
@@ -37,37 +37,36 @@ export function useFlashcardsSync() {
                 if (error) {
                     console.warn('Failed to load from Supabase:', error.message);
                     loadFromLocalStorage();
-                    return;
+                } else {
+                    // Transform to match expected format
+                    const cards = data.map(card => ({
+                        id: card.id,
+                        questionId: card.question_id,
+                        question: card.question,
+                        code: card.code,
+                        answer: card.answer,
+                        explanation: card.explanation,
+                        type: card.type,
+                        topic: card.topic,
+                        difficulty: card.difficulty,
+                        addedAt: new Date(card.created_at).getTime(),
+                        reviewedAt: card.reviewed_at ? new Date(card.reviewed_at).getTime() : null,
+                        timesReviewed: card.times_reviewed || 0,
+                        correctCount: card.correct_count || 0,
+                        incorrectCount: card.incorrect_count || 0
+                    }));
+
+                    setFlashcards(cards);
                 }
-
-                // Transform to match expected format
-                const cards = data.map(card => ({
-                    id: card.id,
-                    questionId: card.question_id,
-                    question: card.question,
-                    code: card.code,
-                    answer: card.answer,
-                    explanation: card.explanation,
-                    type: card.type,
-                    topic: card.topic,
-                    difficulty: card.difficulty,
-                    addedAt: new Date(card.created_at).getTime(),
-                    reviewedAt: card.reviewed_at ? new Date(card.reviewed_at).getTime() : null,
-                    timesReviewed: card.times_reviewed || 0,
-                    correctCount: card.correct_count || 0,
-                    incorrectCount: card.incorrect_count || 0
-                }));
-
-                setFlashcards(cards);
-            } catch (e) {
-                console.error('Error loading flashcards:', e);
+            } else {
                 loadFromLocalStorage();
             }
-        } else {
+        } catch (e) {
+            console.error('Error loading flashcards:', e);
             loadFromLocalStorage();
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     }, [user]);
 
     const loadFromLocalStorage = () => {

@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     // Fetch user role and permissions
     const fetchUserRole = async (userId) => {
         try {
+            console.log('Fetching role for user:', userId);
             const { data, error } = await supabase
                 .from('users')
                 .select(`
@@ -32,14 +33,26 @@ export const AuthProvider = ({ children }) => {
                 .eq('id', userId)
                 .single();
 
-            if (error) throw error;
+            if (error) {
+                console.error('Error in fetchUserRole query:', error);
+                throw error;
+            }
 
-            if (data) {
+            console.log('fetchUserRole data:', data);
+
+            if (data && data.roles) {
+                console.log('Setting user role to:', data.roles.name);
                 setUserRole(data.roles.name);
-                setPermissions(data.roles.permissions);
+                setPermissions(data.roles.permissions || {});
+            } else {
+                console.warn('No role data found, setting default user role');
+                setUserRole('user');
+                setPermissions({});
             }
         } catch (error) {
             console.error('Error fetching user role:', error);
+            setUserRole('user'); // Default to 'user' on error
+            setPermissions({});
         }
     };
 
