@@ -51,10 +51,10 @@ export default function FeedbackWidget() {
         setErrorMessage('');
 
         const templateParams = {
-            feedback_type: FEEDBACK_TYPES.find(t => t.id === feedbackType)?.label || feedbackType,
+            type: FEEDBACK_TYPES.find(t => t.id === feedbackType)?.label || feedbackType,
             title: title.trim(),
-            message: message.trim(),
-            from_email: email || 'Non fourni',
+            description: message.trim(),
+            user_email: email || 'Non fourni',
             page_url: window.location.href,
             user_agent: navigator.userAgent,
             date: new Date().toLocaleString('fr-FR', {
