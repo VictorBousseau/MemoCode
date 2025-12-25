@@ -21,7 +21,7 @@ import QuizManagement from './admin/QuizManagement';
  */
 export default function AdminDashboard() {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, signOut } = useAuth();
     const [activeSection, setActiveSection] = useState('overview');
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -72,8 +72,14 @@ export default function AdminDashboard() {
     ];
 
     const handleLogout = async () => {
-        await logout();
-        navigate('/');
+        console.log('handleLogout called in AdminDashboard');
+        try {
+            await signOut();
+            console.log('signOut completed');
+            navigate('/');
+        } catch (error) {
+            console.error('signOut error:', error);
+        }
     };
 
     const renderContent = () => {
@@ -158,8 +164,8 @@ export default function AdminDashboard() {
                             key={item.id}
                             onClick={() => setActiveSection(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeSection === item.id
-                                    ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
-                                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                                ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
+                                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                                 }`}
                         >
                             <item.icon className="w-5 h-5" />
