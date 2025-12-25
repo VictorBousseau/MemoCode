@@ -31,13 +31,32 @@ export default function StatsSection() {
 
     const loadStats = async () => {
         setLoading(true);
+
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Timeout')), 5000)
+        );
+
         try {
-            const stats = await getUserStats();
-            const history = await getQuizHistory();
+            // Race between actual fetch and timeout
+            const [stats, history] = await Promise.race([
+                Promise.all([getUserStats(), getQuizHistory()]),
+                timeoutPromise
+            ]);
+
             setQuizStats(stats);
-            setQuizHistory(history.slice(0, 10)); // Last 10
+            setQuizHistory(Array.isArray(history) ? history.slice(0, 10) : []);
         } catch (error) {
             console.error('Error loading stats:', error);
+            // Set default empty stats on error
+            setQuizStats({
+                totalQuizzes: 0,
+                totalQuestions: 0,
+                totalCorrect: 0,
+                averageScore: 0,
+                totalTimeSpent: 0
+            });
+            setQuizHistory([]);
         } finally {
             setLoading(false);
         }
@@ -182,7 +201,7 @@ export default function StatsSection() {
                                     </div>
                                     <div className="text-right">
                                         <p className={`text-sm font-bold ${quiz.percentage >= 80 ? 'text-green-400' :
-                                                quiz.percentage >= 50 ? 'text-yellow-400' : 'text-red-400'
+                                            quiz.percentage >= 50 ? 'text-yellow-400' : 'text-red-400'
                                             }`}>
                                             {quiz.percentage}%
                                         </p>
