@@ -18,39 +18,49 @@ export const AuthProvider = ({ children }) => {
     const [permissions, setPermissions] = useState({});
 
     // Fetch user role and permissions
+    // Fetch user role and permissions
     const fetchUserRole = async (userId) => {
         try {
             console.log('Fetching role for user:', userId);
-            const { data, error } = await supabase
+
+            // 1. Get role_id from users table
+            const { data: userData, error: userError } = await supabase
                 .from('users')
-                .select(`
-          role_id,
-          roles (
-            name,
-            permissions
-          )
-        `)
+                .select('role_id')
                 .eq('id', userId)
                 .single();
 
-            if (error) {
-                console.error('Error in fetchUserRole query:', error);
-                throw error;
+            if (userError) {
+                console.error('Error fetching user role_id:', userError);
+                throw userError;
             }
 
-            console.log('fetchUserRole data:', data);
-
-            if (data && data.roles) {
-                console.log('Setting user role to:', data.roles.name);
-                setUserRole(data.roles.name);
-                setPermissions(data.roles.permissions || {});
-            } else {
-                console.warn('No role data found, setting default user role');
+            if (!userData?.role_id) {
+                console.warn('No role_id found for user');
                 setUserRole('user');
                 setPermissions({});
+                return;
+            }
+
+            // 2. Get role details from roles table
+            const { data: roleData, error: roleError } = await supabase
+                .from('roles')
+                .select('name, permissions')
+                .eq('id', userData.role_id)
+                .single();
+
+            if (roleError) {
+                console.error('Error fetching role details:', roleError);
+                throw roleError;
+            }
+
+            if (roleData) {
+                console.log('Setting user role to:', roleData.name);
+                setUserRole(roleData.name);
+                setPermissions(roleData.permissions || {});
             }
         } catch (error) {
-            console.error('Error fetching user role:', error);
+            console.error('Error in fetchUserRole sequence:', error);
             setUserRole('user'); // Default to 'user' on error
             setPermissions({});
         }
@@ -59,42 +69,70 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         let isMounted = true;
 
-        // Set a timeout to prevent infinite loading (3 seconds max)
+        // Set a timeout to prevent infinite loading (5 seconds max)
         const loadingTimeout = setTimeout(() => {
             if (isMounted && loading) {
                 console.warn('Auth loading timeout - setting loading to false');
                 setLoading(false);
             }
-        }, 3000);
+        }, 5000);
 
-        // Check active session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (isMounted) {
-                setUser(session?.user ?? null);
-                if (session?.user) {
-                    fetchUserRole(session.user.id);
+        // Initialize auth state
+        const initAuth = async () => {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.error('Error getting session:', error);
                 }
-                setLoading(false);
+
+                if (isMounted) {
+                    if (session?.user) {
+                        console.log('Session found for user:', session.user.id);
+                        setUser(session.user);
+                        await fetchUserRole(session.user.id);
+                    } else {
+                        console.log('No active session');
+                        setUser(null);
+                        setUserRole(null);
+                        setPermissions({});
+                    }
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error('Error in initAuth:', error);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
-        }).catch((error) => {
-            console.error('Error getting session:', error);
-            if (isMounted) {
-                setLoading(false);
-            }
-        });
+        };
+
+        initAuth();
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            if (isMounted) {
-                setUser(session?.user ?? null);
-                if (session?.user) {
-                    await fetchUserRole(session.user.id);
-                } else {
-                    setUserRole(null);
-                    setPermissions({});
-                }
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log('Auth state changed:', event);
+
+            if (!isMounted) return;
+
+            if (event === 'SIGNED_OUT') {
+                console.log('User signed out');
+                setUser(null);
+                setUserRole(null);
+                setPermissions({});
                 setLoading(false);
+                return;
             }
+
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                if (session?.user) {
+                    console.log('User signed in/refreshed:', session.user.id);
+                    setUser(session.user);
+                    await fetchUserRole(session.user.id);
+                }
+            }
+
+            setLoading(false);
         });
 
         return () => {
@@ -122,7 +160,12 @@ export const AuthProvider = ({ children }) => {
 
     const signOut = async () => {
         try {
-            await supabase.auth.signOut();
+            // Race between actual signOut and a 2s timeout
+            // This ensures local logout happens even if network/Supabase hangs
+            await Promise.race([
+                supabase.auth.signOut(),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ]);
         } catch (error) {
             console.error('Error signing out:', error);
         } finally {

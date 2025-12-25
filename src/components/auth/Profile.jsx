@@ -80,7 +80,7 @@ export default function Profile() {
     }) : 'Non disponible';
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-y-auto">
             {/* Header */}
             <header className="bg-zinc-900/80 backdrop-blur-sm border-b border-zinc-800 sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-3">
