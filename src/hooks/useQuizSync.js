@@ -129,12 +129,20 @@ export function useQuizSync() {
         }
 
         try {
-            const { data, error } = await supabase
+            // Add a timeout for the Supabase query
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Supabase timeout')), 2000)
+            );
+
+            const query = supabase
                 .from('quiz_sessions')
                 .select('score, total_questions, percentage, time_spent_seconds')
                 .eq('user_id', user.id);
 
+            const { data, error } = await Promise.race([query, timeout]);
+
             if (error || !data || data.length === 0) {
+                console.warn('⚠️ No Supabase stats, using localStorage');
                 return getLocalStats();
             }
 
@@ -153,7 +161,7 @@ export function useQuizSync() {
                 source: 'supabase'
             };
         } catch (e) {
-            console.error('Error fetching stats:', e);
+            console.warn('⚠️ Stats fetch error, using localStorage:', e.message);
             return getLocalStats();
         }
     }, [user]);

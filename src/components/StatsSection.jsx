@@ -32,9 +32,9 @@ export default function StatsSection() {
     const loadStats = async () => {
         setLoading(true);
 
-        // Add timeout to prevent infinite loading
+        // Reduced timeout from 5s to 3s
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout')), 5000)
+            setTimeout(() => reject(new Error('Stats loading timeout')), 3000)
         );
 
         try {
@@ -44,11 +44,17 @@ export default function StatsSection() {
                 timeoutPromise
             ]);
 
-            setQuizStats(stats);
+            setQuizStats(stats || {
+                totalQuizzes: 0,
+                totalQuestions: 0,
+                totalCorrect: 0,
+                averageScore: 0,
+                totalTimeSpent: 0
+            });
             setQuizHistory(Array.isArray(history) ? history.slice(0, 10) : []);
         } catch (error) {
-            console.error('Error loading stats:', error);
-            // Set default empty stats on error
+            console.error('⚠️ Stats loading error:', error);
+            // Set default empty stats on error/timeout
             setQuizStats({
                 totalQuizzes: 0,
                 totalQuestions: 0,

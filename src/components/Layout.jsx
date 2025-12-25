@@ -16,15 +16,10 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
 
-    const handleSignOut = async () => {
-        console.log('handleSignOut called in Layout');
-        try {
-            await signOut();
-            console.log('signOut completed successfully');
-            navigate('/');
-        } catch (error) {
-            console.error('signOut error:', error);
-        }
+    const handleSignOut = () => {
+        console.log('🚪 Logout clicked');
+        signOut(); // Don't await - instant logout
+        navigate('/');
     };
 
     React.useEffect(() => {

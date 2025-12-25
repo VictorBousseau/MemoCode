@@ -21,15 +21,10 @@ export default function Profile() {
     const [passwordStatus, setPasswordStatus] = useState('idle'); // idle, loading, success, error
     const [passwordError, setPasswordError] = useState('');
 
-    const handleSignOut = async () => {
-        console.log('handleSignOut called in Profile');
-        try {
-            await signOut();
-            console.log('signOut completed');
-            navigate('/');
-        } catch (error) {
-            console.error('signOut error:', error);
-        }
+    const handleSignOut = () => {
+        console.log('🚪 Logout clicked');
+        signOut(); // Don't await - instant logout
+        navigate('/');
     };
 
     const handlePasswordChange = async (e) => {

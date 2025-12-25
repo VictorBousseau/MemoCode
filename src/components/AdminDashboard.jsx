@@ -71,15 +71,10 @@ export default function AdminDashboard() {
         { id: 'quizzes', label: 'Questions Quiz', icon: FileQuestion },
     ];
 
-    const handleLogout = async () => {
-        console.log('handleLogout called in AdminDashboard');
-        try {
-            await signOut();
-            console.log('signOut completed');
-            navigate('/');
-        } catch (error) {
-            console.error('signOut error:', error);
-        }
+    const handleLogout = () => {
+        console.log('🚪 Logout clicked');
+        signOut(); // Don't await - instant logout
+        navigate('/');
     };
 
     const renderContent = () => {

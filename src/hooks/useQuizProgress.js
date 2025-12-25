@@ -112,7 +112,7 @@ export function useQuizProgress(quizId) {
                     isCorrect = userAnswer === question.correctAnswer;
                     break;
                 case 'code-completion':
-                    isCorrect = userAnswer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+                    isCorrect = String(userAnswer).trim().toLowerCase() === String(question.correctAnswer).toLowerCase();
                     break;
                 case 'true-false':
                     isCorrect = userAnswer === question.correctAnswer;
