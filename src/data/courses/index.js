@@ -1,100 +1,67 @@
 // Course data structure for MemoCode
-// Each course has chapters with markdown content
+// Enhanced Python course with 29 modules based on Complete Python 3 Bootcamp
 
 export const COURSES = {
     python: {
         id: 'python',
-        title: 'Python - Les Fondamentaux',
-        description: 'Maîtrisez Python de zéro jusqu\'à la POO',
+        title: 'Python - De Débutant à Expert',
+        description: 'Cours complet : fondamentaux jusqu\'aux sujets avancés (décorateurs, regex, web scraping)',
         icon: '🐍',
         color: 'from-blue-500 to-yellow-500',
-        duration: '~10 heures',
-        level: 'Débutant → Intermédiaire',
+        duration: '~25-30 heures',
+        level: 'Débutant → Avancé',
+        parts: [
+            { id: 'part1', title: 'Partie 1 : Fondamentaux', modules: ['00', '01', '02', '03', '04', '05', '06'] },
+            { id: 'part2', title: 'Partie 2 : Contrôle de Flux', modules: ['07', '08', '09', '10'] },
+            { id: 'part3', title: 'Partie 3 : Fonctions', modules: ['11', '12', '13', '14'] },
+            { id: 'part4', title: 'Partie 4 : POO', modules: ['15', '16'] },
+            { id: 'part5', title: 'Partie 5 : Modules & Erreurs', modules: ['17', '18'] },
+            { id: 'part6', title: 'Partie 6 : Concepts Avancés', modules: ['19', '20', '21', '22', '23'] },
+            { id: 'part7', title: 'Partie 7 : Applications', modules: ['24', '25', '26', '27', '28'] },
+        ],
         chapters: [
-            {
-                id: '00-environnement',
-                title: 'Module 0 : Environnement Professionnel',
-                duration: '30 min',
-                description: 'Installation, IDE, premiers pas'
-            },
-            {
-                id: '01-variables',
-                title: 'Module 1 : Variables et Mémoire',
-                duration: '40 min',
-                description: 'Types, références, F-Strings'
-            },
-            {
-                id: '02-operateurs',
-                title: 'Module 2 : Opérateurs',
-                duration: '25 min',
-                description: 'Arithmétique, comparaison, logique'
-            },
-            {
-                id: '03-conditions',
-                title: 'Module 3 : Conditions',
-                duration: '30 min',
-                description: 'if/elif/else, opérateur ternaire'
-            },
-            {
-                id: '04-boucles',
-                title: 'Module 4 : Boucles',
-                duration: '40 min',
-                description: 'for, while, break, continue'
-            },
-            {
-                id: '05-listes',
-                title: 'Module 5 : Listes',
-                duration: '45 min',
-                description: 'Indexation, slicing, comprehensions'
-            },
-            {
-                id: '06-dictionnaires',
-                title: 'Module 6 : Dictionnaires',
-                duration: '40 min',
-                description: 'Clé-valeur, JSON, comprehensions'
-            },
-            {
-                id: '07-tuples-sets',
-                title: 'Module 7 : Tuples et Sets',
-                duration: '25 min',
-                description: 'Immutabilité, unicité'
-            },
-            {
-                id: '08-fonctions',
-                title: 'Module 8 : Fonctions',
-                duration: '50 min',
-                description: 'args, kwargs, scope, lambda'
-            },
-            {
-                id: '09-fichiers',
-                title: 'Module 9 : Gestion des Fichiers',
-                duration: '30 min',
-                description: 'Lecture, écriture, JSON'
-            },
-            {
-                id: '10-erreurs',
-                title: 'Module 10 : Gestion des Erreurs',
-                duration: '25 min',
-                description: 'try/except, raise'
-            },
-            {
-                id: '11-modules',
-                title: 'Module 11 : Modules et Packages',
-                duration: '30 min',
-                description: 'import, pip, venv'
-            },
-            {
-                id: '12-poo',
-                title: 'Module 12 : POO',
-                duration: '60 min',
-                description: 'Classes, héritage, dunder methods'
-            },
-            {
-                id: '13-bonnes-pratiques',
-                title: 'Module 13 : Bonnes Pratiques',
-                duration: '20 min',
-                description: 'PEP 8, DRY, clean code'
-            }
+            // PARTIE 1 : FONDAMENTAUX
+            { id: '00-environnement', title: 'Module 0 : Environnement & Installation', duration: '30 min', part: 'Fondamentaux' },
+            { id: '01-variables', title: 'Module 1 : Variables et Types de Données', duration: '45 min', part: 'Fondamentaux' },
+            { id: '02-strings', title: 'Module 2 : Chaînes de Caractères', duration: '50 min', part: 'Fondamentaux' },
+            { id: '03-listes', title: 'Module 3 : Listes', duration: '50 min', part: 'Fondamentaux' },
+            { id: '04-dictionnaires', title: 'Module 4 : Dictionnaires', duration: '45 min', part: 'Fondamentaux' },
+            { id: '05-tuples-sets', title: 'Module 5 : Tuples et Sets', duration: '35 min', part: 'Fondamentaux' },
+            { id: '06-fichiers', title: 'Module 6 : Fichiers I/O', duration: '40 min', part: 'Fondamentaux' },
+
+            // PARTIE 2 : CONTRÔLE DE FLUX
+            { id: '07-comparaisons', title: 'Module 7 : Opérateurs de Comparaison', duration: '25 min', part: 'Contrôle de Flux' },
+            { id: '08-conditions', title: 'Module 8 : Conditions (if/elif/else)', duration: '35 min', part: 'Contrôle de Flux' },
+            { id: '09-boucles', title: 'Module 9 : Boucles (for/while)', duration: '45 min', part: 'Contrôle de Flux' },
+            { id: '10-fonctions-utiles', title: 'Module 10 : Fonctions Built-in Utiles', duration: '30 min', part: 'Contrôle de Flux' },
+
+            // PARTIE 3 : FONCTIONS
+            { id: '11-methodes', title: 'Module 11 : Méthodes d\'Objets', duration: '25 min', part: 'Fonctions' },
+            { id: '12-fonctions', title: 'Module 12 : Fonctions', duration: '60 min', part: 'Fonctions' },
+            { id: '13-lambda', title: 'Module 13 : Lambda, Map & Filter', duration: '35 min', part: 'Fonctions' },
+            { id: '14-scope', title: 'Module 14 : Portée (Scope) & Closures', duration: '35 min', part: 'Fonctions' },
+
+            // PARTIE 4 : POO
+            { id: '15-poo-bases', title: 'Module 15 : POO - Classes & Objets', duration: '70 min', part: 'POO' },
+            { id: '16-poo-avancee', title: 'Module 16 : POO Avancée', duration: '50 min', part: 'POO' },
+
+            // PARTIE 5 : MODULES & ERREURS
+            { id: '17-modules', title: 'Module 17 : Modules et Packages', duration: '40 min', part: 'Modules & Erreurs' },
+            { id: '18-erreurs', title: 'Module 18 : Gestion des Erreurs', duration: '45 min', part: 'Modules & Erreurs' },
+
+            // PARTIE 6 : CONCEPTS AVANCÉS
+            { id: '19-decorateurs', title: 'Module 19 : Décorateurs', duration: '45 min', part: 'Concepts Avancés' },
+            { id: '20-generateurs', title: 'Module 20 : Générateurs & Itérateurs', duration: '40 min', part: 'Concepts Avancés' },
+            { id: '21-modules-avances', title: 'Module 21 : Modules Avancés', duration: '60 min', part: 'Concepts Avancés' },
+            { id: '22-regex', title: 'Module 22 : Expressions Régulières', duration: '50 min', part: 'Concepts Avancés' },
+            { id: '23-zip-files', title: 'Module 23 : Fichiers ZIP', duration: '25 min', part: 'Concepts Avancés' },
+
+            // PARTIE 7 : APPLICATIONS
+            { id: '24-web-scraping', title: 'Module 24 : Web Scraping', duration: '60 min', part: 'Applications' },
+            { id: '25-images', title: 'Module 25 : Manipulation d\'Images', duration: '35 min', part: 'Applications' },
+            { id: '26-pdf-excel', title: 'Module 26 : PDFs et Spreadsheets', duration: '45 min', part: 'Applications' },
+            { id: '27-email', title: 'Module 27 : Email avec Python', duration: '30 min', part: 'Applications' },
+            { id: '28-gui', title: 'Module 28 : GUIs avec Tkinter', duration: '50 min', part: 'Applications' },
         ]
     }
 };
