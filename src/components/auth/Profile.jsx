@@ -4,12 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
     User, Mail, Shield, Key, Save, AlertCircle, CheckCircle,
-    ChevronLeft, LogOut, Loader2, Eye, EyeOff
+    ChevronLeft, LogOut, Loader2, Eye, EyeOff, Settings
 } from 'lucide-react';
 import StatsSection from '../StatsSection';
 
 export default function Profile() {
-    const { user, userRole, signOut, updatePassword } = useAuth();
+    const { user, userRole, signOut, updatePassword, isAdmin } = useAuth();
     const navigate = useNavigate();
 
     // Password change state
@@ -138,6 +138,17 @@ export default function Profile() {
                                     <p className="text-white capitalize">{userRole || 'Utilisateur'}</p>
                                 </div>
                             </div>
+
+                            {/* Admin Dashboard Button - Only visible for admins */}
+                            {isAdmin() && (
+                                <Link
+                                    to="/admin"
+                                    className="flex items-center justify-center gap-2 w-full p-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium rounded-lg transition-all"
+                                >
+                                    <Settings className="w-5 h-5" />
+                                    Accéder au Tableau de Bord Admin
+                                </Link>
+                            )}
 
                             {/* Member Since */}
                             <div className="flex items-center gap-3 p-3 bg-zinc-800/50 rounded-lg">
