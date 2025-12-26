@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import {
     Home, Brain, BookMarked, Code2, LogOut, User,
-    GraduationCap, Lock, ChevronLeft
+    GraduationCap, Lock, ChevronLeft, BookOpen
 } from 'lucide-react';
 import FeedbackWidget from './FeedbackWidget';
 
@@ -24,6 +24,7 @@ export default function LearningLayout({ children }) {
     };
 
     const navItems = [
+        { path: '/learn/courses', label: 'Cours', icon: BookOpen, color: 'blue' },
         { path: '/learn/quiz', label: 'Quiz & Exercices', icon: Brain, color: 'green' },
         { path: '/learn/flashcards', label: 'Flashcards', icon: BookMarked, color: 'orange' },
         { path: '/learn/playground', label: 'Playground', icon: Code2, color: 'purple' },

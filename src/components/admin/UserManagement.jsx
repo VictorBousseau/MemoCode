@@ -149,7 +149,7 @@ export default function UserManagement() {
             </div>
 
             {/* Users Table */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl">
                 <table className="w-full">
                     <thead>
                         <tr className="border-b border-zinc-800">
@@ -209,7 +209,7 @@ export default function UserManagement() {
                                             </button>
 
                                             {editingUser === user.id && (
-                                                <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl z-10 overflow-hidden">
+                                                <div className="absolute right-0 bottom-full mb-2 w-48 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl z-50">
                                                     {roles.map((role) => (
                                                         <button
                                                             key={role.id}

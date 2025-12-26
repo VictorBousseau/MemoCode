@@ -26,6 +26,8 @@ import LearningLayout from './components/LearningLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './components/AdminDashboard';
+import CoursesPage from './components/CoursesPage';
+import CourseDetail from './components/CourseDetail';
 import { useAuth } from './context/AuthContext';
 
 function PublicApp() {
@@ -231,6 +233,18 @@ const PlaygroundPage = () => (
   </LearningLayout>
 );
 
+const CoursesPageWrapper = () => (
+  <LearningLayout>
+    <CoursesPage />
+  </LearningLayout>
+);
+
+const CourseDetailWrapper = () => (
+  <LearningLayout>
+    <CourseDetail />
+  </LearningLayout>
+);
+
 export default function App() {
   return (
     <Router basename="/MemoCode">
@@ -244,6 +258,10 @@ export default function App() {
         <Route path="/learn/quiz" element={<QuizPage />} />
         <Route path="/learn/flashcards" element={<FlashcardsPage />} />
         <Route path="/learn/playground" element={<PlaygroundPage />} />
+        <Route path="/learn/courses" element={<CoursesPageWrapper />} />
+        <Route path="/courses/:courseId/:chapterId" element={<CourseDetailWrapper />} />
+        <Route path="/courses/:courseId" element={<CourseDetailWrapper />} />
+        <Route path="/courses" element={<CoursesPageWrapper />} />
         <Route path="/learn" element={<Navigate to="/learn/quiz" replace />} />
 
         {/* Protected Routes */}
