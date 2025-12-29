@@ -74,7 +74,6 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
     return (
         <motion.div
             onClick={onClick}
-            whileTap={{ scale: 0.98 }}
             className="bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all duration-300 cursor-pointer"
         >
             {breadcrumb && (

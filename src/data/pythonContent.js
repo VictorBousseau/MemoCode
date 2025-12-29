@@ -63,6 +63,25 @@ df.to_excel('output.xlsx', sheet_name='Resultats', index=False)
 
 # Pickle (format binaire rapide pour Python)
 df.to_pickle('data.pkl')`
+                        },
+                        {
+                            id: 'export_parquet',
+                            title: 'Exporter en Parquet',
+                            description: 'Format colonnaire optimisé pour les grands volumes de données.',
+                            level: 'intermediate',
+                            tags: ['parquet', 'io', 'pandas', 'big-data'],
+                            code: `# Exporter en Parquet (format colonnaire performant)
+# Avantages : compression efficace, lecture rapide, compatible Spark/Dask
+df.to_parquet('output.parquet', index=False)
+
+# Avec compression (gzip, snappy, brotli)
+df.to_parquet('output.parquet', compression='snappy')
+
+# Lire un fichier Parquet
+df = pd.read_parquet('data.parquet')
+
+# Lire uniquement certaines colonnes (optimisation mémoire)
+df = pd.read_parquet('data.parquet', columns=['col1', 'col2'])`
                         }
                     ]
                 },
@@ -118,6 +137,30 @@ print(df['age'].var())      # Variance
 print(df['age'].min())      # Minimum
 print(df['age'].max())      # Maximum
 print(df['age'].quantile([0.25, 0.75])) # Quartiles`
+                        },
+                        {
+                            id: 'display_unique_values',
+                            title: 'Afficher les valeurs distinctes',
+                            description: 'Lister toutes les valeurs uniques d\'une colonne.',
+                            level: 'beginner',
+                            tags: ['eda', 'unique', 'distinct', 'pandas'],
+                            code: `# Toutes les valeurs distinctes d'une colonne (array NumPy)
+print(df['colonne'].unique())
+
+# Nombre de valeurs distinctes
+print(df['colonne'].nunique())
+
+# Valeurs distinctes avec leur fréquence (trié par fréquence)
+print(df['colonne'].value_counts())
+
+# Afficher TOUTES les valeurs distinctes (même si très nombreuses)
+pd.set_option('display.max_rows', None)
+print(df['colonne'].value_counts())
+pd.reset_option('display.max_rows')
+
+# En liste Python (utile pour itérer)
+valeurs = df['colonne'].unique().tolist()
+print(valeurs)`
                         }
                     ]
                 },
@@ -440,7 +483,7 @@ Souscription_individuelle_selec['Propo_gagné'] = (Souscription_individuelle_sel
                 },
                 {
                     id: 'time_series_advanced',
-                    title: 'Feature Engineering Temporel',
+                    title: '6. Feature Engineering Temporel',
                     description: 'Techniques avancées pour les dates.',
                     snippets: [
                         {
@@ -548,6 +591,75 @@ df_clean = df.dropna()
 print("\\n--- Dataset Enrichi (Feature Engineering) ---")
 cols_to_show = ['date', 'month_sin', 'month_cos', 'ventes', 'ventes_lag_1', 'ventes_rolling_mean_7']
 print(df_clean[cols_to_show].tail())`
+                        },
+                        {
+                            id: 'time_correlation_yoy',
+                            title: 'Corrélation Année N / N-1',
+                            description: 'Utiliser l\'historique de l\'année précédente comme feature.',
+                            level: 'advanced',
+                            tags: ['time-series', 'correlation', 'feature-engineering', 'pandas'],
+                            code: `import numpy as np
+import pandas as pd
+
+# 1. Configuration
+df_model = df.copy() # Votre DataFrame principal
+cols_dates = ['date_creation', 'date_validation'] # Vos colonnes dates
+target_col = 'target_value' # La valeur à prédire (ex: Ventes, Conversion...)
+ref_year = 2024 # L'année de référence (N-1) pour construire l'historique
+
+# === TRAITEMENT DES DATES & CYCLICITÉ ===
+for col in cols_dates:
+    # Conversion
+    df_model[col] = pd.to_datetime(df_model[col], errors='coerce')
+    
+    # Encodage cyclique (Jour de l'année)
+    # Permet au modèle de comprendre que le 31 déc est proche du 1er jan
+    day_of_year = df_model[col].dt.dayofyear
+    df_model[f'{col}_sin'] = np.sin(2 * np.pi * day_of_year / 365.25)
+    df_model[f'{col}_cos'] = np.cos(2 * np.pi * day_of_year / 365.25)
+
+# === FEATURE : DÉLAI ===
+# Temps écoulé entre les deux dates
+df_model['delai_jours'] = (df_model[cols_dates[1]] - df_model[cols_dates[0]]).dt.days
+df_model['delai_jours'] = df_model['delai_jours'].fillna(-1)
+
+# === CORRÉLATION SEMAINE PAR SEMAINE (HISTORIQUE) ===
+# On veut associer à chaque semaine de l'année en cours, 
+# la moyenne de la cible de la MÊME SEMAINE de l'année précédente.
+
+# 1. Création des clés de jointure
+df_model['semaine'] = df_model[cols_dates[0]].dt.isocalendar().week
+df_model['annee'] = df_model[cols_dates[0]].dt.year
+
+# 2. Construction du Référentiel (Année N-1 uniquement)
+ref_data = df.copy()
+ref_data[cols_dates[0]] = pd.to_datetime(ref_data[cols_dates[0]], errors='coerce')
+ref_data['annee'] = ref_data[cols_dates[0]].dt.year
+ref_data['semaine'] = ref_data[cols_dates[0]].dt.isocalendar().week
+
+# On ne garde que l'année de référence pour avoir un historique "clos" et statique
+# On fait la moyenne par semaine
+history_stats = ref_data[ref_data['annee'] == ref_year].groupby('semaine')[target_col].mean().rename('target_N_minus_1')
+
+# 3. Fusion (Merge) : On injecte l'historique dans le dataset actuel
+df_model = df_model.merge(history_stats, on='semaine', how='left')
+
+# 4. Gestion des semaines manquantes (Cold Start)
+# Si une semaine n'existait pas l'an dernier, on met la moyenne globale de l'année N-1
+global_mean_N_1 = ref_data[ref_data['annee'] == ref_year][target_col].mean()
+df_model['target_N_minus_1'] = df_model['target_N_minus_1'].fillna(global_mean_N_1)
+
+# === FILTRAGE TEMPOREL ===
+# Exemple : On garde l'année N-1 complète + l'année N jusqu'à un cutoff
+# (Pour éviter le Data Leakage si on est en train d'entraîner)
+date_cutoff = df_model[cols_dates[0]].max() - pd.Timedelta(days=30)
+if not df_model.empty:
+    df_model = df_model[df_model[cols_dates[0]] < date_cutoff]
+
+# Nettoyage technique
+df_model = df_model.drop(columns=cols_dates + ['semaine', 'annee'], errors='ignore')
+
+print(f"✅ Features générées : {[c for c in df_model.columns if 'sin' in c or 'cos' in c or 'target' in c]}")`
                         }
                     ]
                 }

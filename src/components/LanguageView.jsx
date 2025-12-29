@@ -663,7 +663,7 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                                                                     theme={snippet.themeTitle || activeTheme?.title}
                                                                     priority={getPriority(snippet.id)}
                                                                     onPriorityChange={(level) => setPriority(snippet.id, level)}
-                                                                    dragHandleProps={sortBy === 'manual' && !hasTagFilters ? dragHandleProps : undefined}
+                                                                    dragHandleProps={undefined}
                                                                 />
                                                             </>
                                                         )}
@@ -755,6 +755,6 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
