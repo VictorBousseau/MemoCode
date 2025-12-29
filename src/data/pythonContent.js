@@ -5673,6 +5673,431 @@ except ValidationError as e:
                     ]
                 }
             ]
+        },
+        {
+            id: 'bayesian_networks',
+            title: 'Réseaux Bayésiens',
+            description: 'Modèles Graphiques Probabilistes avec pgmpy',
+            categories: [
+                {
+                    id: 'bn_fundamentals',
+                    title: '1. Fondamentaux',
+                    description: 'Création de réseaux et tables de probabilités',
+                    snippets: [
+                        {
+                            id: 'bn_install',
+                            title: 'Installation de pgmpy',
+                            description: 'Installer la bibliothèque pour les modèles graphiques probabilistes.',
+                            level: 'beginner',
+                            tags: ['pgmpy', 'installation', 'bayesian'],
+                            code: `# Installation de pgmpy
+# pip install pgmpy
+
+# Imports de base
+from pgmpy.models import BayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.inference import VariableElimination
+
+# Vérification de l'installation
+import pgmpy
+print(f"pgmpy version: {pgmpy.__version__}")`
+                        },
+                        {
+                            id: 'bn_create_dag',
+                            title: 'Créer un DAG (Graphe Orienté Acyclique)',
+                            description: 'Définir la structure du réseau bayésien.',
+                            level: 'intermediate',
+                            tags: ['dag', 'structure', 'bayesian', 'pgmpy'],
+                            markdown: `### Qu'est-ce qu'un DAG ?
+Un **Directed Acyclic Graph** représente les relations causales entre variables.
+- **Nœuds** = Variables aléatoires
+- **Arêtes** = Relations de dépendance (Parent → Enfant)
+- **Acyclique** = Pas de boucles
+
+### Exemple : Réseau "Alarme"
+\`\`\`
+Cambriolage  Tremblement
+     \\         /
+      ↘       ↙
+        Alarme
+        /    \\
+       ↓      ↓
+    Jean     Marie
+    appelle  appelle
+\`\`\``,
+                            code: `from pgmpy.models import BayesianNetwork
+
+# Définition de la structure du réseau
+# Format : liste de tuples (Parent, Enfant)
+model = BayesianNetwork([
+    ('Cambriolage', 'Alarme'),
+    ('Tremblement', 'Alarme'),
+    ('Alarme', 'JeanAppelle'),
+    ('Alarme', 'MarieAppelle')
+])
+
+# Afficher les nœuds
+print("Nœuds:", model.nodes())
+# ['Cambriolage', 'Tremblement', 'Alarme', 'JeanAppelle', 'MarieAppelle']
+
+# Afficher les arêtes
+print("Arêtes:", model.edges())
+
+# Parents d'un nœud
+print("Parents de Alarme:", model.get_parents('Alarme'))
+# ['Cambriolage', 'Tremblement']
+
+# Enfants d'un nœud
+print("Enfants de Alarme:", model.get_children('Alarme'))
+# ['JeanAppelle', 'MarieAppelle']`
+                        },
+                        {
+                            id: 'bn_cpd',
+                            title: 'Tables de Probabilités Conditionnelles (CPT)',
+                            description: 'Définir les probabilités P(Enfant | Parents).',
+                            level: 'intermediate',
+                            tags: ['cpd', 'cpt', 'probability', 'bayesian', 'pgmpy'],
+                            markdown: `### CPT = Conditional Probability Table
+Chaque nœud a une **table de probabilités conditionnelles** qui définit :
+- P(Nœud | Parents) si le nœud a des parents
+- P(Nœud) si c'est un nœud racine
+
+### Structure d'une CPT
+| Parent1 | Parent2 | P(Enfant=Oui) | P(Enfant=Non) |
+|---------|---------|---------------|---------------|
+| Oui     | Oui     | 0.95          | 0.05          |
+| Oui     | Non     | 0.94          | 0.06          |
+| Non     | Oui     | 0.29          | 0.71          |
+| Non     | Non     | 0.001         | 0.999         |`,
+                            code: `from pgmpy.factors.discrete import TabularCPD
+
+# === CPT pour nœuds SANS parents (prior) ===
+cpd_cambriolage = TabularCPD(
+    variable='Cambriolage',
+    variable_card=2,  # 2 états : [Non, Oui]
+    values=[[0.999], [0.001]]  # P(Non)=0.999, P(Oui)=0.001
+)
+
+cpd_tremblement = TabularCPD(
+    variable='Tremblement',
+    variable_card=2,
+    values=[[0.998], [0.002]]
+)
+
+# === CPT pour nœud AVEC parents ===
+# P(Alarme | Cambriolage, Tremblement)
+# Colonnes = combinaisons des parents
+cpd_alarme = TabularCPD(
+    variable='Alarme',
+    variable_card=2,
+    values=[
+        # P(Alarme=Non | ...)
+        [0.999, 0.71, 0.06, 0.05],
+        # P(Alarme=Oui | ...)
+        [0.001, 0.29, 0.94, 0.95]
+    ],
+    evidence=['Cambriolage', 'Tremblement'],
+    evidence_card=[2, 2]
+)
+# Ordre des colonnes : (C=0,T=0), (C=0,T=1), (C=1,T=0), (C=1,T=1)
+
+cpd_jean = TabularCPD(
+    variable='JeanAppelle',
+    variable_card=2,
+    values=[[0.95, 0.10], [0.05, 0.90]],
+    evidence=['Alarme'],
+    evidence_card=[2]
+)
+
+cpd_marie = TabularCPD(
+    variable='MarieAppelle',
+    variable_card=2,
+    values=[[0.99, 0.30], [0.01, 0.70]],
+    evidence=['Alarme'],
+    evidence_card=[2]
+)
+
+# Ajouter les CPT au modèle
+model.add_cpds(cpd_cambriolage, cpd_tremblement, cpd_alarme, cpd_jean, cpd_marie)
+
+# Vérifier la cohérence du modèle
+print("Modèle valide:", model.check_model())  # True`
+                        },
+                        {
+                            id: 'bn_view_cpd',
+                            title: 'Afficher une CPT',
+                            description: 'Visualiser les tables de probabilités.',
+                            level: 'beginner',
+                            tags: ['cpd', 'display', 'bayesian', 'pgmpy'],
+                            code: `# Afficher une CPT spécifique
+print(model.get_cpds('Alarme'))
+
+# Sortie :
+# +------------+---------------+---------------+---------------+---------------+
+# | Cambriolage| Cambriolage_0 | Cambriolage_0 | Cambriolage_1 | Cambriolage_1 |
+# | Tremblement| Tremblement_0 | Tremblement_1 | Tremblement_0 | Tremblement_1 |
+# +------------+---------------+---------------+---------------+---------------+
+# | Alarme_0   | 0.999         | 0.71          | 0.06          | 0.05          |
+# | Alarme_1   | 0.001         | 0.29          | 0.94          | 0.95          |
+# +------------+---------------+---------------+---------------+---------------+
+
+# Afficher toutes les CPT
+for cpd in model.get_cpds():
+    print(f"\\n=== {cpd.variable} ===")
+    print(cpd)`
+                        }
+                    ]
+                },
+                {
+                    id: 'bn_inference',
+                    title: '2. Inférence',
+                    description: 'Calculer des probabilités conditionnelles',
+                    snippets: [
+                        {
+                            id: 'bn_variable_elimination',
+                            title: 'Inférence Exacte (Variable Elimination)',
+                            description: 'Calculer P(Query | Evidence) de manière exacte.',
+                            level: 'intermediate',
+                            tags: ['inference', 'query', 'bayesian', 'pgmpy'],
+                            markdown: `### Inférence Bayésienne
+L'inférence permet de répondre à des questions du type :
+- **P(Cambriolage | JeanAppelle=Oui)** : Quelle est la probabilité d'un cambriolage sachant que Jean a appelé ?
+- **P(Alarme | MarieAppelle=Oui, Tremblement=Non)** : Probabilité que l'alarme sonne sachant que Marie a appelé mais qu'il n'y a pas eu de tremblement.
+
+### Méthode : Variable Elimination
+Algorithme exact qui marginalise les variables non pertinentes.`,
+                            code: `from pgmpy.inference import VariableElimination
+
+# Créer l'objet d'inférence
+infer = VariableElimination(model)
+
+# === Query simple ===
+# P(Cambriolage | JeanAppelle=Oui)
+result = infer.query(
+    variables=['Cambriolage'],
+    evidence={'JeanAppelle': 1}  # 1 = Oui
+)
+print(result)
+# +---------------+---------------------+
+# | Cambriolage   |   phi(Cambriolage)  |
+# +===============+=====================+
+# | Cambriolage_0 |              0.9844 |
+# | Cambriolage_1 |              0.0156 |
+# +---------------+---------------------+
+
+# === Query avec plusieurs évidences ===
+# P(Cambriolage | JeanAppelle=Oui, MarieAppelle=Oui)
+result = infer.query(
+    variables=['Cambriolage'],
+    evidence={'JeanAppelle': 1, 'MarieAppelle': 1}
+)
+print(result)
+# La probabilité de cambriolage augmente !
+
+# === Probabilité jointe ===
+# P(Cambriolage, Tremblement | Alarme=Oui)
+result = infer.query(
+    variables=['Cambriolage', 'Tremblement'],
+    evidence={'Alarme': 1}
+)
+print(result)`
+                        },
+                        {
+                            id: 'bn_map_query',
+                            title: 'MAP Query (Most Probable Explanation)',
+                            description: 'Trouver l\'état le plus probable des variables.',
+                            level: 'advanced',
+                            tags: ['map', 'mpe', 'inference', 'bayesian', 'pgmpy'],
+                            code: `# MAP = Maximum A Posteriori
+# Trouve l'état le plus probable des variables query
+
+# Quel est l'état le plus probable de Cambriolage et Tremblement
+# sachant que Jean ET Marie ont appelé ?
+map_result = infer.map_query(
+    variables=['Cambriolage', 'Tremblement'],
+    evidence={'JeanAppelle': 1, 'MarieAppelle': 1}
+)
+print("État le plus probable:", map_result)
+# {'Cambriolage': 1, 'Tremblement': 0}
+# Interprétation : Probablement un cambriolage, pas un tremblement
+
+# Sans évidence : état a priori le plus probable
+prior_map = infer.map_query(variables=['Cambriolage', 'Alarme'])
+print("A priori:", prior_map)
+# {'Cambriolage': 0, 'Alarme': 0} - Pas de cambriolage, pas d'alarme`
+                        },
+                        {
+                            id: 'bn_sampling',
+                            title: 'Inférence Approchée (Échantillonnage)',
+                            description: 'Monte Carlo sampling pour les grands réseaux.',
+                            level: 'advanced',
+                            tags: ['sampling', 'monte-carlo', 'bayesian', 'pgmpy'],
+                            code: `from pgmpy.sampling import BayesianModelSampling
+
+# Créer le sampler
+sampler = BayesianModelSampling(model)
+
+# === Forward Sampling ===
+# Générer des échantillons selon la distribution jointe
+samples = sampler.forward_sample(size=1000)
+print(samples.head())
+#    Cambriolage  Tremblement  Alarme  JeanAppelle  MarieAppelle
+# 0            0            0       0            0             0
+# 1            0            0       0            0             0
+# ...
+
+# Estimer P(Cambriolage=1)
+p_cambriolage = samples['Cambriolage'].mean()
+print(f"P(Cambriolage) ≈ {p_cambriolage:.4f}")
+
+# === Rejection Sampling ===
+# Échantillonnage conditionnel (garde seulement les échantillons compatibles)
+samples_given = sampler.rejection_sample(
+    size=1000,
+    evidence=[('JeanAppelle', 1)]
+)
+p_camb_given_jean = samples_given['Cambriolage'].mean()
+print(f"P(Cambriolage | JeanAppelle=Oui) ≈ {p_camb_given_jean:.4f}")`
+                        }
+                    ]
+                },
+                {
+                    id: 'bn_learning',
+                    title: '3. Apprentissage',
+                    description: 'Apprendre les paramètres et la structure depuis les données',
+                    snippets: [
+                        {
+                            id: 'bn_param_learning',
+                            title: 'Apprentissage des Paramètres (MLE)',
+                            description: 'Estimer les CPT à partir de données.',
+                            level: 'advanced',
+                            tags: ['learning', 'mle', 'parameters', 'bayesian', 'pgmpy'],
+                            markdown: `### Apprentissage des Paramètres
+Quand on connaît la **structure** (le DAG) mais pas les **probabilités** (CPT), on peut les estimer à partir de données.
+
+**Méthodes :**
+- **MLE** (Maximum Likelihood Estimation) : Compte les fréquences
+- **Bayesian Estimation** : Ajoute des pseudo-counts (prior)`,
+                            code: `import pandas as pd
+from pgmpy.models import BayesianNetwork
+from pgmpy.estimators import MaximumLikelihoodEstimator, BayesianEstimator
+
+# === Données d'entraînement ===
+data = pd.DataFrame({
+    'Pluie':    [1, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+    'Arroseur': [0, 1, 1, 0, 0, 1, 0, 1, 0, 0],
+    'Mouillé':  [1, 1, 1, 0, 1, 1, 1, 1, 0, 1]
+})
+
+# === Définir la structure (DAG connu) ===
+model = BayesianNetwork([
+    ('Pluie', 'Mouillé'),
+    ('Arroseur', 'Mouillé')
+])
+
+# === MLE : Maximum Likelihood Estimation ===
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+print("=== CPT apprise par MLE ===")
+print(model.get_cpds('Mouillé'))
+
+# === Bayesian Estimation (avec prior) ===
+# Utile quand on a peu de données
+model_bayes = BayesianNetwork([
+    ('Pluie', 'Mouillé'),
+    ('Arroseur', 'Mouillé')
+])
+model_bayes.fit(
+    data, 
+    estimator=BayesianEstimator,
+    prior_type='BDeu',  # Prior de Bayesian Dirichlet equivalent uniform
+    equivalent_sample_size=10  # Force du prior
+)
+print("\\n=== CPT apprise par Bayesian Estimation ===")
+print(model_bayes.get_cpds('Mouillé'))`
+                        },
+                        {
+                            id: 'bn_structure_learning',
+                            title: 'Apprentissage de Structure',
+                            description: 'Découvrir le DAG optimal à partir des données.',
+                            level: 'advanced',
+                            tags: ['learning', 'structure', 'hill-climbing', 'bayesian', 'pgmpy'],
+                            markdown: `### Apprentissage de Structure
+Quand on ne connaît **ni la structure ni les paramètres**, on peut apprendre les deux !
+
+**Méthodes :**
+- **Score-based** : Hill Climbing, recherche le DAG avec le meilleur score (BIC, K2)
+- **Constraint-based** : PC Algorithm, utilise des tests d'indépendance`,
+                            code: `import pandas as pd
+from pgmpy.estimators import HillClimbSearch, BicScore, K2Score
+
+# === Données ===
+data = pd.DataFrame({
+    'A': [0, 1, 1, 0, 1, 0, 1, 1, 0, 0],
+    'B': [0, 1, 1, 0, 1, 1, 1, 1, 0, 0],
+    'C': [0, 1, 1, 0, 1, 1, 1, 1, 0, 1]
+})
+
+# === Hill Climbing avec score BIC ===
+hc = HillClimbSearch(data)
+best_model = hc.estimate(scoring_method=BicScore(data))
+
+print("Structure découverte:")
+print("Arêtes:", best_model.edges())
+
+# === Créer le modèle complet ===
+from pgmpy.models import BayesianNetwork
+from pgmpy.estimators import MaximumLikelihoodEstimator
+
+model = BayesianNetwork(best_model.edges())
+model.fit(data, estimator=MaximumLikelihoodEstimator)
+
+print("\\n=== Modèle appris ===")
+for cpd in model.get_cpds():
+    print(f"\\n{cpd.variable}:")
+    print(cpd)`
+                        },
+                        {
+                            id: 'bn_independence',
+                            title: 'Tests d\'Indépendance (d-séparation)',
+                            description: 'Vérifier les indépendances conditionnelles.',
+                            level: 'advanced',
+                            tags: ['d-separation', 'independence', 'bayesian', 'pgmpy'],
+                            code: `# La d-séparation permet de vérifier quelles variables sont
+# conditionnellement indépendantes dans le graphe
+
+# Dans notre réseau Alarme :
+# Cambriolage ⊥ Tremblement (indépendants a priori)
+# Cambriolage ⊥ Tremblement | Alarme ? (depends on d-separation)
+
+# Vérifier l'indépendance conditionnelle
+from pgmpy.models import BayesianNetwork
+
+model = BayesianNetwork([
+    ('Cambriolage', 'Alarme'),
+    ('Tremblement', 'Alarme'),
+    ('Alarme', 'JeanAppelle'),
+    ('Alarme', 'MarieAppelle')
+])
+
+# Est-ce que Cambriolage est indépendant de Tremblement ?
+# (sans observation)
+independencies = model.get_independencies()
+print("Indépendances du modèle:")
+print(independencies)
+
+# D-séparation : X et Y sont-ils indépendants sachant Z ?
+# Syntaxe: is_d_separated(X, Y, Z)
+print("\\nCambriolage ⊥ Tremblement ?", 
+      model.is_d_separated('Cambriolage', 'Tremblement', {}))
+# True : marginalement indépendants
+
+print("Cambriolage ⊥ Tremblement | Alarme ?", 
+      model.is_d_separated('Cambriolage', 'Tremblement', {'Alarme'}))
+# False : conditionnellement dépendants (explaining away)`
+                        }
+                    ]
+                }
+            ]
         }
     ]
 };

@@ -10,13 +10,24 @@ import {
     Menu, X, CheckCircle, Circle, Download, FileCode
 } from 'lucide-react';
 import { getCourse, getChapter } from '../data/courses/index';
-import { getChapterContent } from '../data/courses/python/chapters';
+import { getChapterContent as getPythonChapterContent } from '../data/courses/python/chapters';
+import { getChapterContent as getBayesianChapterContent } from '../data/courses/bayesian/chapters';
 
 // Exercise files available for download
 const EXERCISE_FILES = {
     '01-variables': { exercice: '01-variables-exercice.py', solution: '01-variables-solution.py' },
     '02-strings': { exercice: '02-strings-exercice.py', solution: '02-strings-solution.py' },
     '03-listes': { exercice: '03-listes-exercice.py', solution: '03-listes-solution.py' },
+};
+
+// Get chapter content based on course
+const getChapterContent = (courseId, chapterId) => {
+    if (courseId === 'python') {
+        return getPythonChapterContent(chapterId);
+    } else if (courseId === 'bayesian') {
+        return getBayesianChapterContent(chapterId);
+    }
+    return null;
 };
 
 export default function CourseDetail() {
@@ -28,7 +39,7 @@ export default function CourseDetail() {
     const course = getCourse(courseId);
     const currentChapterInfo = chapterId ? getChapter(courseId, chapterId) : course?.chapters[0];
     const currentChapterId = chapterId || course?.chapters[0]?.id;
-    const chapterContent = getChapterContent(currentChapterId);
+    const chapterContent = getChapterContent(courseId, currentChapterId);
 
     // Load completed chapters from localStorage
     useEffect(() => {

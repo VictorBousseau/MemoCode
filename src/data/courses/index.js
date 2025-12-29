@@ -63,6 +63,39 @@ export const COURSES = {
             { id: '27-email', title: 'Module 27 : Email avec Python', duration: '30 min', part: 'Applications' },
             { id: '28-gui', title: 'Module 28 : GUIs avec Tkinter', duration: '50 min', part: 'Applications' },
         ]
+    },
+    bayesian: {
+        id: 'bayesian',
+        title: 'Réseaux Bayésiens',
+        description: 'Modélisation probabiliste, inférence et apprentissage avec pgmpy',
+        icon: '🎲',
+        color: 'from-purple-500 to-pink-500',
+        duration: '~8-10 heures',
+        level: 'Intermédiaire → Avancé',
+        parts: [
+            { id: 'part1', title: 'Partie 1 : Fondements Théoriques', modules: ['01', '02', '03'] },
+            { id: 'part2', title: 'Partie 2 : Modélisation', modules: ['04', '05'] },
+            { id: 'part3', title: 'Partie 3 : Inférence', modules: ['06', '07'] },
+            { id: 'part4', title: 'Partie 4 : Apprentissage', modules: ['08', '09'] },
+        ],
+        chapters: [
+            // PARTIE 1 : FONDEMENTS THÉORIQUES
+            { id: '01-introduction', title: 'Module 1 : Introduction aux Réseaux Bayésiens', duration: '45 min', part: 'Fondements Théoriques' },
+            { id: '02-probabilites', title: 'Module 2 : Rappels de Probabilités', duration: '60 min', part: 'Fondements Théoriques' },
+            { id: '03-independance', title: 'Module 3 : Indépendance Conditionnelle', duration: '45 min', part: 'Fondements Théoriques' },
+
+            // PARTIE 2 : MODÉLISATION
+            { id: '04-dag', title: 'Module 4 : Graphes Orientés Acycliques (DAG)', duration: '50 min', part: 'Modélisation' },
+            { id: '05-cpt', title: 'Module 5 : Tables de Probabilités Conditionnelles', duration: '55 min', part: 'Modélisation' },
+
+            // PARTIE 3 : INFÉRENCE
+            { id: '06-inference-exacte', title: 'Module 6 : Inférence Exacte', duration: '70 min', part: 'Inférence' },
+            { id: '07-inference-approchee', title: 'Module 7 : Inférence Approchée (Sampling)', duration: '50 min', part: 'Inférence' },
+
+            // PARTIE 4 : APPRENTISSAGE
+            { id: '08-apprentissage-params', title: 'Module 8 : Apprentissage des Paramètres', duration: '60 min', part: 'Apprentissage' },
+            { id: '09-apprentissage-structure', title: 'Module 9 : Apprentissage de Structure', duration: '65 min', part: 'Apprentissage' },
+        ]
     }
 };
 
