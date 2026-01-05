@@ -115,7 +115,7 @@ export default function FeedbackWidget() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl z-[101] overflow-hidden"
+                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl z-[101] overflow-hidden max-h-[85vh] flex flex-col"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between p-4 border-b border-zinc-800">
@@ -145,7 +145,7 @@ export default function FeedbackWidget() {
                                     <p className="text-zinc-400">Votre feedback a été envoyé avec succès.</p>
                                 </motion.div>
                             ) : (
-                                <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                                <form onSubmit={handleSubmit} className="p-4 space-y-4 overflow-y-auto custom-scrollbar">
                                     {/* Feedback Type Selector */}
                                     <div>
                                         <label className="block text-sm font-medium text-zinc-300 mb-2">

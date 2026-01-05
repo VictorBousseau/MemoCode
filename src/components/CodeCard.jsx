@@ -197,7 +197,10 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                             )}
 
                             {cell.markdown && (
-                                <div className="px-6 py-4 text-zinc-300 overflow-x-auto">
+                                <div
+                                    className="px-6 py-4 text-zinc-300 overflow-x-auto cursor-text"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkMath]}
                                         rehypePlugins={[rehypeKatex]}
@@ -257,6 +260,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                             background: 'rgba(0,0,0,0.2)',
                                             fontSize: '0.9rem',
                                         }}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         {cell.code}
                                     </SyntaxHighlighter>
@@ -269,7 +273,10 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                 /* Legacy: Single Block Rendering */
                 <>
                     {snippet.markdown && (
-                        <div className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0">
+                        <div
+                            className="p-6 text-zinc-300 overflow-x-auto border-b border-zinc-800 last:border-0 cursor-text"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm, remarkMath]}
                                 rehypePlugins={[rehypeKatex]}
@@ -315,6 +322,7 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
                                     background: 'transparent',
                                     fontSize: '0.9rem',
                                 }}
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 {snippet.code}
                             </SyntaxHighlighter>
