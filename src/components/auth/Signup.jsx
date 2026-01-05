@@ -28,7 +28,9 @@ export default function Signup() {
         setLoading(true);
 
         try {
-            const { error } = await signUp(email, password);
+            const { error } = await signUp(email, password, {
+                emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`
+            });
             if (error) {
                 setError(error.message);
             } else {
