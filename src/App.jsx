@@ -235,13 +235,17 @@ const PlaygroundPage = () => (
 
 const CoursesPageWrapper = () => (
   <LearningLayout>
-    <CoursesPage />
+    <ConditionalAccess featureName="les cours">
+      <CoursesPage />
+    </ConditionalAccess>
   </LearningLayout>
 );
 
 const CourseDetailWrapper = () => (
   <LearningLayout>
-    <CourseDetail />
+    <ConditionalAccess featureName="ce cours">
+      <CourseDetail />
+    </ConditionalAccess>
   </LearningLayout>
 );
 
@@ -254,15 +258,18 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Learning Zone Routes - Now accessible to all with conditional content */}
+        {/* Learning Zone Routes - All protected individually via wrappers */}
         <Route path="/learn/quiz" element={<QuizPage />} />
         <Route path="/learn/flashcards" element={<FlashcardsPage />} />
         <Route path="/learn/playground" element={<PlaygroundPage />} />
         <Route path="/learn/courses" element={<CoursesPageWrapper />} />
         <Route path="/courses/:courseId/:chapterId" element={<CourseDetailWrapper />} />
         <Route path="/courses/:courseId" element={<CourseDetailWrapper />} />
-        <Route path="/courses" element={<CoursesPageWrapper />} />
-        <Route path="/learn" element={<Navigate to="/learn/quiz" replace />} />
+        {/* Legacy /courses route redirects to /learn/courses or handles valid routes */}
+        <Route path="/courses" element={<Navigate to="/learn/courses" replace />} />
+
+        {/* Default redirect for /learn */}
+        <Route path="/learn" element={<Navigate to="/learn/courses" replace />} />
 
         {/* Protected Routes */}
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
