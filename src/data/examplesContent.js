@@ -1185,6 +1185,125 @@ if not df_referentiel.empty:
 💡 **Pro Tip** : \`Ctrl + K, Ctrl + S\` ouvre la liste complète des raccourcis`
                         }
                     ]
+                },
+                {
+                    id: 'latex_writing',
+                    title: 'Ecrire en LaTeX',
+                    description: 'Guide complet pour rédiger des mathématiques.',
+                    snippets: [
+                        {
+                            id: 'latex_tutorial',
+                            title: 'Tutoriel LaTeX',
+                            description: 'Guide interactif : Opérations, Écriture, Symboles et Astuces.',
+                            level: 'intermediate',
+                            runnable: false,
+                            tags: ['latex', 'math', 'tips', 'markdown'],
+                            cells: [
+                                {
+                                    title: "Introduction",
+                                    markdown: `### 📝 Bases du LaTeX
+Tout code mathématique est écrit entre deux symboles dollar \`$\`.
+
+- **Formule en ligne** : \`$votre_code$\` (s'intègre dans le texte)
+- **Bloc centré** : \`$$votre_code$$\` (une ligne dédiée)
+
+Exemple : \`$\\sqrt{x}$\` donne $\\sqrt{x}$`
+                                },
+                                {
+                                    title: "Opérations de Base",
+                                    markdown: `### ➗ Opérations Courantes
+
+| Opération | Code | Résultat |
+|:---|:---|:---|
+| **Fraction** | \`$\\frac{a}{b}$\` | $\\frac{a}{b}$ |
+| **Racine Carrée** | \`$\\sqrt{x}$\` | $\\sqrt{x}$ |
+| **Racine Indice n** | \`$\\sqrt[3]{x}$\` | $\\sqrt[3]{x}$ |
+| **Multiplication** | \`$\\times$\` ou \`$\\cdot$\` | $\\times$ ou $\\cdot$ |
+| **Division** | \`$\\div$\` | $\\div$ |
+| **Somme** | \`$\\sum_{i=0}^{n}$\` | $\\sum_{i=0}^{n}$ |
+| **Intégrale** | \`$\\int_{a}^{b}$\` | $\\int_{a}^{b}$ |
+| **Infini** | \`$\\infty$\` | $\\infty$ |`
+                                },
+                                {
+                                    title: "Écriture & Notation",
+                                    markdown: `### ✍️ Notations et Exposants
+
+| Terme | Expression | Résultat |
+|:---|:---|:---|
+| **Exposant** | \`$x^2$\` | $x^2$ |
+| **Indice** | \`$x_i$\` | $x_i$ |
+| **Complexes** | \`$e^{2x + 1}$\` ou \`$x_{total}$\` | $e^{2x + 1}$ ou $x_{total}$ |
+| **Barre** | \`$\\bar{x}$\` | $\\bar{x}$ |
+| **Chapeau** | \`$\\hat{a}$\` | $\\hat{a}$ |
+| **Tilde** | \`$\\tilde{x}$\` | $\\tilde{x}$ |
+| **Point (Dérivée)** | \`$\\dot{x}$\` | $\\dot{x}$ |
+| **Espérance** | \`$\\mathbb{E}[X]$\` | $\\mathbb{E}[X]$ |
+| **Ensemble Réel** | \`$\\mathbb{R}$\` | $\\mathbb{R}$ |
+
+#### Fonctions par morceaux
+\`\`\`latex
+$$ f(x) = \\begin{cases} x^2 & \\text{si } x > 0 \\\\ 0 & \\text{si } x = 0 \\\\ -x & \\text{si } x < 0 \\end{cases} $$
+\`\`\`
+$$ f(x) = \\begin{cases} x^2 & \\text{si } x > 0 \\\\ 0 & \\text{si } x = 0 \\\\ -x & \\text{si } x < 0 \\end{cases} $$
+
+#### Matrices
+\`\`\`latex
+$$ A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix} $$
+\`\`\`
+$$ A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{bmatrix} $$`
+                                },
+                                {
+                                    title: "Lettres Grecques",
+                                    markdown: `### α Lettres Grecques
+
+| Lettre | Code | Résultat | | Lettre | Code | Résultat |
+|:---|:---|:---|---|:---|:---|:---|
+| **Alpha** | \`$\\alpha$\` | $\\alpha$ | | **Pi** | \`$\\pi$\` | $\\pi$ |
+| **Beta** | \`$\\beta$\` | $\\beta$ | | **Sigma** | \`$\\sigma$\` | $\\sigma$ |
+| **Gamma** | \`$\\gamma$\` | $\\gamma$ | | **Theta** | \`$\\theta$\` | $\\theta$ |
+| **Delta** | \`$\\delta$\` | $\\delta$ | | **Omega** | \`$\\omega$\` | $\\omega$ |
+| **Delta Maj** | \`$\\Delta$\` | $\\Delta$ | | **Omega Maj** | \`$\\Omega$\` | $\\Omega$ |
+| **Phi** | \`$\\phi$\` | $\\phi$ | | **Psi** | \`$\\psi$\` | $\\psi$ |`
+                                },
+                                {
+                                    title: "Astuces & Productivité",
+                                    markdown: `### 💡 Tips LaTeX
+
+| Objectif | Code | Avec | Sans |
+|:---|:---|:---|:---|
+| **Parenthèses adaptatives** | \`\\left( \\frac{a}{b} \\right)\` | $\\left( \\frac{a}{b} \\right)$ | $(\\frac{a}{b})$ (trop petit) |
+| **Petit espace** | \`a \\ b\` | $a \\ b$ | $ab$ |
+| **Grand espace** | \`a \\quad b\` | $a \\quad b$ | $ab$ |
+| **Texte dans math** | \`\\text{a et b}\` | $\\text{a et b}$ | $a et b$ (italique moche) |`
+                                },
+                                {
+                                    title: "Logique, Ensembles & Flèches",
+                                    markdown: `### 🧠 Logique & Ensembles
+
+| Terme | Code | Résultat |
+|:---|:---|:---|
+| **Pour tout** | \`$\\forall$\` | $\\forall$ |
+| **Il existe** | \`$\\exists$\` | $\\exists$ |
+| **Implique** | \`$\\implies$\` | $\\implies$ |
+| **Équivalent** | \`$\\iff$\` | $\\iff$ |
+| **Non** | \`$\\neg$\` | $\\neg$ |
+| **Et / Ou** | \`$\\land / \\lor$\` | $\\land / \\lor$ |
+| **Appartient** | \`$\\in$\` | $\\in$ |
+| **Inclus** | \`$\\subset$\` | $\\subset$ |
+| **Union** | \`$\\cup$\` | $\\cup$ |
+| **Intersection** | \`$\\cap$\` | $\\cap$ |
+| **Vide** | \`$\\emptyset$\` | $\\emptyset$ |
+| **Réels / Naturels** | \`$\\mathbb{R} / \\mathbb{N}$\` | $\\mathbb{R} / \\mathbb{N}$ |
+
+#### ➡️ Flèches
+| Code | Résultat | Code | Résultat |
+|:---|:---|:---|:---|
+| \`$\\rightarrow$\` | $\\rightarrow$ | \`$\\leftarrow$\` | $\\leftarrow$ |
+| \`$\\leftrightarrow$\` | $\\leftrightarrow$ | \`$\\mapsto$\` | $\\mapsto$ |`
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
