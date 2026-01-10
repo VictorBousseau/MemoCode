@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2, Brain, BookMarked, Code2, Lock, GraduationCap, Home } from 'lucide-react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2, Brain, BookMarked, Code2, Lock, GraduationCap, Home, FileSpreadsheet } from 'lucide-react';
 import DataSettings from './DataSettings';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,6 +13,7 @@ const languages = [
     { name: 'DAX', icon: TrendingUp },
     { name: 'Power Query (M)', icon: Table },
     { name: 'NoSQL', icon: Database },
+    { name: 'Excel', icon: FileSpreadsheet },
     { name: 'Exemples', icon: FileCode2 },
 ];
 

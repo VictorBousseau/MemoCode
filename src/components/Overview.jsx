@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileCode2, Database, GitBranch, Zap, TrendingUp, BarChart3, Table, ArrowRight, Flame } from 'lucide-react';
+import { FileCode2, Database, GitBranch, Zap, TrendingUp, BarChart3, Table, ArrowRight, Flame, FileSpreadsheet } from 'lucide-react';
 import { pythonContent } from '../data/pythonContent';
 import { sqlContent } from '../data/sqlContent';
 import { gitContent } from '../data/gitContent';
@@ -82,6 +82,14 @@ const languages = [
         color: 'text-purple-400',
         bg: 'bg-purple-400/10',
         description: "Cas pratiques et projets. De la simulation numérique à l'optimisation avec Gurobi, en passant par des projets Data Science complets."
+    },
+    {
+        id: 'Excel',
+        name: 'Excel',
+        icon: FileSpreadsheet,
+        color: 'text-green-500',
+        bg: 'bg-green-500/10',
+        description: "Maîtrisez le tableur incontournable. Des formules de base aux tableaux croisés dynamiques, en passant par les raccourcis essentiels pour gagner du temps."
     },
 ];
 

@@ -484,9 +484,55 @@ print(domaine)  # "example.com"
     '03-listes': `
 # Module 3 : Listes
 
-Les listes sont des **séquences ordonnées et mutables** d'éléments.
+Les listes sont des **séquences ordonnées et mutables** d'éléments. C'est la structure de données **la plus utilisée** en Python car elle est à la fois flexible et puissante.
 
-## Création
+---
+
+## 🧠 Pourquoi Utiliser des Listes ?
+
+Imaginez que vous devez gérer **plusieurs données similaires**. Sans liste, vous devriez créer une variable pour chaque élément :
+
+\`\`\`python
+# ❌ SANS LISTE - Cauchemar à maintenir !
+note1 = 15
+note2 = 18
+note3 = 12
+note4 = 20
+# Et si vous avez 100 notes ?
+
+# ✅ AVEC LISTE - Simple et flexible !
+notes = [15, 18, 12, 20]
+# Facilement extensible à 100, 1000 notes...
+\`\`\`
+
+### Schéma Mental
+
+\`\`\`
+      Index:    0        1        2        3
+              ┌────┬────┬────┬────┐
+   Liste  →   │ 15 │ 18 │ 12 │ 20 │
+              └────┴────┴────┴────┘
+              
+   Accès:  notes[0] = 15
+           notes[-1] = 20 (dernier élément)
+\`\`\`
+
+### Cas d'Usage Concrets
+
+| Situation | Exemple de liste |
+|-----------|------------------|
+| 📋 **Todo list** | \`["Faire courses", "Appeler maman", "Coder"]\` |
+| 📊 **Notes d'étudiants** | \`[15, 18, 12, 20, 14]\` |
+| 🛒 **Panier d'achat** | \`["Pommes", "Pain", "Lait"]\` |
+| 📁 **Fichiers à traiter** | \`["data1.csv", "data2.csv", "data3.csv"]\` |
+| 👥 **Utilisateurs connectés** | \`["alice", "bob", "charlie"]\` |
+| 🎮 **Scores de jeu** | \`[1500, 2300, 1800, 3200]\` |
+
+> 💡 **Règle d'or** : Utilisez une liste dès que vous avez **plusieurs éléments du même type** à gérer ensemble.
+
+---
+
+## 📦 Création de Listes
 
 \`\`\`python
 # Liste vide
@@ -495,9 +541,9 @@ vide = list()
 
 # Liste avec éléments
 nombres = [1, 2, 3, 4, 5]
-mixte = [1, "hello", 3.14, True]
+mixte = [1, "hello", 3.14, True]  # Types mixtes possibles
 
-# Liste de listes (matrice)
+# Liste de listes (matrice 2D)
 matrice = [
     [1, 2, 3],
     [4, 5, 6],
@@ -635,134 +681,277 @@ print(moyenne([85, 90, 78, 92, 88]))  # 86.6
     '04-dictionnaires': `
 # Module 4 : Dictionnaires
 
-Les dictionnaires stockent des paires **clé-valeur** avec accès O(1).
+Les dictionnaires sont l'une des structures de données **les plus puissantes** de Python. Ils stockent des paires **clé-valeur** et permettent un accès ultra-rapide (O(1)) à n'importe quelle valeur via sa clé.
 
-## Création
+---
+
+## 🧠 Pourquoi Utiliser un Dictionnaire ?
+
+### Le Problème avec les Listes
+
+Avec une liste, pour trouver une information, vous devez **connaître sa position** (index). C'est peu pratique pour des données structurées :
+
+\`\`\`python
+# ❌ AVEC LISTE - Confus et fragile !
+utilisateur = ["Alice", 25, "alice@email.com", "Paris"]
+# Qu'est-ce que utilisateur[2] ?
+# Si on ajoute un champ, tous les index changent !
+
+# ✅ AVEC DICTIONNAIRE - Clair et robuste !
+utilisateur = {
+    "nom": "Alice",
+    "age": 25,
+    "email": "alice@email.com",
+    "ville": "Paris"
+}
+# utilisateur["email"] → toujours explicite !
+\`\`\`
+
+### Schéma Mental : L'Annuaire Téléphonique
+
+Un dictionnaire fonctionne comme un **annuaire** : vous cherchez par le nom (la clé) et vous obtenez le numéro (la valeur).
+
+\`\`\`
+┌─────────────────────────────────────┐
+│           DICTIONNAIRE              │
+├──────────────┬──────────────────────┤
+│     CLÉ      │       VALEUR         │
+├──────────────┼──────────────────────┤
+│    "nom"     │      "Alice"         │
+│    "age"     │        25            │
+│   "ville"    │      "Paris"         │
+└──────────────┴──────────────────────┘
+\`\`\`
+
+### Avantages du Dictionnaire
+
+| Liste | Dictionnaire |
+|-------|--------------|
+| Accès par **position** (index) | Accès par **nom** (clé) |
+| Ordre implicite (0, 1, 2...) | Noms explicites |
+| Recherche lente O(n) | Recherche instantanée O(1) |
+| Pour données **homogènes** | Pour données **structurées** |
+
+### Cas d'Usage Concrets
+
+| Situation | Exemple |
+|-----------|---------|
+| 👤 **Profil utilisateur** | \`{"nom": "Alice", "age": 25, "email": "..."}\` |
+| ⚙️ **Configuration app** | \`{"debug": True, "port": 8080, "theme": "dark"}\` |
+| 🔢 **Compteur de mots** | \`{"le": 5, "chat": 3, "et": 2}\` |
+| 📊 **Mapping codes** | \`{"FR": "France", "DE": "Allemagne"}\` |
+| 🗃️ **Cache/Mémoire** | \`{url: contenu_page for pages}\` |
+| 📝 **Réponse API** | Données JSON converties en dict |
+
+> 💡 **Règle d'or** : Utilisez un dictionnaire quand vous avez besoin d'**associer des informations** (nom → valeur) ou de **regrouper des propriétés** liées.
+
+---
+
+## 📦 Création de Dictionnaires
+
+### Syntaxe de base
 
 \`\`\`python
 # Dictionnaire vide
 vide = {}
 vide = dict()
 
-# Avec des données
+# Avec des données (syntaxe recommandée)
 personne = {
     "nom": "Alice",
     "age": 25,
     "ville": "Paris"
 }
 
-# Avec dict()
+# Avec dict() et arguments nommés
 personne = dict(nom="Alice", age=25, ville="Paris")
 
-# À partir de tuples
-items = [("a", 1), ("b", 2)]
-d = dict(items)
+# À partir d'une liste de tuples
+items = [("a", 1), ("b", 2), ("c", 3)]
+d = dict(items)  # {"a": 1, "b": 2, "c": 3}
 \`\`\`
 
-## Accès aux Valeurs
+> 💡 **Règles sur les clés** : Les clés doivent être **immutables** (str, int, tuple). Les listes ne peuvent PAS être des clés !
+
+---
+
+## 🔑 Accès aux Valeurs
+
+### Deux méthodes d'accès
 
 \`\`\`python
 personne = {"nom": "Alice", "age": 25}
 
-# Accès direct
+# Méthode 1 : Accès direct avec []
 print(personne["nom"])     # "Alice"
+# ⚠️ ATTENTION : KeyError si la clé n'existe pas !
+# print(personne["email"])  # KeyError !
 
-# Avec get() (évite les erreurs)
+# Méthode 2 : Avec get() - RECOMMANDÉ
 print(personne.get("age"))           # 25
-print(personne.get("email"))         # None
+print(personne.get("email"))         # None (pas d'erreur !)
 print(personne.get("email", "N/A"))  # "N/A" (valeur par défaut)
-
-# Vérifier si une clé existe
-print("nom" in personne)    # True
-print("email" in personne)  # False
 \`\`\`
 
-## Modification
+### Vérifier l'existence d'une clé
 
 \`\`\`python
 personne = {"nom": "Alice", "age": 25}
 
-# Ajouter/Modifier
-personne["email"] = "alice@example.com"
-personne["age"] = 26
+# Avec l'opérateur 'in'
+if "nom" in personne:
+    print("La clé 'nom' existe")
 
-# Mise à jour multiple
-personne.update({"ville": "Lyon", "age": 27})
-
-# setdefault - ajoute seulement si absent
-personne.setdefault("pays", "France")
-
-# Suppression
-del personne["email"]
-age = personne.pop("age")          # Retourne et supprime
-item = personne.popitem()          # Supprime le dernier item
-personne.clear()                   # Vide le dictionnaire
+if "email" not in personne:
+    print("Pas d'email enregistré")
 \`\`\`
 
-## Parcourir un Dictionnaire
+> 📝 **Bonne pratique** : Utilisez toujours \`.get()\` quand vous n'êtes pas sûr que la clé existe !
+
+---
+
+## ✏️ Modification d'un Dictionnaire
+
+\`\`\`python
+personne = {"nom": "Alice", "age": 25}
+
+# Ajouter ou modifier une valeur
+personne["email"] = "alice@example.com"  # Ajoute
+personne["age"] = 26                      # Modifie
+
+# Mise à jour multiple avec update()
+personne.update({
+    "ville": "Lyon",
+    "profession": "Développeuse"
+})
+
+# setdefault - ajoute SEULEMENT si la clé n'existe pas
+personne.setdefault("pays", "France")  # Ajoute
+personne.setdefault("nom", "Bob")      # Ne fait rien (nom existe déjà)
+\`\`\`
+
+### Suppression d'éléments
 
 \`\`\`python
 personne = {"nom": "Alice", "age": 25, "ville": "Paris"}
 
-# Clés
-for cle in personne.keys():
+# del - Supprime par clé
+del personne["ville"]
+
+# pop() - Supprime ET retourne la valeur
+age = personne.pop("age")  # age = 25, clé supprimée
+
+# pop() avec valeur par défaut (évite KeyError)
+email = personne.pop("email", "Pas d'email")
+
+# popitem() - Supprime le dernier élément ajouté
+cle, valeur = personne.popitem()
+
+# clear() - Vide le dictionnaire
+personne.clear()  # {}
+\`\`\`
+
+---
+
+## 🔄 Parcourir un Dictionnaire
+
+\`\`\`python
+personne = {"nom": "Alice", "age": 25, "ville": "Paris"}
+
+# ✅ Parcourir les clés (par défaut)
+for cle in personne:  # ou personne.keys()
     print(cle)
 
-# Valeurs
+# ✅ Parcourir les valeurs
 for valeur in personne.values():
     print(valeur)
 
-# Clés et valeurs
+# ✅ Parcourir clés ET valeurs (RECOMMANDÉ)
 for cle, valeur in personne.items():
     print(f"{cle}: {valeur}")
 \`\`\`
 
-## Dictionnaires Imbriqués
+---
+
+## 🗃️ Dictionnaires Imbriqués
+
+Les dictionnaires peuvent contenir d'autres dictionnaires, créant des structures complexes.
 
 \`\`\`python
 utilisateurs = {
     "user1": {
         "nom": "Alice",
-        "scores": [95, 87, 92]
+        "scores": [95, 87, 92],
+        "actif": True
     },
     "user2": {
         "nom": "Bob",
-        "scores": [78, 85, 90]
+        "scores": [78, 85, 90],
+        "actif": False
     }
 }
 
-# Accès
+# Accès aux données imbriquées
 print(utilisateurs["user1"]["nom"])        # "Alice"
 print(utilisateurs["user1"]["scores"][0])  # 95
+
+# Modifier une valeur imbriquée
+utilisateurs["user1"]["actif"] = False
 \`\`\`
 
-## Dict Comprehensions
+---
+
+## 🎯 Dict Comprehensions
+
+Syntaxe élégante pour créer des dictionnaires en une ligne.
 
 \`\`\`python
 # Créer un dictionnaire de carrés
 carres = {x: x**2 for x in range(1, 6)}
 # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
 
-# Filtrer
+# Avec condition (filtrer les pairs)
 pairs = {k: v for k, v in carres.items() if v % 2 == 0}
 # {2: 4, 4: 16}
 
 # Inverser clés et valeurs
 inverse = {v: k for k, v in carres.items()}
+# {1: 1, 4: 2, 9: 3, 16: 4, 25: 5}
+
+# Transformer une liste en dictionnaire
+fruits = ["pomme", "banane", "cerise"]
+longueurs = {fruit: len(fruit) for fruit in fruits}
+# {"pomme": 5, "banane": 6, "cerise": 6}
 \`\`\`
+
+---
+
+## 📋 Cas d'Usage Courants
+
+| Cas d'usage | Exemple |
+|-------------|---------|
+| Configuration | \`{"debug": True, "port": 8080}\` |
+| Cache | \`{url: contenu for url in pages}\` |
+| Comptage | \`{"a": 3, "b": 1, "c": 2}\` |
+| Mapping | \`{"lundi": 1, "mardi": 2, ...}\` |
+| Base de données simple | \`{id: user for users}\` |
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Compter les mots
 \`\`\`python
-# Exercice 1 : Compter les mots
 texte = "le chat et le chien et le chat"
 mots = texte.split()
 compteur = {}
 for mot in mots:
     compteur[mot] = compteur.get(mot, 0) + 1
 print(compteur)  # {'le': 3, 'chat': 2, 'et': 2, 'chien': 1}
+\`\`\`
 
-# Exercice 2 : Annuaire
+### Exercice 2 : Mini-annuaire
+\`\`\`python
 annuaire = {}
 
 def ajouter_contact(nom, telephone):
@@ -770,17 +959,37 @@ def ajouter_contact(nom, telephone):
 
 def chercher(nom):
     return annuaire.get(nom, "Non trouvé")
+
+ajouter_contact("Alice", "0601020304")
+print(chercher("Alice"))  # "0601020304"
+print(chercher("Bob"))    # "Non trouvé"
 \`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/04-dictionnaires-exercice.py\`
 `,
 
     '05-tuples-sets': `
 # Module 5 : Tuples et Sets
 
-## Tuples
+Ce module couvre deux structures de données essentielles : les **tuples** (séquences immuables) et les **sets** (ensembles d'éléments uniques). Chacune a des cas d'usage bien spécifiques.
 
-Les tuples sont des séquences **immuables** et ordonnées.
+---
 
-### Création
+## 🔒 Tuples : Séquences Immuables
+
+Un tuple est comme une liste, mais **immuable** : une fois créé, on ne peut plus le modifier. C'est parfait pour des données qui ne doivent pas changer.
+
+### Schéma Mental
+
+\`\`\`
+TUPLE                          LISTE
+┌───┬───┬───┬───┐              ┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │   🔒 Verrou  │ 1 │ 2 │ 3 │ 4 │   ✏️ Modifiable
+└───┴───┴───┴───┘              └───┴───┴───┴───┘
+  Création unique               Ajout/Suppression/Modification
+\`\`\`
+
+### Création de Tuples
 
 \`\`\`python
 # Tuple vide
@@ -791,257 +1000,481 @@ vide = tuple()
 coords = (10, 20)
 personne = ("Alice", 25, "Paris")
 
-# Sans parenthèses (packing)
-point = 3, 4
+# Sans parenthèses (packing implicite)
+point = 3, 4  # Crée aussi un tuple !
 
-# Tuple d'un seul élément (virgule obligatoire!)
-un_element = (42,)  # ✅ Tuple
-pas_tuple = (42)    # ❌ C'est un int
+# ⚠️ PIÈGE : Tuple d'un seul élément
+un_element = (42,)  # ✅ Tuple (virgule obligatoire !)
+pas_tuple = (42)    # ❌ C'est juste l'entier 42
+
+print(type(un_element))  # <class 'tuple'>
+print(type(pas_tuple))   # <class 'int'>
 \`\`\`
 
-### Utilisation
-
-\`\`\`python
-# Unpacking
-x, y = (10, 20)
-nom, age, ville = personne
-
-# Unpacking avec *
-premier, *reste = [1, 2, 3, 4, 5]
-# premier = 1, reste = [2, 3, 4, 5]
-
-# Échange de variables
-a, b = 1, 2
-a, b = b, a  # Maintenant a=2, b=1
-
-# Retourner plusieurs valeurs
-def min_max(liste):
-    return min(liste), max(liste)
-
-mini, maxi = min_max([3, 1, 4, 1, 5])
-\`\`\`
-
-### Tuple vs Liste
-
-| Tuple | Liste |
-|-------|-------|
-| Immuable | Mutable |
-| Plus léger en mémoire | Plus lourd |
-| Hashable (clé de dict) | Non hashable |
-| Pour données fixes | Pour données variables |
+> 💡 **Règle d'or** : Un tuple d'un seul élément nécessite une virgule : \`(valeur,)\`
 
 ---
 
-## Sets (Ensembles)
+## 📦 Unpacking : La Magie des Tuples
 
-Les sets sont des collections **non ordonnées** d'éléments **uniques**.
+L'**unpacking** permet d'extraire les valeurs d'un tuple dans plusieurs variables en une seule ligne.
 
-### Création
+\`\`\`python
+# Unpacking basique
+coords = (10, 20)
+x, y = coords  # x = 10, y = 20
+
+# Unpacking d'une séquence
+personne = ("Alice", 25, "Paris")
+nom, age, ville = personne
+
+# Unpacking avec * (rest operator)
+nombres = (1, 2, 3, 4, 5)
+premier, *reste = nombres
+# premier = 1, reste = [2, 3, 4, 5]
+
+*debut, dernier = nombres
+# debut = [1, 2, 3, 4], dernier = 5
+
+premier, *milieu, dernier = nombres
+# premier = 1, milieu = [2, 3, 4], dernier = 5
+\`\`\`
+
+### L'Échange de Variables (Astuce Python)
+
+\`\`\`python
+a = 10
+b = 20
+
+# En une seule ligne !
+a, b = b, a
+
+print(a)  # 20
+print(b)  # 10
+\`\`\`
+
+---
+
+## 🔄 Retourner Plusieurs Valeurs
+
+Les fonctions Python peuvent retourner plusieurs valeurs grâce aux tuples.
+
+\`\`\`python
+def min_max(liste):
+    """Retourne le minimum et maximum d'une liste."""
+    return min(liste), max(liste)  # Retourne un tuple
+
+# Unpacking du résultat
+mini, maxi = min_max([3, 1, 4, 1, 5, 9, 2, 6])
+print(f"Min: {mini}, Max: {maxi}")  # Min: 1, Max: 9
+
+# Ou récupérer le tuple entier
+resultat = min_max([3, 1, 4, 1, 5])
+print(resultat)        # (1, 5)
+print(resultat[0])     # 1 (minimum)
+\`\`\`
+
+---
+
+## 📊 Tuple vs Liste : Comparaison
+
+| Critère | Tuple | Liste |
+|---------|-------|-------|
+| Mutabilité | 🔒 Immuable | ✏️ Mutable |
+| Mémoire | Plus léger | Plus lourd |
+| Hashable | ✅ Oui (clé de dict) | ❌ Non |
+| Cas d'usage | Données fixes | Données variables |
+| Performance | Plus rapide | Plus lent |
+
+\`\`\`python
+# Un tuple peut être une clé de dictionnaire !
+positions = {
+    (0, 0): "origine",
+    (1, 0): "droite",
+    (0, 1): "haut"
+}
+print(positions[(0, 0)])  # "origine"
+
+# Une liste ne peut PAS être une clé
+# positions[[0, 0]] = "erreur"  # TypeError !
+\`\`\`
+
+---
+
+## 🎯 Sets : Ensembles d'Éléments Uniques
+
+Un **set** est une collection **non ordonnée** d'éléments **uniques**. Idéal pour éliminer les doublons et tester l'appartenance.
+
+### Création de Sets
 
 \`\`\`python
 # Set vide
-vide = set()  # ⚠️ Pas {}, c'est un dict vide !
+vide = set()  # ⚠️ Pas {} qui crée un dict vide !
 
 # Avec éléments
 fruits = {"pomme", "banane", "cerise"}
 
-# À partir d'une liste (dédoublonne)
-nombres = [1, 2, 2, 3, 3, 3]
-unique = set(nombres)  # {1, 2, 3}
+# À partir d'une liste (DÉDOUBLONNE automatiquement)
+nombres = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+unique = set(nombres)  # {1, 2, 3, 4}
+print(f"Avant: {len(nombres)} éléments → Après: {len(unique)} uniques")
 \`\`\`
 
-### Opérations
+---
+
+## ⚡ Opérations sur les Sets
+
+Les sets supportent les **opérations ensemblistes** mathématiques.
 
 \`\`\`python
-a = {1, 2, 3, 4}
-b = {3, 4, 5, 6}
+a = {1, 2, 3, 4, 5}
+b = {4, 5, 6, 7, 8}
 
-# Appartenance (très rapide: O(1))
+# 🔍 Test d'appartenance (très rapide : O(1))
 print(3 in a)  # True
+print(9 in a)  # False
+\`\`\`
 
+### Diagramme de Venn
+
+\`\`\`
+         A             B
+     ┌───────┐     ┌───────┐
+     │ 1 2 3 │     │ 6 7 8 │
+     │   ┌───┼─────┼───┐   │
+     │   │ 4 │     │ 5 │   │
+     └───┴───┘     └───┴───┘
+         Intersection: {4, 5}
+\`\`\`
+
+\`\`\`python
 # Union (tous les éléments)
-print(a | b)   # {1, 2, 3, 4, 5, 6}
+print(a | b)   # {1, 2, 3, 4, 5, 6, 7, 8}
 print(a.union(b))
 
 # Intersection (éléments communs)
-print(a & b)   # {3, 4}
+print(a & b)   # {4, 5}
 print(a.intersection(b))
 
-# Différence (dans a mais pas dans b)
-print(a - b)   # {1, 2}
+# Différence (dans a mais PAS dans b)
+print(a - b)   # {1, 2, 3}
 print(a.difference(b))
 
 # Différence symétrique (dans l'un OU l'autre, pas les deux)
-print(a ^ b)   # {1, 2, 5, 6}
+print(a ^ b)   # {1, 2, 3, 6, 7, 8}
+print(a.symmetric_difference(b))
 \`\`\`
 
-### Modification
+---
+
+## ✏️ Modification de Sets
 
 \`\`\`python
 s = {1, 2, 3}
 
-# Ajouter
-s.add(4)
+# Ajouter un élément
+s.add(4)  # {1, 2, 3, 4}
 
-# Ajouter plusieurs
-s.update([5, 6])
+# Ajouter plusieurs éléments
+s.update([5, 6, 7])  # {1, 2, 3, 4, 5, 6, 7}
 
-# Supprimer
-s.remove(4)     # Erreur si absent
-s.discard(4)    # Pas d'erreur si absent
-s.pop()         # Retire un élément aléatoire
-s.clear()       # Vide le set
+# Supprimer un élément
+s.remove(7)    # ⚠️ Erreur si absent !
+s.discard(10)  # ✅ Pas d'erreur si absent
+
+# Retirer un élément aléatoire
+element = s.pop()
+
+# Vider le set
+s.clear()  # set()
 \`\`\`
+
+---
+
+## 📋 Cas d'Usage Courants
+
+| Cas d'usage | Exemple |
+|-------------|---------|
+| Dédoublonner | \`list(set(ma_liste))\` |
+| Éléments communs | \`set(a) & set(b)\` |
+| Test d'appartenance rapide | \`if x in mon_set\` |
+| Éliminer les doublons d'emails | \`unique_emails = set(emails)\` |
+| Vérifier les permissions | \`user_perms & required_perms\` |
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Dédoublonner une liste
 \`\`\`python
-# Exercice 1 : Dédoublonner une liste
 liste = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
 unique = list(set(liste))
-print(unique)  # [1, 2, 3, 4]
+print(unique)  # [1, 2, 3, 4] (ordre non garanti)
 
-# Exercice 2 : Trouver les éléments communs
+# Pour préserver l'ordre (Python 3.7+)
+unique_ordonne = list(dict.fromkeys(liste))
+print(unique_ordonne)  # [1, 2, 3, 4]
+\`\`\`
+
+### Exercice 2 : Éléments communs entre deux listes
+\`\`\`python
 liste1 = [1, 2, 3, 4, 5]
 liste2 = [4, 5, 6, 7, 8]
 communs = set(liste1) & set(liste2)
 print(communs)  # {4, 5}
 \`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/05-tuples-sets-exercice.py\`
 `,
 
     '06-fichiers': `
 # Module 6 : Fichiers I/O
 
-## Ouvrir un Fichier
+La manipulation de fichiers est essentielle pour sauvegarder des données, lire des configurations, ou traiter des logs. Python offre une API simple et puissante avec le **context manager**.
+
+---
+
+## 🔑 Concept Clé : Le Context Manager (with)
+
+Le context manager \`with\` garantit que le fichier sera **toujours fermé**, même en cas d'erreur.
 
 \`\`\`python
-# Méthode avec context manager (recommandée)
+# ✅ BONNE PRATIQUE : avec context manager
 with open("fichier.txt", "r") as f:
     contenu = f.read()
-# Le fichier est automatiquement fermé ici
+# Le fichier est automatiquement fermé ici !
 
-# Méthode manuelle (déconseillée)
+# ❌ À ÉVITER : méthode manuelle
 f = open("fichier.txt", "r")
 contenu = f.read()
-f.close()  # Toujours fermer !
+f.close()  # Oubli facile = fuite de ressources !
 \`\`\`
 
-### Modes d'ouverture
+> 💡 **Pourquoi c'est important ?** Un fichier non fermé peut :
+> - Bloquer d'autres programmes
+> - Corrompre les données
+> - Consommer de la mémoire inutilement
 
-| Mode | Description |
-|------|-------------|
-| \`r\` | Lecture (défaut) |
-| \`w\` | Écriture (écrase) |
-| \`a\` | Ajout (append) |
-| \`r+\` | Lecture et écriture |
-| \`rb\` | Lecture binaire |
-| \`wb\` | Écriture binaire |
+---
 
-## Lecture
+## 📖 Modes d'Ouverture
+
+| Mode | Description | Crée le fichier ? |
+|------|-------------|-------------------|
+| \`r\` | Lecture seule (défaut) | ❌ Erreur si absent |
+| \`w\` | Écriture (écrase tout) | ✅ Si absent |
+| \`a\` | Ajout à la fin (append) | ✅ Si absent |
+| \`r+\` | Lecture + écriture | ❌ Erreur si absent |
+| \`x\` | Création exclusive | ❌ Erreur si existe |
+| \`rb\` / \`wb\` | Mode binaire | - |
+
+\`\`\`python
+# Lecture seule
+with open("config.txt", "r") as f:
+    pass
+
+# Écriture (EFFACE le contenu existant !)
+with open("output.txt", "w") as f:
+    pass
+
+# Ajout à la fin (préserve le contenu)
+with open("log.txt", "a") as f:
+    pass
+\`\`\`
+
+---
+
+## 📚 Lecture de Fichiers
+
+### Différentes méthodes de lecture
 
 \`\`\`python
 with open("fichier.txt", "r", encoding="utf-8") as f:
-    # Tout lire d'un coup
+    # 1. Lire tout d'un coup (petits fichiers)
     contenu = f.read()
     
-    # Lire ligne par ligne
+    # 2. Lire une seule ligne
     f.seek(0)  # Revenir au début
-    ligne = f.readline()       # Une ligne
-    lignes = f.readlines()     # Liste de toutes les lignes
-
-# Itérer sur les lignes (efficace en mémoire)
-with open("gros_fichier.txt", "r") as f:
-    for ligne in f:
-        print(ligne.strip())
+    premiere_ligne = f.readline()
+    
+    # 3. Lire toutes les lignes comme liste
+    f.seek(0)
+    lignes = f.readlines()  # ["ligne1\\n", "ligne2\\n", ...]
 \`\`\`
 
-## Écriture
+### Itération efficace (gros fichiers)
+
+Pour les gros fichiers, itérer ligne par ligne est **beaucoup plus efficace** en mémoire :
 
 \`\`\`python
-# Écraser le contenu
-with open("nouveau.txt", "w") as f:
+# ✅ Efficace : une ligne à la fois en mémoire
+with open("gros_fichier.log", "r") as f:
+    for ligne in f:
+        print(ligne.strip())  # .strip() enlève \\n
+
+# ❌ Risqué : tout en mémoire d'un coup
+with open("gros_fichier.log", "r") as f:
+    lignes = f.readlines()  # Peut crasher si fichier énorme!
+\`\`\`
+
+---
+
+## ✏️ Écriture de Fichiers
+
+\`\`\`python
+# Écrire du texte (écrase le contenu existant)
+with open("sortie.txt", "w", encoding="utf-8") as f:
     f.write("Première ligne\\n")
     f.write("Deuxième ligne\\n")
 
-# Ajouter à la fin
-with open("nouveau.txt", "a") as f:
-    f.write("Ligne ajoutée\\n")
+# Ajouter à la fin d'un fichier existant
+with open("log.txt", "a", encoding="utf-8") as f:
+    f.write("[INFO] Nouvelle entrée\\n")
 
-# Écrire plusieurs lignes
+# Écrire plusieurs lignes d'un coup
 lignes = ["Ligne 1\\n", "Ligne 2\\n", "Ligne 3\\n"]
-with open("nouveau.txt", "w") as f:
+with open("sortie.txt", "w") as f:
     f.writelines(lignes)
 \`\`\`
 
-## Fichiers JSON
+> ⚠️ **Attention** : \`write()\` n'ajoute pas automatiquement \`\\n\`. Vous devez le faire vous-même !
+
+---
+
+## 🌍 Encodage : UTF-8
+
+Toujours spécifier l'encodage pour éviter les problèmes avec les accents et caractères spéciaux.
+
+\`\`\`python
+# ✅ Toujours spécifier l'encodage
+with open("fichier.txt", "r", encoding="utf-8") as f:
+    contenu = f.read()
+
+# ❌ Sans encodage = problèmes possibles
+with open("fichier.txt", "r") as f:  # Encodage par défaut du système
+    contenu = f.read()  # Peut échouer avec des accents !
+\`\`\`
+
+---
+
+## 📁 Fichiers JSON
+
+JSON est le format standard pour échanger des données structurées.
 
 \`\`\`python
 import json
 
 # Données Python
-data = {
+utilisateur = {
     "nom": "Alice",
     "age": 25,
-    "hobbies": ["lecture", "musique"]
+    "hobbies": ["lecture", "musique"],
+    "actif": True
 }
 
-# Écrire en JSON
-with open("data.json", "w") as f:
-    json.dump(data, f, indent=4)
+# ÉCRIRE en JSON
+with open("user.json", "w", encoding="utf-8") as f:
+    json.dump(utilisateur, f, indent=2, ensure_ascii=False)
 
-# Lire du JSON
-with open("data.json", "r") as f:
-    data_lu = json.load(f)
+# LIRE du JSON
+with open("user.json", "r", encoding="utf-8") as f:
+    data = json.load(f)
 
-print(data_lu["nom"])  # "Alice"
-
-# Convertir en string JSON
-json_str = json.dumps(data, indent=2)
-print(json_str)
+print(data["nom"])  # "Alice"
 \`\`\`
 
-## Gestion des Chemins
+### JSON vers/depuis string
+
+\`\`\`python
+# Python → String JSON
+json_str = json.dumps(utilisateur, indent=2)
+print(json_str)
+
+# String JSON → Python
+data = json.loads('{"nom": "Bob", "age": 30}')
+print(data["nom"])  # "Bob"
+\`\`\`
+
+---
+
+## 🗂️ Gestion des Chemins
+
+Le module \`os\` permet de manipuler les chemins de fichiers de manière portable.
 
 \`\`\`python
 import os
 
-# Chemin actuel
+# Répertoire de travail actuel
 print(os.getcwd())
 
-# Changer de répertoire
-os.chdir("/chemin/vers/dossier")
+# Vérifier si un fichier/dossier existe
+print(os.path.exists("config.json"))  # True/False
+print(os.path.isfile("config.json"))  # Est-ce un fichier ?
+print(os.path.isdir("data/"))         # Est-ce un dossier ?
 
-# Vérifier si existe
-print(os.path.exists("fichier.txt"))
-print(os.path.isfile("fichier.txt"))
-print(os.path.isdir("dossier"))
+# Construire un chemin (portable Windows/Linux)
+chemin = os.path.join("data", "users", "alice.json")
+# → "data/users/alice.json" ou "data\\\\users\\\\alice.json"
 
-# Joindre des chemins
-chemin = os.path.join("dossier", "sous-dossier", "fichier.txt")
-
-# Lister les fichiers
+# Lister les fichiers d'un dossier
 fichiers = os.listdir(".")
+print(fichiers)
+
+# Obtenir le nom de fichier et l'extension
+nom, ext = os.path.splitext("rapport.pdf")
+print(nom)  # "rapport"
+print(ext)  # ".pdf"
 \`\`\`
+
+---
+
+## ⚠️ Gestion des Erreurs
+
+\`\`\`python
+try:
+    with open("fichier_inexistant.txt", "r") as f:
+        contenu = f.read()
+except FileNotFoundError:
+    print("Le fichier n'existe pas !")
+except PermissionError:
+    print("Pas les droits pour lire ce fichier !")
+except Exception as e:
+    print(f"Erreur inattendue : {e}")
+\`\`\`
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Compter les lignes
 \`\`\`python
-# Exercice 1 : Compter les lignes
-def compter_lignes(fichier):
-    with open(fichier, "r") as f:
+def compter_lignes(chemin):
+    with open(chemin, "r", encoding="utf-8") as f:
         return len(f.readlines())
 
-# Exercice 2 : Sauvegarder un dictionnaire
-def sauvegarder(data, fichier):
-    import json
-    with open(fichier, "w") as f:
+print(compter_lignes("mon_fichier.txt"))
+\`\`\`
+
+### Exercice 2 : Sauvegarder un dictionnaire en JSON
+\`\`\`python
+import json
+
+def sauvegarder(data, chemin):
+    with open(chemin, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-def charger(fichier):
-    import json
-    with open(fichier, "r") as f:
+def charger(chemin):
+    with open(chemin, "r", encoding="utf-8") as f:
         return json.load(f)
+
+# Usage
+config = {"debug": True, "version": "1.0"}
+sauvegarder(config, "config.json")
+config_lu = charger("config.json")
+print(config_lu)
 \`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/06-fichiers-exercice.py\`
 `,
 
     '07-comparaisons': `

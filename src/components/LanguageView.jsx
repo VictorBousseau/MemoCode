@@ -33,7 +33,10 @@ const themeIcons = {
     optimisation: Zap,
     data_science: BarChart,
     python_date: FileCode,
-    python_basics: Terminal
+    python_basics: Terminal,
+    admin_basics: Table,
+    data_manipulation: Filter,
+    shortcuts: Zap
 };
 
 import Breadcrumbs from './Breadcrumbs';
@@ -223,6 +226,8 @@ export default function LanguageView({ content, searchQuery, languageName, onNav
         language = 'nosql';
     } else if (content.themes.some(t => t.id === 'simulation' || t.id === 'optimisation')) {
         language = 'python-examples'; // Exclude from 'python' run button check
+    } else if (content.themes.some(t => t.id === 'admin_basics' || t.id === 'data_manipulation')) {
+        language = 'excel';
     }
 
     // Reset state when content changes (i.e., when language changes)
