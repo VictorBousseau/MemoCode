@@ -160,6 +160,424 @@ db.users.createIndex({ email: 1 })
 db.users.createIndex({ lastname: 1, firstname: 1 })`
                         }
                     ]
+                },
+                {
+                    id: 'mongo_syntax',
+                    title: '3. Syntaxe des Requêtes',
+                    description: 'L\'ordre des mots-clés MongoDB.',
+                    snippets: [
+                        {
+                            id: 'mongo_query_order',
+                            title: 'Ordre des Mots-Clés',
+                            description: 'Comment construire une requête complète.',
+                            level: 'beginner',
+                            tags: ['mongodb', 'syntax', 'query'],
+                            markdown: `### 📝 Structure d'une Requête MongoDB
+
+\`\`\`javascript
+db.collection.method({ filtre }, { projection })
+    .sort({ tri })
+    .skip(n)
+    .limit(n)
+\`\`\`
+
+### 🔢 Ordre des Éléments
+
+| # | Élément | Description | Exemple |
+|---|---------|-------------|---------|
+| 1 | \`db\` | Base de données | \`db\` |
+| 2 | \`collection\` | Nom de la collection | \`.Sportifs\` |
+| 3 | \`method()\` | find, aggregate, etc. | \`.find()\` |
+| 4 | \`{ filtre }\` | Condition WHERE | \`{ Age: { $gte: 25 } }\` |
+| 5 | \`{ projection }\` | Champs à afficher | \`{ _id: 0, Nom: 1 }\` |
+| 6 | \`.sort()\` | Tri des résultats | \`.sort({ Age: -1 })\` |
+| 7 | \`.skip()\` | Sauter N résultats | \`.skip(10)\` |
+| 8 | \`.limit()\` | Limiter les résultats | \`.limit(5)\` |
+
+### 🎯 Exemple Complet
+
+\`\`\`javascript
+// Trouver les sportifs de 25 ans ou plus,
+// Afficher seulement Nom et Age,
+// Trier par Age décroissant puis Nom croissant,
+// Prendre les 10 premiers résultats.
+
+db.Sportifs.find(
+    { "Age": { "$gte": 25 } },           // 1. FILTRE
+    { "_id": 0, "Nom": 1, "Age": 1 }     // 2. PROJECTION
+).sort(
+    { "Age": -1, "Nom": 1 }              // 3. TRI
+).limit(10)                               // 4. LIMITE
+\`\`\`
+
+> **💡 Astuce**: La projection utilise \`1\` pour afficher et \`0\` pour masquer.`
+                        }
+                    ]
+                },
+                {
+                    id: 'mongo_operators',
+                    title: '4. Opérateurs Avancés',
+                    description: '$or, $exists, $regex, $in, $nin...',
+                    snippets: [
+                        {
+                            id: 'mongo_logical_ops',
+                            title: 'Opérateurs Logiques',
+                            description: '$or, $and, $not, $nor.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'operators', 'logical'],
+                            code: `// $or : Age >= 32 OU Sexe = "F"
+db.Sportifs.find({
+    "$or": [
+        { "Age": { "$gte": 32 } },
+        { "Sexe": "F" }
+    ]
+})
+
+// $and implicite (les deux conditions)
+db.Sportifs.find({
+    "Age": { "$gte": 25 },
+    "Sexe": "M"
+})
+
+// $not : inverse une condition
+db.Sportifs.find({
+    "Sports.Entrainer": {
+        "$not": { "$elemMatch": { "$nin": ["Hand ball", "Basket ball"] } }
+    }
+})`
+                        },
+                        {
+                            id: 'mongo_element_ops',
+                            title: 'Opérateurs d\'Éléments',
+                            description: '$exists, $type.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'operators', 'exists'],
+                            code: `// Sportifs qui ont le champ "Sports.Arbitrer"
+db.Sportifs.find({
+    "Sports.Arbitrer": { "$exists": true }
+})
+
+// Sportifs sans conseiller (champ absent ou null)
+db.Sportifs.find({
+    "$or": [
+        { "IdSportifConseiller": { "$exists": false } },
+        { "IdSportifConseiller": null }
+    ]
+})`
+                        },
+                        {
+                            id: 'mongo_comparison_ops',
+                            title: 'Opérateurs de Comparaison',
+                            description: '$in, $nin, $gt, $gte, $lt, $lte.',
+                            level: 'beginner',
+                            tags: ['mongodb', 'operators', 'comparison'],
+                            code: `// $in : Ville dans la liste
+db.Gymnases.find({
+    "Ville": { "$in": ["Villetaneuse", "Sarcelles"] }
+})
+
+// $nin : Jour PAS dans la liste
+db.Gymnases.find({
+    "Seances.Jour": { "$nin": ["Dimanche", "dimanche"] }
+})
+
+// Combinaison : Ville dans liste ET Surface > 400
+db.Gymnases.find({
+    "Ville": { "$in": ["Villetaneuse", "Sarcelles"] },
+    "Surface": { "$gt": 400 }
+})`
+                        },
+                        {
+                            id: 'mongo_regex',
+                            title: 'Pattern Matching ($regex)',
+                            description: 'Recherche par expression régulière.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'regex', 'pattern'],
+                            code: `// Séances le mercredi (insensible à la casse)
+db.Gymnases.find({
+    "Seances.Jour": { "$regex": /mercredi/i }
+})
+
+// Noms commençant par "K"
+db.Sportifs.find({
+    "Nom": { "$regex": /^K/ }
+})`
+                        }
+                    ]
+                },
+                {
+                    id: 'mongo_arrays',
+                    title: '5. Tableaux (Arrays)',
+                    description: '$elemMatch, $all, $size, $unwind.',
+                    snippets: [
+                        {
+                            id: 'mongo_array_intro',
+                            title: 'Comprendre les Tableaux',
+                            description: 'Le problème des documents imbriqués.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'arrays', 'concept'],
+                            markdown: `### 📦 Le Problème des Tableaux Imbriqués
+
+En MongoDB, un document peut contenir des **tableaux d'objets** :
+
+\`\`\`json
+{
+  "NomGymnase": "Gym A",
+  "Seances": [
+    { "Jour": "Lundi", "Libelle": "Hockey", "Horaire": 14 },
+    { "Jour": "Mardi", "Libelle": "Basket", "Horaire": 18 }
+  ]
+}
+\`\`\`
+
+### ❓ Comment chercher dedans ?
+
+| Besoin | Opérateur | Exemple |
+|--------|-----------|----------|
+| Un élément contient une valeur | Requête simple | \`"Seances.Jour": "Lundi"\` |
+| Plusieurs conditions sur le **même** élément | \`$elemMatch\` | Hockey ET après 15h |
+| Toutes les valeurs sont présentes | \`$all\` | Joue au Hand ET Basket |
+| Taille exacte du tableau | \`$size\` | Exactement 3 sports |
+
+> **⚠️ Piège classique** : Sans \`$elemMatch\`, MongoDB peut matcher des conditions sur des éléments *différents* du tableau !`
+                        },
+                        {
+                            id: 'mongo_array_query',
+                            title: 'Requêtes sur Tableaux',
+                            description: '$elemMatch, $all, $size.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'arrays', 'elemMatch'],
+                            code: `// $all : Entraîne Hand ball ET Basket ball
+db.Sportifs.find({
+    "Sports.Entrainer": { "$all": ["Hand ball", "Basket ball"] }
+})
+
+// $size : Tableau vide (0 éléments)
+db.Sportifs.find({
+    "Sports.Jouer": { "$size": 0 }
+})
+
+// $elemMatch : Condition complexe sur UN MÊME élément
+// ⚠️ SANS $elemMatch : "Hockey" peut être Lundi, "Horaire > 15" peut être Mardi
+// ✅ AVEC $elemMatch : Les deux conditions sur LA MÊME séance
+db.Gymnases.find({
+    "Seances": {
+        "$elemMatch": {
+            "Libelle": "Hockey",
+            "Horaire": { "$gt": 15 }
+        }
+    }
+})`
+                        },
+                        {
+                            id: 'mongo_unwind_concept',
+                            title: 'Aplatir un Tableau ($unwind)',
+                            description: 'Pourquoi et comment dérouler.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'unwind', 'concept'],
+                            markdown: `### 🔄 C'est quoi $unwind ?
+
+\`$unwind\` **"explose"** un tableau : il crée **un document par élément** du tableau.
+
+### Avant $unwind (1 document)
+\`\`\`json
+{
+  "Gymnase": "Gym A",
+  "Seances": [
+    { "Jour": "Lundi", "Sport": "Hockey" },
+    { "Jour": "Mardi", "Sport": "Basket" }
+  ]
+}
+\`\`\`
+
+### Après $unwind (2 documents)
+\`\`\`json
+{ "Gymnase": "Gym A", "Seances": { "Jour": "Lundi", "Sport": "Hockey" } }
+{ "Gymnase": "Gym A", "Seances": { "Jour": "Mardi", "Sport": "Basket" } }
+\`\`\`
+
+### 🎯 Pourquoi faire ça ?
+
+| Cas d'usage | Explication |
+|-------------|-------------|
+| **Compter** | Combien de séances par jour ? |
+| **Grouper** | Regrouper par sport |
+| **Filtrer** | Garder seulement les séances de Hockey |
+| **Statistiques** | Calculer la moyenne des horaires |
+
+> **💡** \`$unwind\` s'utilise dans un **\`aggregate()\`**, pas dans \`find()\`.`
+                        },
+                        {
+                            id: 'mongo_unwind',
+                            title: '$unwind en Pratique',
+                            description: 'Exemples concrets.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'unwind', 'aggregation'],
+                            code: `// 1. Aplatir puis limiter
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$limit": 5 }
+])
+
+// 2. Compter les séances par jour (insensible à la casse)
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$group": {
+        "_id": { "$toLower": "$Seances.Jour" },
+        "nb": { "$sum": 1 }
+    }}
+])
+
+// 3. Pipeline complet : Filtrer -> Aplatir -> Grouper
+db.Gymnases.aggregate([
+    { "$match": { "Ville": "Stains" } },     // 1. Filtrer par ville
+    { "$unwind": "$Seances" },                // 2. Aplatir
+    { "$group": {                             // 3. Grouper par gymnase/jour
+        "_id": { "Gym": "$NomGymnase", "Jour": "$Seances.Jour" },
+        "Debut": { "$min": "$Seances.Horaire" },
+        "Fin": { "$max": "$Seances.Horaire" }
+    }}
+])`
+                        }
+                    ]
+                },
+                {
+                    id: 'mongo_lookup',
+                    title: '6. Jointures ($lookup)',
+                    description: 'Le LEFT JOIN de MongoDB.',
+                    snippets: [
+                        {
+                            id: 'mongo_lookup_intro',
+                            title: 'Comprendre $lookup',
+                            description: 'Les jointures en MongoDB.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'lookup', 'concept'],
+                            markdown: `### 🔗 C'est quoi $lookup ?
+
+\`$lookup\` est l'équivalent MongoDB du **LEFT JOIN** en SQL.
+
+### Équivalence SQL
+\`\`\`sql
+SELECT * FROM Orders
+LEFT JOIN Customers ON Orders.customerId = Customers._id
+\`\`\`
+
+### Version MongoDB
+\`\`\`javascript
+db.Orders.aggregate([
+    { "$lookup": {
+        "from": "Customers",           // Collection à joindre
+        "localField": "customerId",    // Champ de Orders
+        "foreignField": "_id",         // Champ de Customers
+        "as": "client"                 // Nom du tableau résultat
+    }}
+])
+\`\`\`
+
+### 📋 Les Paramètres
+
+| Paramètre | Description | Équivalent SQL |
+|-----------|-------------|----------------|
+| \`from\` | Collection à joindre | \`JOIN table\` |
+| \`localField\` | Clé dans le doc actuel | \`ON a.field\` |
+| \`foreignField\` | Clé dans l'autre collection | \`= b.field\` |
+| \`as\` | Nom du tableau résultat | Alias |
+
+> **⚠️ Important** : Le résultat est toujours un **tableau** (même vide ou avec 1 élément). Utilisez \`$unwind\` pour "aplatir".`
+                        },
+                        {
+                            id: 'mongo_lookup_simple',
+                            title: '$lookup Simple',
+                            description: 'Jointure basique entre collections.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'lookup', 'join'],
+                            code: `// Trouver les sportifs les plus jeunes
+// 1. Récupérer l'âge minimum
+// 2. Joindre tous les sportifs de cet âge
+db.Sportifs.aggregate([
+    { "$group": { "_id": null, "minAge": { "$min": "$Age" } } },
+    {
+        "$lookup": {
+            "from": "Sportifs",
+            "localField": "minAge",
+            "foreignField": "Age",
+            "as": "Jeunes"
+        }
+    },
+    { "$unwind": "$Jeunes" },
+    { "$replaceRoot": { "newRoot": "$Jeunes" } }
+])`
+                        },
+                        {
+                            id: 'mongo_lookup_advanced_intro',
+                            title: '$lookup avec Pipeline',
+                            description: 'Pour des jointures complexes.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'lookup', 'concept'],
+                            markdown: `### 🚀 Jointure Avancée avec Pipeline
+
+Parfois on a besoin de **conditions complexes** dans la jointure :
+- Comparer plusieurs champs
+- Filtrer les résultats de la jointure
+- Faire des calculs
+
+### Syntaxe Étendue
+\`\`\`javascript
+{ "$lookup": {
+    "from": "AutreCollection",
+    "let": { "var1": "$champ1", "var2": "$champ2" },  // Variables locales
+    "pipeline": [                                      // Pipeline sur l'autre collection
+        { "$match": { "$expr": { ... } } }
+    ],
+    "as": "resultat"
+}}
+\`\`\`
+
+### 🔑 Points Clés
+
+| Élément | Rôle |
+|---------|------|
+| \`let\` | Déclare des variables depuis le doc actuel |
+| \`$$var\` | Accède à une variable déclarée dans \`let\` |
+| \`$var\` | Accède à un champ de l'autre collection |
+| \`$expr\` | Permet de comparer des champs entre eux |
+
+> **💡 Cas d'usage** : Self-joins (couples de même âge), jointures conditionnelles, filtrage post-jointure.`
+                        },
+                        {
+                            id: 'mongo_lookup_pipeline',
+                            title: '$lookup Pipeline (Code)',
+                            description: 'Exemple : couples de même âge.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'lookup', 'pipeline'],
+                            code: `// Trouver les couples de sportifs du même âge
+// Self-join : on joint Sportifs avec... Sportifs !
+db.Sportifs.aggregate([
+    { "$project": { "Nom": 1, "Prenom": 1, "Age": 1 } },
+    {
+        "$lookup": {
+            "from": "Sportifs",
+            "let": { "age": "$Age", "id": "$_id" },  // Variables du doc actuel
+            "pipeline": [
+                {
+                    "$match": {
+                        "$expr": {
+                            "$and": [
+                                { "$eq": ["$Age", "$$age"] },   // Même âge
+                                { "$lt": ["$_id", "$$id"] }     // Éviter doublons (A,B) et (B,A)
+                            ]
+                        }
+                    }
+                },
+                { "$project": { "Nom": 1, "Prenom": 1 } }
+            ],
+            "as": "MemeAge"
+        }
+    },
+    { "$match": { "MemeAge": { "$ne": [] } } }  // Garder seulement ceux avec matches
+])`
+                        }
+                    ]
                 }
             ]
         },
