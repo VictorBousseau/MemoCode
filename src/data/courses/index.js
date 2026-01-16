@@ -96,6 +96,36 @@ export const COURSES = {
             { id: '08-apprentissage-params', title: 'Module 8 : Apprentissage des Paramètres', duration: '60 min', part: 'Apprentissage' },
             { id: '09-apprentissage-structure', title: 'Module 9 : Apprentissage de Structure', duration: '65 min', part: 'Apprentissage' },
         ]
+    },
+    mongodb: {
+        id: 'mongodb',
+        title: 'MongoDB - Requêtes et Agrégations',
+        description: 'Maîtrisez find(), aggregate, $unwind, $lookup et les bonnes pratiques',
+        icon: '🍃',
+        color: 'from-green-500 to-emerald-600',
+        duration: '~6-8 heures',
+        level: 'Débutant → Intermédiaire',
+        parts: [
+            { id: 'part1', title: 'Partie 1 : Requêtes de Base', modules: ['01', '02', '03', '04'] },
+            { id: 'part2', title: 'Partie 2 : Pipeline d\'Agrégation', modules: ['05', '06', '07'] },
+            { id: 'part3', title: 'Partie 3 : Techniques Avancées', modules: ['08', '09'] },
+        ],
+        chapters: [
+            // PARTIE 1 : REQUÊTES DE BASE
+            { id: '01-introduction', title: 'Module 1 : Introduction à MongoDB', duration: '30 min', part: 'Requêtes de Base' },
+            { id: '02-find-basics', title: 'Module 2 : Requêtes avec find()', duration: '45 min', part: 'Requêtes de Base' },
+            { id: '03-operators', title: 'Module 3 : Opérateurs Logiques et de Champs', duration: '40 min', part: 'Requêtes de Base' },
+            { id: '04-arrays', title: 'Module 4 : Opérations sur les Tableaux', duration: '35 min', part: 'Requêtes de Base' },
+
+            // PARTIE 2 : PIPELINE D'AGRÉGATION
+            { id: '05-aggregate-basics', title: 'Module 5 : Pipeline d\'Agrégation', duration: '50 min', part: 'Pipeline d\'Agrégation' },
+            { id: '06-unwind', title: 'Module 6 : $unwind - Éclater les Tableaux', duration: '45 min', part: 'Pipeline d\'Agrégation' },
+            { id: '07-lookup', title: 'Module 7 : $lookup - Jointures', duration: '55 min', part: 'Pipeline d\'Agrégation' },
+
+            // PARTIE 3 : TECHNIQUES AVANCÉES
+            { id: '08-variables', title: 'Module 8 : Variables et Sous-Requêtes', duration: '40 min', part: 'Techniques Avancées' },
+            { id: '09-best-practices', title: 'Module 9 : Bonnes Pratiques et Pièges', duration: '35 min', part: 'Techniques Avancées' },
+        ]
     }
 };
 

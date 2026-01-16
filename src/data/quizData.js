@@ -214,8 +214,53 @@ const nosqlQuestionBanks = {
         { id: 'no_b18', type: 'mcq', question: 'Comment créer un index ?', options: ['createIndex()', 'addIndex()', 'index()', 'makeIndex()'], correctAnswer: 0, explanation: 'createIndex() optimise les requêtes sur un champ.' },
         { id: 'no_b19', type: 'true-false', question: 'MongoDB est un système relationnel.', correctAnswer: false, explanation: 'Faux, MongoDB est une base NoSQL orientée document.' },
         { id: 'no_b20', type: 'code-completion', question: 'Complétez pour projeter (exclure _id) :', code: 'db.users.find({}, {nom: 1, _____: 0})', correctAnswer: '_id', explanation: 'Projeter avec 0 exclut le champ du résultat.' }
+    ],
+    mongodb_aggregate: [
+        { id: 'mg_a1', type: 'mcq', question: 'Quelle étape équivaut à WHERE en SQL ?', options: ['$match', '$project', '$group', '$filter'], correctAnswer: 0, explanation: '$match filtre les documents comme WHERE.' },
+        { id: 'mg_a2', type: 'code-completion', question: 'Complétez pour regrouper par ville :', code: 'db.Gyms.aggregate([{ ____: { "_id": "$Ville" } }])', correctAnswer: '"$group"', explanation: '$group regroupe les documents sur une clé.' },
+        { id: 'mg_a3', type: 'mcq', question: 'Quelle étape équivaut à SELECT en SQL ?', options: ['$match', '$project', '$group', '$sort'], correctAnswer: 1, explanation: '$project sélectionne et transforme les champs.' },
+        { id: 'mg_a4', type: 'true-false', question: '$match devrait être placé en premier dans le pipeline.', correctAnswer: true, explanation: 'Vrai, pour réduire le volume de données dès le début.' },
+        { id: 'mg_a5', type: 'code-completion', question: 'Complétez pour compter les documents :', code: '{ "$group": { "_id": null, "total": { "____": 1 } } }', correctAnswer: '$sum', explanation: '$sum: 1 compte les documents.' },
+        { id: 'mg_a6', type: 'mcq', question: 'Comment calculer une moyenne dans $group ?', options: ['$avg', '$mean', '$average', '$mid'], correctAnswer: 0, explanation: '$avg calcule la moyenne des valeurs.' },
+        { id: 'mg_a7', type: 'true-false', question: '$unwind transforme 1 document en plusieurs documents.', correctAnswer: true, explanation: 'Vrai, $unwind éclate un tableau en documents individuels.' },
+        { id: 'mg_a8', type: 'code-completion', question: 'Complétez pour éclater le tableau Seances :', code: '{ "____": "$Seances" }', correctAnswer: '$unwind', explanation: '$unwind éclate chaque élément du tableau en document.' },
+        { id: 'mg_a9', type: 'mcq', question: 'Quelle fonction convertit en minuscules dans $project ?', options: ['$toLower', '$lowercase', '$lower', '$min'], correctAnswer: 0, explanation: '$toLower convertit une chaîne en minuscules.' },
+        { id: 'mg_a10', type: 'true-false', question: 'Après $unwind, on accède aux champs avec Seances[0].Jour.', correctAnswer: false, explanation: 'Faux, après $unwind c\'est $Seances.Jour (plus de tableau).' },
+        { id: 'mg_a11', type: 'code-completion', question: 'Complétez pour trier par âge décroissant :', code: '{ "$sort": { "Age": ____ } }', correctAnswer: '-1', explanation: '-1 = ordre décroissant, 1 = ordre croissant.' },
+        { id: 'mg_a12', type: 'mcq', question: 'Comment renommer un champ dans $project ?', options: ['"nouveauNom": "$ancienChamp"', 'rename()', '$rename', '$alias'], correctAnswer: 0, explanation: 'On assigne le champ source au nouveau nom.' },
+        { id: 'mg_a13', type: 'true-false', question: '_id: null dans $group regroupe tous les documents.', correctAnswer: true, explanation: 'Vrai, c\'est l\'équivalent de COUNT(*) sans GROUP BY.' },
+        { id: 'mg_a14', type: 'code-completion', question: 'Complétez pour obtenir le minimum :', code: '{ "$group": { "_id": "$Ville", "minAge": { "____": "$Age" } } }', correctAnswer: '$min', explanation: '$min retourne la valeur minimale du groupe.' },
+        { id: 'mg_a15', type: 'mcq', question: 'Quel $match après $group équivaut à HAVING en SQL ?', options: ['Le 2ème $match', 'Le 1er $match', '$filter', '$having'], correctAnswer: 0, explanation: 'Un $match après $group filtre les groupes (HAVING).' },
+        { id: 'mg_a16', type: 'true-false', question: '$project peut créer de nouveaux champs calculés.', correctAnswer: true, explanation: 'Vrai, on peut ajouter des calculs comme { total: { $add: ["$a", "$b"] } }.' },
+        { id: 'mg_a17', type: 'code-completion', question: 'Complétez pour limiter à 5 résultats :', code: '{ "____": 5 }', correctAnswer: '$limit', explanation: '$limit restreint le nombre de documents.' },
+        { id: 'mg_a18', type: 'mcq', question: 'Comment concaténer des chaînes dans $project ?', options: ['$concat', '$join', '$merge', '$add'], correctAnswer: 0, explanation: '$concat: ["$a", " ", "$b"] concatène les chaînes.' },
+        { id: 'mg_a19', type: 'true-false', question: 'On peut avoir plusieurs $match dans un même pipeline.', correctAnswer: true, explanation: 'Vrai, on peut filtrer avant et après $group par exemple.' },
+        { id: 'mg_a20', type: 'code-completion', question: 'Complétez pour un groupe par multiple champs :', code: '{ "$group": { "_id": { "ville": "$Ville", "____": "$Jour" } } }', correctAnswer: '"jour"', explanation: 'La clé _id peut être un objet pour grouper sur plusieurs champs.' }
+    ],
+    mongodb_advanced: [
+        { id: 'mg_adv1', type: 'mcq', question: 'Quelle étape effectue une jointure en MongoDB ?', options: ['$lookup', '$join', '$merge', '$link'], correctAnswer: 0, explanation: '$lookup est l\'équivalent de LEFT JOIN.' },
+        { id: 'mg_adv2', type: 'code-completion', question: 'Complétez le paramètre pour la collection à joindre :', code: '{ "$lookup": { "____": "Sportifs", "localField": "id", ... } }', correctAnswer: '"from"', explanation: 'from spécifie la collection à joindre.' },
+        { id: 'mg_adv3', type: 'true-false', question: 'Le résultat de $lookup est toujours un tableau.', correctAnswer: true, explanation: 'Vrai, même avec 0 ou 1 élément, c\'est un tableau.' },
+        { id: 'mg_adv4', type: 'mcq', question: 'Comment stocker un résultat de find() dans une variable ?', options: ['toArray()', 'save()', 'store()', 'export()'], correctAnswer: 0, explanation: 'toArray() convertit le curseur en tableau JavaScript.' },
+        { id: 'mg_adv5', type: 'code-completion', question: 'Complétez pour récupérer les valeurs uniques :', code: 'db.Sportifs.________("Age")', correctAnswer: 'distinct', explanation: 'distinct() retourne les valeurs uniques d\'un champ.' },
+        { id: 'mg_adv6', type: 'true-false', question: 'findOne() retourne un tableau de documents.', correctAnswer: false, explanation: 'Faux, findOne() retourne un seul document ou null.' },
+        { id: 'mg_adv7', type: 'mcq', question: 'Comment éviter le piège des conditions sur tableau ?', options: ['$elemMatch', '$all', '$in', '$match'], correctAnswer: 0, explanation: '$elemMatch garantit que toutes les conditions s\'appliquent au même élément.' },
+        { id: 'mg_adv8', type: 'code-completion', question: 'Complétez pour extraire des IDs avec JavaScript :', code: 'ids = resultats.____(e => e.IdSportif)', correctAnswer: 'map', explanation: 'map() transforme chaque élément du tableau.' },
+        { id: 'mg_adv9', type: 'true-false', question: 'En JSON, deux clés identiques écrasent la première.', correctAnswer: true, explanation: 'Vrai, { "a": 1, "a": 2 } donne { "a": 2 }.' },
+        { id: 'mg_adv10', type: 'mcq', question: 'Quel opérateur vérifie qu\'un tableau contient TOUS les éléments ?', options: ['$all', '$in', '$elemMatch', '$contains'], correctAnswer: 0, explanation: '$all vérifie que le tableau contient tous les éléments demandés.' },
+        { id: 'mg_adv11', type: 'code-completion', question: 'Complétez pour accéder au résultat d\'agrégation :', code: 'result = db.col.aggregate([...]).____()[0]', correctAnswer: 'toArray', explanation: 'toArray() puis [0] pour accéder au premier résultat.' },
+        { id: 'mg_adv12', type: 'true-false', question: '$first et $last dépendent de l\'ordre des documents dans le groupe.', correctAnswer: true, explanation: 'Vrai, utilisez $sort avant $group pour garantir l\'ordre.' },
+        { id: 'mg_adv13', type: 'mcq', question: 'Quelle différence entre $push et $addToSet ?', options: ['$addToSet évite les doublons', '$push est plus rapide', '$addToSet trie', 'Aucune'], correctAnswer: 0, explanation: '$addToSet n\'ajoute que les valeurs uniques.' },
+        { id: 'mg_adv14', type: 'code-completion', question: 'Complétez pour déclarer une variable dans $lookup pipeline :', code: '{ "$lookup": { "____": { "age": "$Age" }, "pipeline": [...] } }', correctAnswer: '"let"', explanation: 'let déclare des variables accessibles dans le pipeline.' },
+        { id: 'mg_adv15', type: 'true-false', question: '$$variable dans $lookup accède aux variables déclarées dans let.', correctAnswer: true, explanation: 'Vrai, $$ préfixe les variables déclarées dans let.' },
+        { id: 'mg_adv16', type: 'mcq', question: 'Quel est l\'ordre optimal du pipeline ?', options: ['$match → $project → $unwind → $group', '$group → $match → $unwind', '$unwind → $match → $group', '$project → $unwind → $group'], correctAnswer: 0, explanation: 'Filtrer d\'abord, projeter, puis éclater et grouper.' },
+        { id: 'mg_adv17', type: 'code-completion', question: 'Complétez pour remplacer le document racine :', code: '{ "____": { "newRoot": "$Jeunes" } }', correctAnswer: '$replaceRoot', explanation: '$replaceRoot remplace le document par un sous-document.' },
+        { id: 'mg_adv18', type: 'true-false', question: '_id est affiché par défaut dans les projections find().', correctAnswer: true, explanation: 'Vrai, il faut explicitement mettre _id: 0 pour le masquer.' },
+        { id: 'mg_adv19', type: 'mcq', question: 'Comment gérer la casse dans les requêtes ?', options: ['$toLower ou $in avec variantes', '$ignoreCase', 'case: false', 'insensitive()'], correctAnswer: 0, explanation: 'Utiliser $toLower ou lister les variantes dans $in.' },
+        { id: 'mg_adv20', type: 'code-completion', question: 'Complétez pour filtrer les groupes non vides après $lookup :', code: '{ "$match": { "MemeAge": { "____": [] } } }', correctAnswer: '"$ne"', explanation: '$ne: [] garde seulement les documents avec tableau non vide.' }
     ]
 };
+
 
 // ----------------------------------------------------------------------
 // R QUESTION BANK
@@ -504,6 +549,28 @@ export const quizzes = {
             estimatedTime: 5,
             questionCount: 5,
             questionBank: 'nosql_basics'
+        },
+        {
+            id: 'mongodb_aggregate',
+            title: 'MongoDB - Pipeline d\'Agrégation',
+            description: '$match, $group, $project, $unwind, $sort',
+            category: 'nosql',
+            difficulty: 'intermediate',
+            tags: ['mongodb', 'aggregation', 'pipeline'],
+            estimatedTime: 10,
+            questionCount: 5,
+            questionBank: 'mongodb_aggregate'
+        },
+        {
+            id: 'mongodb_advanced',
+            title: 'MongoDB - Avancé',
+            description: '$lookup, variables, sous-requêtes, pièges',
+            category: 'nosql',
+            difficulty: 'advanced',
+            tags: ['mongodb', 'lookup', 'advanced'],
+            estimatedTime: 15,
+            questionCount: 5,
+            questionBank: 'mongodb_advanced'
         }
     ],
     r: [

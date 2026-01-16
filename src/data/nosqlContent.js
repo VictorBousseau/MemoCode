@@ -578,6 +578,408 @@ db.Sportifs.aggregate([
 ])`
                         }
                     ]
+                },
+                {
+                    id: 'mongo_variables',
+                    title: '7. Variables & Sous-Requêtes',
+                    description: 'Stocker et réutiliser des résultats.',
+                    snippets: [
+                        {
+                            id: 'mongo_variables_intro',
+                            title: 'Stocker des Résultats',
+                            description: 'Utiliser JavaScript dans mongosh.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'variables', 'javascript'],
+                            markdown: `### 💾 Pourquoi Stocker des Résultats ?
+
+MongoDB Shell utilise **JavaScript**. Vous pouvez :
+- Stocker un résultat pour le réutiliser
+- Éviter les requêtes imbriquées complexes
+- Débugger étape par étape
+
+### Méthodes Clés
+
+| Méthode | Description | Retourne |
+|---------|-------------|----------|
+| \`toArray()\` | Convertit un curseur en tableau | Array |
+| \`findOne()\` | Retourne 1 seul document | Object |
+| \`distinct()\` | Valeurs uniques d'un champ | Array |
+
+### Accéder aux Résultats
+
+\`\`\`javascript
+// Stocker le résultat
+resultats = db.Sportifs.find({ Age: 25 }).toArray()
+
+// Accéder au premier élément
+premier = resultats[0]
+
+// Accéder à un champ
+premier.Nom
+// ou
+premier["Nom"]
+\`\`\``
+                        },
+                        {
+                            id: 'mongo_subquery_distinct',
+                            title: 'Sous-Requête avec distinct()',
+                            description: 'Récupérer une liste de valeurs.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'distinct', 'subquery'],
+                            code: `// Exemple : Trouver les sportifs qui sont conseillers
+// 1. Récupérer tous les IDs de conseillers (valeurs uniques)
+conseillers = db.Sportifs.distinct("IdSportifConseiller")
+// Résultat : [1, 5, 12, 23, ...]
+
+// 2. Chercher les sportifs dont l'ID est dans cette liste
+db.Sportifs.find({
+    "IdSportif": { "$in": conseillers }
+})`
+                        },
+                        {
+                            id: 'mongo_subquery_findone',
+                            title: 'Sous-Requête avec findOne()',
+                            description: 'Requête imbriquée en une ligne.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'findOne', 'subquery'],
+                            code: `// Exemple : Trouver le conseiller de Kervadec
+
+// Version en 2 étapes (plus lisible)
+kervadec = db.Sportifs.findOne({ "Nom": "KERVADEC" })
+idConseiller = kervadec.IdSportifConseiller
+db.Sportifs.find({ "IdSportif": idConseiller })
+
+// Version en 1 ligne (sous-requête)
+db.Sportifs.find({
+    "IdSportif": db.Sportifs.findOne({ "Nom": "KERVADEC" }).IdSportifConseiller
+})`
+                        },
+                        {
+                            id: 'mongo_subquery_map',
+                            title: 'Extraire des IDs avec map()',
+                            description: 'Transformer un tableau de documents.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'map', 'javascript'],
+                            code: `// Exemple : Trouver les séances des entraîneurs de Hand ball
+
+// 1. Récupérer les entraîneurs de Hand ball
+entraineursHand = db.Sportifs.find(
+    { "Sports.Entrainer": "Hand ball" },
+    { "_id": 0, "IdSportif": 1 }
+).toArray()
+// [{ IdSportif: 1 }, { IdSportif: 2 }, { IdSportif: 7 }, ...]
+
+// 2. Extraire seulement les IDs avec map()
+ids = entraineursHand.map(e => e.IdSportif)
+// [1, 2, 7, 151]
+
+// 3. Utiliser dans une requête
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$match": { "Seances.IdSportifEntraineur": { "$in": ids } } }
+])`
+                        },
+                        {
+                            id: 'mongo_subquery_aggregate',
+                            title: 'Stocker un Résultat d\'Agrégation',
+                            description: 'Récupérer une valeur calculée.',
+                            level: 'advanced',
+                            tags: ['mongodb', 'aggregate', 'variable'],
+                            code: `// Exemple : Trouver les sportifs les plus jeunes
+
+// 1. Calculer l'âge minimum
+agemin = db.Sportifs.aggregate([
+    { "$group": { "_id": null, "agemin": { "$min": "$Age" } } }
+]).toArray()[0]
+// Résultat : { "_id": null, "agemin": 22 }
+
+// 2. Utiliser la valeur dans une autre requête
+db.Sportifs.find(
+    { "Age": agemin.agemin },
+    { "_id": 0, "Nom": 1, "Age": 1 }
+)`
+                        }
+                    ]
+                },
+                {
+                    id: 'mongo_agg_operators',
+                    title: '8. Opérateurs d\'Agrégation',
+                    description: '$first, $last, $push, $addToSet.',
+                    snippets: [
+                        {
+                            id: 'mongo_agg_ops_intro',
+                            title: 'Accumulateurs dans $group',
+                            description: 'Au-delà de $sum et $avg.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'aggregation', 'operators'],
+                            markdown: `### 🔢 Opérateurs d'Accumulation
+
+Dans \`$group\`, ces opérateurs permettent d'agréger les valeurs :
+
+| Opérateur | Description | Exemple |
+|-----------|-------------|---------|
+| \`$sum\` | Somme / Comptage | \`$sum: 1\` = COUNT |
+| \`$avg\` | Moyenne | \`$avg: "$prix"\` |
+| \`$min\` | Minimum | \`$min: "$age"\` |
+| \`$max\` | Maximum | \`$max: "$score"\` |
+| \`$first\` | Premier du groupe | \`$first: "$date"\` |
+| \`$last\` | Dernier du groupe | \`$last: "$statut"\` |
+| \`$push\` | Tableau de toutes les valeurs | \`$push: "$nom"\` |
+| \`$addToSet\` | Tableau sans doublons | \`$addToSet: "$sport"\` |
+
+> **💡 Astuce** : \`$first\` et \`$last\` dépendent de l'ordre des documents. Utilisez \`$sort\` avant \`$group\` pour garantir l'ordre.`
+                        },
+                        {
+                            id: 'mongo_push_addtoset',
+                            title: '$push vs $addToSet',
+                            description: 'Collecter des valeurs dans un tableau.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'push', 'addToSet'],
+                            code: `// Exemple : Lister tous les sports par ville
+
+// $push : garde tous les éléments (avec doublons)
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$group": {
+        "_id": "$Ville",
+        "sports": { "$push": "$Seances.Libelle" }
+    }}
+])
+// { "_id": "Stains", "sports": ["Hockey", "Basket", "Hockey", "Volley"] }
+
+// $addToSet : valeurs uniques seulement
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$group": {
+        "_id": "$Ville",
+        "sports": { "$addToSet": "$Seances.Libelle" }
+    }}
+])
+// { "_id": "Stains", "sports": ["Hockey", "Basket", "Volley"] }`
+                        },
+                        {
+                            id: 'mongo_first_last',
+                            title: '$first et $last',
+                            description: 'Premier et dernier élément d\'un groupe.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'first', 'last'],
+                            code: `// Exemple : Première et dernière séance par gymnase
+
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    // ⚠️ Trier AVANT grouper pour garantir l'ordre
+    { "$sort": { "NomGymnase": 1, "Seances.Horaire": 1 } },
+    { "$group": {
+        "_id": "$NomGymnase",
+        "premiereSeance": { "$first": "$Seances.Horaire" },
+        "derniereSeance": { "$last": "$Seances.Horaire" }
+    }}
+])`
+                        }
+                    ]
+                },
+                {
+                    id: 'mongo_best_practices',
+                    title: '9. Bonnes Pratiques',
+                    description: 'Optimisation et pièges à éviter.',
+                    snippets: [
+                        {
+                            id: 'mongo_pipeline_order',
+                            title: 'Ordre Optimal du Pipeline',
+                            description: 'Optimiser les performances.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'optimization', 'pipeline'],
+                            markdown: `### ⚡ Ordre Recommandé du Pipeline
+
+\`\`\`
+Documents originaux
+        │
+        ▼
+    ┌───────────┐
+    │  $match   │  ← 1. Filtrer EN PREMIER (réduire le volume)
+    └───────────┘
+        │
+        ▼
+    ┌───────────┐
+    │  $project │  ← 2. Garder seulement les champs nécessaires
+    └───────────┘
+        │
+        ▼
+    ┌───────────┐
+    │  $unwind  │  ← 3. Éclater APRÈS filtrage
+    └───────────┘
+        │
+        ▼
+    ┌───────────┐
+    │  $group   │  ← 4. Regrouper + agréger
+    └───────────┘
+        │
+        ▼
+    ┌───────────┐
+    │  $match   │  ← 5. Re-filtrer les groupes (= HAVING en SQL)
+    └───────────┘
+        │
+        ▼
+    ┌───────────┐
+    │   $sort   │  ← 6. Trier les résultats
+    └───────────┘
+\`\`\`
+
+### 🎯 Règles d'Or
+
+1. **\`$match\` en premier** : Réduit le volume de données dès le début
+2. **\`$project\` tôt** : Supprime les champs inutiles
+3. **\`$unwind\` après filtrage** : Évite d'éclater des documents inutiles
+4. **Testez avec \`$limit: 5\`** : Debug progressif`
+                        },
+                        {
+                            id: 'mongo_unwind_tips',
+                            title: 'Maîtriser $unwind',
+                            description: 'Exemples détaillés d\'aplatissement.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'unwind', 'examples'],
+                            markdown: `### 🔄 $unwind en Détail
+
+#### Avant $unwind (1 document avec tableau)
+\`\`\`json
+{
+  "NomGymnase": "Palais des Sports",
+  "Ville": "Stains",
+  "Seances": [
+    { "Jour": "Lundi", "Libelle": "Hockey", "Horaire": 10 },
+    { "Jour": "Mardi", "Libelle": "Basket", "Horaire": 14 },
+    { "Jour": "Mercredi", "Libelle": "Volley", "Horaire": 16 }
+  ]
+}
+\`\`\`
+
+#### Après \`{ "$unwind": "$Seances" }\` (3 documents)
+\`\`\`json
+{ "NomGymnase": "Palais des Sports", "Ville": "Stains", 
+  "Seances": { "Jour": "Lundi", "Libelle": "Hockey", "Horaire": 10 } }
+
+{ "NomGymnase": "Palais des Sports", "Ville": "Stains", 
+  "Seances": { "Jour": "Mardi", "Libelle": "Basket", "Horaire": 14 } }
+
+{ "NomGymnase": "Palais des Sports", "Ville": "Stains", 
+  "Seances": { "Jour": "Mercredi", "Libelle": "Volley", "Horaire": 16 } }
+\`\`\`
+
+### ⚠️ Attention
+
+- \`$unwind\` **multiplie** le nombre de documents
+- Placez \`$match\` **AVANT** pour réduire le volume
+- Après \`$unwind\`, accédez aux champs avec \`$Seances.Jour\` (plus de tableau)`
+                        },
+                        {
+                            id: 'mongo_unwind_examples',
+                            title: '$unwind - Cas Pratiques',
+                            description: 'Compter, filtrer, grouper après $unwind.',
+                            level: 'intermediate',
+                            tags: ['mongodb', 'unwind', 'examples'],
+                            code: `// CAS 1 : Compter les séances par jour
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$group": {
+        "_id": { "$toLower": "$Seances.Jour" },
+        "nbSeances": { "$sum": 1 }
+    }},
+    { "$sort": { "nbSeances": -1 } }
+])
+
+// CAS 2 : Filtrer PUIS éclater (plus performant)
+db.Gymnases.aggregate([
+    { "$match": { "Ville": "MONTMORENCY" } },  // Filtre d'abord !
+    { "$unwind": "$Seances" },
+    { "$match": { "Seances.Libelle": "Hand ball" } },
+    { "$project": {
+        "_id": 0,
+        "Gymnase": "$NomGymnase",
+        "Jour": "$Seances.Jour",
+        "Horaire": "$Seances.Horaire"
+    }}
+])
+
+// CAS 3 : Gymnases avec plus de 15 séances le mercredi
+db.Gymnases.aggregate([
+    { "$unwind": "$Seances" },
+    { "$match": { "Seances.Jour": { "$in": ["mercredi", "Mercredi"] } } },
+    { "$group": {
+        "_id": { "nom": "$NomGymnase", "ville": "$Ville" },
+        "nbMercredi": { "$sum": 1 }
+    }},
+    { "$match": { "nbMercredi": { "$gte": 15 } } },  // HAVING en SQL
+    { "$sort": { "nbMercredi": -1 } }
+])
+
+// CAS 4 : Horaires min/max par gymnase et jour
+db.Gymnases.aggregate([
+    { "$match": { "Ville": "STAINS" } },
+    { "$unwind": "$Seances" },
+    { "$group": {
+        "_id": { "gym": "$NomGymnase", "jour": { "$toLower": "$Seances.Jour" } },
+        "premiereSeance": { "$min": "$Seances.Horaire" },
+        "derniereSeance": { "$max": "$Seances.Horaire" }
+    }},
+    { "$sort": { "_id.gym": 1, "_id.jour": 1 } }
+])`
+                        },
+                        {
+                            id: 'mongo_pitfalls',
+                            title: 'Pièges Courants',
+                            description: 'Erreurs fréquentes à éviter.',
+                            level: 'beginner',
+                            tags: ['mongodb', 'pitfalls', 'errors'],
+                            markdown: `### ⚠️ Pièges à Éviter
+
+#### 1. Oublier \`_id: 0\` dans la projection
+\`\`\`javascript
+// ❌ _id affiché par défaut
+db.Sportifs.find({}, { "Nom": 1 })
+
+// ✅ Masquer explicitement _id
+db.Sportifs.find({}, { "_id": 0, "Nom": 1 })
+\`\`\`
+
+#### 2. Conditions sur tableau sans $elemMatch
+\`\`\`javascript
+// ❌ Hockey peut être Lundi, Horaire > 15 peut être Mardi !
+db.Gymnases.find({
+    "Seances.Libelle": "Hockey",
+    "Seances.Horaire": { "$gt": 15 }
+})
+
+// ✅ Les deux conditions sur LA MÊME séance
+db.Gymnases.find({
+    "Seances": { "$elemMatch": {
+        "Libelle": "Hockey",
+        "Horaire": { "$gt": 15 }
+    }}
+})
+\`\`\`
+
+#### 3. Écraser une clé dans le filtre
+\`\`\`javascript
+// ❌ La 2ème clé écrase la 1ère (JSON invalide)
+{ "Sports.Entrainer": "Hand ball", "Sports.Entrainer": "Basket ball" }
+
+// ✅ Utiliser $all pour TOUS les éléments
+{ "Sports.Entrainer": { "$all": ["Hand ball", "Basket ball"] } }
+\`\`\`
+
+#### 4. Casse des valeurs (case sensitivity)
+\`\`\`javascript
+// ❌ Peut rater "mercredi" si la BDD a "Mercredi"
+{ "Seances.Jour": "mercredi" }
+
+// ✅ Gérer les deux casses
+{ "Seances.Jour": { "$in": ["mercredi", "Mercredi"] } }
+
+// ✅ Ou normaliser avec $toLower dans aggregate
+{ "$project": { "jour": { "$toLower": "$Seances.Jour" } } }
+\`\`\``
+                        }
+                    ]
                 }
             ]
         },

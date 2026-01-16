@@ -12,6 +12,7 @@ import {
 import { getCourse, getChapter } from '../data/courses/index';
 import { getChapterContent as getPythonChapterContent } from '../data/courses/python/chapters';
 import { getChapterContent as getBayesianChapterContent } from '../data/courses/bayesian/chapters';
+import { getChapterContent as getMongodbChapterContent } from '../data/courses/mongodb/chapters';
 
 // Exercise files available for download
 const EXERCISE_FILES = {
@@ -26,6 +27,8 @@ const getChapterContent = (courseId, chapterId) => {
         return getPythonChapterContent(chapterId);
     } else if (courseId === 'bayesian') {
         return getBayesianChapterContent(chapterId);
+    } else if (courseId === 'mongodb') {
+        return getMongodbChapterContent(chapterId);
     }
     return null;
 };
