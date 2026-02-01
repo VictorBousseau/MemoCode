@@ -353,132 +353,450 @@ print(f"{celsius}°C = {fahrenheit}°F")
     '02-strings': `
 # Module 2 : Chaînes de Caractères (Strings)
 
-## Création de Strings
+Les **chaînes de caractères** (strings) sont omniprésentes en programmation. Elles représentent du **texte** : noms d'utilisateurs, messages, URLs, fichiers, logs... Maîtriser les strings est indispensable pour tout développeur Python.
+
+---
+
+## 🧠 Concept Fondamental : Les Strings sont des Séquences
+
+En Python, une string est une **séquence ordonnée de caractères**. Chaque caractère a une position (index) et on peut accéder individuellement à chacun d'eux.
+
+\`\`\`
+     Index positif:    0   1   2   3   4   5
+                     ┌───┬───┬───┬───┬───┬───┐
+       "Python"  →   │ P │ y │ t │ h │ o │ n │
+                     └───┴───┴───┴───┴───┴───┘
+     Index négatif:   -6  -5  -4  -3  -2  -1
+\`\`\`
+
+### Cas d'Usage Concrets
+
+| Situation | Exemple |
+|-----------|---------|
+| 👤 **Noms d'utilisateur** | \`"alice_dev"\` |
+| 📧 **Emails** | \`"alice@example.com"\` |
+| 📝 **Messages** | \`"Bienvenue sur notre site !"\` |
+| 🔗 **URLs** | \`"https://api.example.com/data"\` |
+| 📁 **Chemins de fichiers** | \`"/home/user/document.txt"\` |
+| 🔑 **Mots de passe hashés** | \`"a1b2c3d4e5f6..."\` |
+
+> 💡 **À retenir** : En Python, tout texte entre guillemets est une string, même un seul caractère comme \`"a"\` ou un texte vide \`""\`.
+
+---
+
+## 📦 Création de Strings
+
+Python offre plusieurs façons de créer des strings. Chacune a son utilité.
+
+### Guillemets simples ou doubles
+
+Les deux sont **équivalents**. Utilisez l'un ou l'autre selon le contenu de votre texte.
 
 \`\`\`python
-# Guillemets simples ou doubles
+# Les deux sont identiques
 simple = 'Hello, World!'
 double = "Hello, World!"
 
-# Multiligne avec triple guillemets
-multi = '''Ceci est
-un texte
-sur plusieurs lignes'''
-
-# Caractères spéciaux
-nouvelle_ligne = "Ligne 1\\nLigne 2"
-tabulation = "Col1\\tCol2"
-guillemet = "Il a dit \\"Bonjour\\""
+# Astuce : mélanger pour éviter l'échappement
+phrase1 = "L'informatique est fascinante"     # ' dans des "..."
+phrase2 = 'Il a dit "Bonjour" en entrant'     # " dans des '...'
 \`\`\`
 
-## Indexation et Slicing
+### Strings multilignes
+
+Les **triple guillemets** permettent d'écrire du texte sur plusieurs lignes, idéal pour les longs textes ou la documentation.
+
+\`\`\`python
+description = """Ceci est un texte
+qui s'étend sur
+plusieurs lignes."""
+
+# Souvent utilisé pour les docstrings
+def ma_fonction():
+    """
+    Cette fonction fait quelque chose d'utile.
+    Elle prend en compte X et Y.
+    """
+    pass
+\`\`\`
+
+### Caractères spéciaux (séquences d'échappement)
+
+Certains caractères ne peuvent pas être tapés directement. On utilise le **backslash** (\`\\\\\`) pour les représenter.
+
+| Séquence | Signification | Exemple |
+|----------|---------------|---------|
+| \`\\\\n\` | Nouvelle ligne | \`"Ligne 1\\\\nLigne 2"\` |
+| \`\\\\t\` | Tabulation | \`"Col1\\\\tCol2"\` |
+| \`\\\\\\\\\` | Backslash | \`"C:\\\\\\\\Users"\` |
+| \`\\\\"\` | Guillemet dans un string | \`"Il a dit \\\\"oui\\\\""\` |
+
+\`\`\`python
+# Nouvelle ligne
+print("Ligne 1\\nLigne 2")
+# Affiche :
+# Ligne 1
+# Ligne 2
+
+# Tabulation (alignement en colonnes)
+print("Nom\\tAge\\tVille")
+print("Alice\\t25\\tParis")
+\`\`\`
+
+> 💡 **Astuce** : Utilisez les **raw strings** (préfixe \`r\`) pour ignorer les séquences d'échappement. C'est utile pour les chemins Windows ou les expressions régulières :
+> \`\`\`python
+> chemin = r"C:\\Users\\Alice\\Documents"  # Le \\n n'est PAS interprété
+> \`\`\`
+
+---
+
+## 🔍 Indexation et Slicing
+
+L'**indexation** permet d'accéder à un caractère précis. Le **slicing** (découpage) permet d'extraire une portion de la string.
+
+### Indexation : accéder à un caractère
 
 \`\`\`python
 texte = "Python"
-#        012345  (index positif)
-#       -6-5-4-3-2-1  (index négatif)
 
-# Indexation
+# Index positif (de gauche à droite, commence à 0)
 print(texte[0])   # 'P' (premier caractère)
-print(texte[-1])  # 'n' (dernier caractère)
+print(texte[3])   # 'h' (quatrième caractère)
 
-# Slicing [start:end:step]
-print(texte[0:3])   # 'Pyt' (index 0, 1, 2)
-print(texte[3:])    # 'hon' (à partir de l'index 3)
-print(texte[:3])    # 'Pyt' (jusqu'à l'index 3)
-print(texte[::2])   # 'Pto' (un caractère sur deux)
-print(texte[::-1])  # 'nohtyP' (inversé)
+# Index négatif (de droite à gauche, commence à -1)
+print(texte[-1])  # 'n' (dernier caractère)
+print(texte[-2])  # 'o' (avant-dernier)
 \`\`\`
 
-## Immutabilité
+> ⚠️ **Attention** : Un index hors limites provoque une erreur \`IndexError\` !
+> \`\`\`python
+> texte = "Python"
+> # print(texte[10])  # IndexError: string index out of range
+> \`\`\`
 
-> ⚠️ Les strings sont **immuables** - on ne peut pas les modifier après création.
+### Slicing : extraire une sous-chaîne
+
+La syntaxe est \`[start:end:step]\` ou \`start\` est **inclus** et \`end\` est **exclu**.
+
+\`\`\`python
+texte = "Python"
+
+# [start:end] - De start (inclus) à end (exclu)
+print(texte[0:3])   # 'Pyt' (index 0, 1, 2)
+print(texte[2:5])   # 'tho' (index 2, 3, 4)
+
+# Raccourcis : omission de start ou end
+print(texte[:3])    # 'Pyt' (du début jusqu'à l'index 3)
+print(texte[3:])    # 'hon' (de l'index 3 jusqu'à la fin)
+print(texte[:])     # 'Python' (copie complète)
+
+# Avec un pas (step)
+print(texte[::2])   # 'Pto' (un caractère sur deux)
+print(texte[1::2])  # 'yhn' (un sur deux, en partant de l'index 1)
+
+# Inverser une string
+print(texte[::-1])  # 'nohtyP' (astuce classique !)
+\`\`\`
+
+> 💡 **Astuce mnémotechnique** : Pensez aux index comme les positions **entre** les caractères, pas sur les caractères eux-mêmes.
+
+---
+
+## 🔒 Immutabilité des Strings
+
+C'est un concept **crucial** : les strings Python sont **immuables** (immutable). Une fois créée, une string ne peut **jamais être modifiée en place**.
 
 \`\`\`python
 texte = "Hello"
-# texte[0] = "h"  # ❌ ERREUR !
 
-# Il faut créer une nouvelle string
+# ❌ IMPOSSIBLE - provoque une erreur
+# texte[0] = "h"  # TypeError: 'str' does not support item assignment
+
+# ✅ Solution : créer une NOUVELLE string
 texte = "h" + texte[1:]  # "hello"
+# Ou utiliser replace()
+texte = "Hello".replace("H", "h")  # "hello"
 \`\`\`
 
-## Méthodes de Strings
+**Pourquoi c'est important ?** Chaque opération sur une string (concaténation, remplacement, etc.) crée un **nouvel objet** en mémoire. Pour beaucoup de modifications, utilisez plutôt une **liste** puis joignez à la fin.
+
+\`\`\`python
+# ❌ LENT : crée une nouvelle string à chaque itération
+resultat = ""
+for i in range(1000):
+    resultat += str(i)  # 1000 nouvelles strings créées !
+
+# ✅ RAPIDE : utiliser une liste puis join()
+morceaux = []
+for i in range(1000):
+    morceaux.append(str(i))
+resultat = "".join(morceaux)  # Une seule string créée
+\`\`\`
+
+---
+
+## 🛠️ Méthodes de Strings
+
+Python offre une riche collection de méthodes pour manipuler les strings. Elles retournent toujours une **nouvelle string** (car les strings sont immuables).
+
+### Changer la casse
+
+\`\`\`python
+texte = "hello World"
+
+print(texte.upper())       # "HELLO WORLD" - tout en majuscules
+print(texte.lower())       # "hello world" - tout en minuscules
+print(texte.title())       # "Hello World" - première lettre de chaque mot
+print(texte.capitalize())  # "Hello world" - première lettre seulement
+print(texte.swapcase())    # "HELLO wORLD" - inverse la casse
+\`\`\`
+
+> 💡 **Cas d'usage** : \`.lower()\` est essentiel pour les **comparaisons insensibles à la casse** (emails, recherche, etc.)
+
+### Nettoyer une string
+
+Les espaces parasites sont un problème courant, surtout avec les saisies utilisateur.
 
 \`\`\`python
 texte = "  Hello, World!  "
 
-# Casse
-print(texte.upper())      # "  HELLO, WORLD!  "
-print(texte.lower())      # "  hello, world!  "
-print(texte.title())      # "  Hello, World!  "
-print(texte.capitalize()) # "  hello, world!  "
+print(texte.strip())      # "Hello, World!" - supprime les espaces des deux côtés
+print(texte.lstrip())     # "Hello, World!  " - supprime à gauche uniquement
+print(texte.rstrip())     # "  Hello, World!" - supprime à droite uniquement
 
-# Nettoyage
-print(texte.strip())      # "Hello, World!" (enlève espaces)
-print(texte.lstrip())     # "Hello, World!  "
-print(texte.rstrip())     # "  Hello, World!"
-
-# Recherche
-print(texte.find("World"))     # 9 (index de début)
-print(texte.count("l"))        # 3
-print("Hello" in texte)        # True
-
-# Remplacement
-print(texte.replace("World", "Python"))  # "  Hello, Python!  "
-
-# Découpage et jonction
-mots = "a,b,c".split(",")      # ['a', 'b', 'c']
-joint = "-".join(['a', 'b'])   # "a-b"
+# Supprimer des caractères spécifiques
+url = "///page/accueil///"
+print(url.strip("/"))     # "page/accueil"
 \`\`\`
 
-## Formatage de Strings
+### Rechercher dans une string
 
-### F-Strings (Moderne ✅)
+\`\`\`python
+texte = "Bonjour Python, bienvenue en Python !"
+
+# Trouver la position d'une sous-chaîne
+print(texte.find("Python"))      # 8 (première occurrence)
+print(texte.rfind("Python"))     # 31 (dernière occurrence)
+print(texte.find("Java"))        # -1 (non trouvé)
+
+# Compter les occurrences
+print(texte.count("Python"))     # 2
+
+# Vérifier le contenu
+print(texte.startswith("Bonjour"))  # True
+print(texte.endswith("!"))          # True
+
+# L'opérateur 'in' pour vérifier la présence
+print("Python" in texte)            # True
+print("Java" not in texte)          # True
+\`\`\`
+
+> 📝 **Différence \`find()\` vs \`index()\`** : \`.find()\` retourne \`-1\` si non trouvé, \`.index()\` lève une erreur \`ValueError\`.
+
+### Remplacer du texte
+
+\`\`\`python
+texte = "Hello World"
+
+# Remplacer une sous-chaîne
+print(texte.replace("World", "Python"))  # "Hello Python"
+
+# Remplacer toutes les occurrences
+phrase = "le chat et le chien et le poisson"
+print(phrase.replace("le", "un"))  # "un chat et un chien et un poisson"
+
+# Limiter le nombre de remplacements
+print(phrase.replace("le", "un", 1))  # "un chat et le chien et le poisson"
+\`\`\`
+
+### Découper et joindre
+
+Ces deux opérations sont **complémentaires** et extrêmement utiles.
+
+\`\`\`python
+# split() : String → Liste
+csv_line = "Alice,25,Paris,alice@email.com"
+champs = csv_line.split(",")
+print(champs)  # ['Alice', '25', 'Paris', 'alice@email.com']
+
+# Découper par espaces (par défaut)
+phrase = "Python est   génial"
+mots = phrase.split()  # Gère les espaces multiples !
+print(mots)  # ['Python', 'est', 'génial']
+
+# join() : Liste → String
+mots = ['Python', 'est', 'génial']
+phrase = " ".join(mots)
+print(phrase)  # "Python est génial"
+
+# Joindre avec un séparateur
+chemin = "/".join(["home", "user", "documents"])
+print(chemin)  # "home/user/documents"
+\`\`\`
+
+> 💡 **Pattern courant** : \`split()\` + transformation + \`join()\` pour transformer du texte efficacement.
+
+### Vérifier le type de contenu
+
+\`\`\`python
+# Vérifier si la string contient uniquement...
+print("123".isdigit())     # True - que des chiffres
+print("abc".isalpha())     # True - que des lettres
+print("abc123".isalnum())  # True - lettres et chiffres
+print("   ".isspace())     # True - que des espaces
+print("Hello".isupper())   # False - pas tout en majuscules
+print("hello".islower())   # True - tout en minuscules
+\`\`\`
+
+---
+
+## 📝 Formatage de Strings
+
+Le formatage permet d'**insérer des valeurs** dans un texte. C'est essentiel pour créer des messages dynamiques, des rapports, des logs...
+
+### F-Strings (Python 3.6+) - La méthode moderne
+
+Les **f-strings** sont la façon la plus lisible et la plus rapide de formater du texte en Python.
 
 \`\`\`python
 nom = "Alice"
 age = 25
 
-# F-string basique
+# Insertion simple de variables
 print(f"Je m'appelle {nom} et j'ai {age} ans")
 
-# Expressions dans les accolades
-print(f"Dans 10 ans: {age + 10} ans")
-
-# Formatage de nombres
-prix = 19.99
-print(f"Prix: {prix:.2f} €")      # "Prix: 19.99 €"
-print(f"Grand: {1000000:,}")      # "Grand: 1,000,000"
-print(f"Pourcent: {0.85:.1%}")    # "Pourcent: 85.0%"
-
-# Alignement
-print(f"{'gauche':<10}|")   # "gauche    |"
-print(f"{'droite':>10}|")   # "    droite|"
-print(f"{'centre':^10}|")   # "  centre  |"
+# Expressions Python dans les accolades
+print(f"Dans 10 ans, j'aurai {age + 10} ans")
+print(f"Mon nom en majuscules : {nom.upper()}")
+print(f"2 + 3 = {2 + 3}")
 \`\`\`
 
-### Méthode .format() (Ancien)
+### Formatage avancé des nombres
 
 \`\`\`python
-print("Je m'appelle {} et j'ai {} ans".format(nom, age))
-print("Je m'appelle {0} et j'ai {1} ans".format(nom, age))
-print("Je m'appelle {n} et j'ai {a} ans".format(n=nom, a=age))
+prix = 19.99
+pourcentage = 0.8567
+grand_nombre = 1234567
+
+# Décimales
+print(f"Prix: {prix:.2f} euros")        # "Prix: 19.99 euros"
+print(f"Arrondi: {prix:.0f} euros")     # "Arrondi: 20 euros"
+
+# Pourcentage
+print(f"Taux: {pourcentage:.1%}")       # "Taux: 85.7%"
+
+# Séparateur de milliers
+print(f"Population: {grand_nombre:,}")  # "Population: 1,234,567"
+print(f"Montant: {grand_nombre:_.2f}")  # "Montant: 1_234_567.00"
 \`\`\`
+
+### Alignement et remplissage
+
+Utile pour créer des tableaux ou des affichages formatés.
+
+\`\`\`python
+# Alignement dans un espace de 15 caractères
+print(f"{'gauche':<15}|")   # "gauche         |" (aligné à gauche)
+print(f"{'droite':>15}|")   # "         droite|" (aligné à droite)
+print(f"{'centre':^15}|")   # "    centre     |" (centré)
+
+# Avec un caractère de remplissage
+print(f"{'titre':=^30}")    # "============titre============="
+print(f"{'42':0>5}")        # "00042" (padding avec des zéros)
+\`\`\`
+
+### Méthode .format() (alternative)
+
+Moins concise que les f-strings, mais encore utilisée dans certains contextes (traductions, templates).
+
+\`\`\`python
+# Avec positions
+print("Je m'appelle {} et j'ai {} ans".format(nom, age))
+
+# Avec indices
+print("{0} a {1} ans. {0} habite à Paris".format(nom, age))
+
+# Avec noms
+print("{n} a {a} ans".format(n=nom, a=age))
+\`\`\`
+
+> 💡 **Recommandation** : Utilisez les **f-strings** dans la majorité des cas. Elles sont plus lisibles, plus rapides, et plus modernes.
+
+---
+
+## 🔗 Concaténation et Répétition
+
+### Concaténation (+)
+
+\`\`\`python
+prenom = "Alice"
+nom = "Dupont"
+
+# Concaténation simple
+nom_complet = prenom + " " + nom
+print(nom_complet)  # "Alice Dupont"
+
+# ⚠️ On ne peut concaténer que des strings entre elles
+age = 25
+# print("Age: " + age)         # ❌ TypeError !
+print("Age: " + str(age))      # ✅ "Age: 25"
+print(f"Age: {age}")           # ✅ Plus simple avec f-string
+\`\`\`
+
+### Répétition (*)
+
+\`\`\`python
+# Répéter une string
+tirets = "-" * 40
+print(tirets)  # "----------------------------------------"
+
+# Utile pour la mise en forme
+print("=" * 30)
+print("   TITRE DU PROGRAMME   ")
+print("=" * 30)
+\`\`\`
+
+---
+
+## 📋 Récapitulatif des Méthodes
+
+| Catégorie | Méthodes principales |
+|-----------|---------------------|
+| **Casse** | \`.upper()\`, \`.lower()\`, \`.title()\`, \`.capitalize()\` |
+| **Nettoyage** | \`.strip()\`, \`.lstrip()\`, \`.rstrip()\` |
+| **Recherche** | \`.find()\`, \`.index()\`, \`.count()\`, \`in\` |
+| **Remplacement** | \`.replace()\` |
+| **Découpage** | \`.split()\`, \`.join()\` |
+| **Vérification** | \`.startswith()\`, \`.endswith()\`, \`.isdigit()\`, \`.isalpha()\` |
+| **Formatage** | f-strings, \`.format()\` |
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Manipulation de casse
 \`\`\`python
-# Exercice 1 : Manipulation
 phrase = "python est génial"
 # Transformer en "Python Est Génial"
-print(phrase.title())
+print(phrase.title())  # "Python Est Génial"
+\`\`\`
 
-# Exercice 2 : Extraction
+### Exercice 2 : Extraction de domaine
+\`\`\`python
 email = "utilisateur@example.com"
 # Extraire le domaine
 domaine = email.split("@")[1]
 print(domaine)  # "example.com"
 \`\`\`
+
+### Exercice 3 : Inverser un mot
+\`\`\`python
+mot = "Python"
+inverse = mot[::-1]
+print(inverse)  # "nohtyP"
+\`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/02-strings-exercice.py\`
 `,
 
     '03-listes': `
@@ -1480,185 +1798,891 @@ print(config_lu)
     '07-comparaisons': `
 # Module 7 : Opérateurs de Comparaison
 
-## Opérateurs de Comparaison
+Les opérateurs de comparaison sont la **base de toute logique** en programmation. Ils permettent à votre programme de **prendre des décisions** en évaluant des conditions. Sans eux, impossible de faire des \`if\`, des \`while\`, ou de filtrer des données !
 
-| Opérateur | Description | Exemple |
-|-----------|-------------|---------|
-| \`==\` | Égal | \`5 == 5\` → \`True\` |
-| \`!=\` | Différent | \`5 != 3\` → \`True\` |
-| \`<\` | Inférieur | \`3 < 5\` → \`True\` |
-| \`>\` | Supérieur | \`5 > 3\` → \`True\` |
-| \`<=\` | Inférieur ou égal | \`5 <= 5\` → \`True\` |
-| \`>=\` | Supérieur ou égal | \`5 >= 3\` → \`True\` |
+---
+
+## 🧠 Pourquoi les Comparaisons sont Essentielles ?
+
+Imaginez un programme qui doit :
+- Vérifier si un utilisateur est **majeur** → \`age >= 18\`
+- Filtrer les produits **en stock** → \`quantite > 0\`
+- Valider un **mot de passe** → \`mot_de_passe == mot_de_passe_confirme\`
+- Vérifier si un email est **dans la liste noire** → \`email in liste_noire\`
+
+Toutes ces opérations reposent sur les **comparaisons** !
+
+### Ce qu'une comparaison retourne
+
+Une comparaison retourne **toujours** un booléen : \`True\` ou \`False\`.
 
 \`\`\`python
+resultat = 5 > 3
+print(resultat)       # True
+print(type(resultat)) # <class 'bool'>
+\`\`\`
+
+---
+
+## ⚖️ Opérateurs de Comparaison
+
+Ces opérateurs comparent deux valeurs et retournent \`True\` ou \`False\`.
+
+| Opérateur | Description | Exemple | Résultat |
+|-----------|-------------|---------|----------|
+| \`==\` | Égal à | \`5 == 5\` | \`True\` |
+| \`!=\` | Différent de | \`5 != 3\` | \`True\` |
+| \`<\` | Strictement inférieur | \`3 < 5\` | \`True\` |
+| \`>\` | Strictement supérieur | \`5 > 3\` | \`True\` |
+| \`<=\` | Inférieur ou égal | \`5 <= 5\` | \`True\` |
+| \`>=\` | Supérieur ou égal | \`5 >= 3\` | \`True\` |
+
+### Exemples pratiques
+
+\`\`\`python
+age = 25
+salaire = 35000
+note = 15
+
+# Comparaisons simples
+print(age == 25)       # True - L'âge est-il exactement 25 ?
+print(age != 30)       # True - L'âge est-il différent de 30 ?
+print(salaire > 30000) # True - Le salaire dépasse-t-il 30000 ?
+print(note < 10)       # False - La note est-elle inférieure à 10 ?
+print(note >= 10)      # True - La note est-elle au moins 10 ?
+\`\`\`
+
+### Comparaison de chaînes de caractères
+
+Les strings sont comparées **lexicographiquement** (ordre alphabétique basé sur les codes ASCII/Unicode).
+
+\`\`\`python
+# Ordre alphabétique
+print("apple" < "banana")   # True (a vient avant b)
+print("cat" > "car")        # True (t vient après r)
+print("Python" == "python") # False (P ≠ p, sensible à la casse !)
+
+# Attention aux majuscules !
+print("A" < "a")            # True (majuscules viennent avant en ASCII)
+print(ord("A"))             # 65
+print(ord("a"))             # 97
+\`\`\`
+
+> 💡 **Astuce** : Pour comparer sans tenir compte de la casse :
+> \`\`\`python
+> "Python".lower() == "python".lower()  # True
+> \`\`\`
+
+---
+
+## 🔗 Enchaînement de Comparaisons
+
+Python permet d'**enchaîner les comparaisons** de façon naturelle, comme en mathématiques !
+
+\`\`\`python
+age = 25
+
+# Au lieu de écrire :
+print(age >= 18 and age <= 65)  # True
+
+# Python permet d'écrire directement :
+print(18 <= age <= 65)          # True - Plus lisible !
+
+# Autres exemples d'enchaînement
 x = 10
+print(1 < x < 20)      # True (x est entre 1 et 20)
+print(5 <= x <= 15)    # True (x est entre 5 et 15 inclus)
+print(0 < x < 5)       # False (x n'est pas entre 0 et 5)
 
-print(x == 10)   # True
-print(x != 5)    # True
-print(x > 5)     # True
-print(x < 20)    # True
-
-# Enchaînement
-print(1 < x < 20)    # True (équivalent à 1 < x and x < 20)
-print(5 <= x <= 15)  # True
+# Triple enchaînement
+a, b, c = 1, 2, 3
+print(a < b < c)       # True (ordre croissant)
 \`\`\`
 
-## Opérateurs Logiques
+> ⚠️ **C'est une spécificité de Python !** En JavaScript ou Java, \`1 < x < 20\` ne fonctionne pas comme attendu.
+
+---
+
+## 🧮 Opérateurs Logiques : and, or, not
+
+Les opérateurs logiques permettent de **combiner plusieurs conditions**.
+
+### Table de vérité
+
+| A | B | A and B | A or B | not A |
+|---|---|---------|--------|-------|
+| True | True | **True** | True | False |
+| True | False | False | **True** | False |
+| False | True | False | **True** | True |
+| False | False | False | False | **True** |
+
+### \`and\` - ET logique
+
+Retourne \`True\` **seulement si les deux conditions sont vraies**.
 
 \`\`\`python
-a = True
-b = False
+age = 25
+a_permis = True
 
-print(a and b)  # False (ET)
-print(a or b)   # True (OU)
-print(not a)    # False (NON)
+# Les deux conditions doivent être vraies
+peut_conduire = age >= 18 and a_permis
+print(peut_conduire)  # True
 
-# Combinaisons
-x = 10
-print(x > 5 and x < 20)   # True
-print(x < 5 or x > 8)     # True
-print(not (x == 10))      # False
+# Exemple pratique : validation de formulaire
+email = "user@example.com"
+password = "secret123"
+
+est_valide = len(email) > 0 and len(password) >= 8
+print(f"Formulaire valide: {est_valide}")  # True
 \`\`\`
 
-## Opérateurs d'Appartenance
+### \`or\` - OU logique
+
+Retourne \`True\` **si au moins une condition est vraie**.
 
 \`\`\`python
-liste = [1, 2, 3, 4, 5]
-texte = "Hello, World!"
+jour = "samedi"
 
-print(3 in liste)          # True
-print(6 in liste)          # False
-print(6 not in liste)      # True
-print("World" in texte)    # True
-print("hello" in texte)    # False (case-sensitive)
+# Au moins une condition doit être vraie
+est_weekend = jour == "samedi" or jour == "dimanche"
+print(est_weekend)  # True
+
+# Exemple : vérifier les droits d'accès
+est_admin = False
+est_moderateur = True
+
+peut_supprimer = est_admin or est_moderateur
+print(f"Peut supprimer: {peut_supprimer}")  # True
 \`\`\`
 
-## Opérateurs d'Identité
+### \`not\` - Négation
+
+**Inverse** la valeur d'un booléen.
 
 \`\`\`python
+est_connecte = True
+
+print(not est_connecte)      # False
+print(not False)             # True
+
+# Exemple pratique
+utilisateur_banni = False
+
+if not utilisateur_banni:
+    print("Accès autorisé")  # S'exécute car not False = True
+\`\`\`
+
+### Combinaisons complexes
+
+\`\`\`python
+age = 25
+est_etudiant = True
+revenu = 15000
+
+# Priorité : not > and > or
+# Utilisez des parenthèses pour clarifier !
+
+# Éligible à une réduction ?
+eligible = (age < 26 and est_etudiant) or (revenu < 20000)
+print(f"Éligible: {eligible}")  # True
+\`\`\`
+
+> 💡 **Bonne pratique** : Utilisez **toujours des parenthèses** pour les expressions complexes !
+
+---
+
+## 🔍 Évaluation Court-circuit (Short-circuit)
+
+Python utilise l'**évaluation paresseuse** : il s'arrête dès qu'il connaît le résultat.
+
+\`\`\`python
+# Avec 'and' : si le premier est False, le second n'est pas évalué
+False and print("Je ne serai jamais affiché")
+
+# Avec 'or' : si le premier est True, le second n'est pas évalué
+True or print("Je ne serai jamais affiché")
+\`\`\`
+
+### Application pratique : éviter les erreurs
+
+\`\`\`python
+liste = []
+
+# ❌ ERREUR si la liste est vide !
+# if liste[0] > 10:  # IndexError !
+
+# ✅ Sécurisé grâce au court-circuit
+if len(liste) > 0 and liste[0] > 10:
+    print("Premier élément supérieur à 10")
+# Si len(liste) == 0, Python ne vérifie PAS liste[0]
+
+# Autre exemple : éviter la division par zéro
+diviseur = 0
+if diviseur != 0 and 100 / diviseur > 10:
+    print("Résultat valide")
+\`\`\`
+
+---
+
+## 📦 Opérateurs d'Appartenance : in, not in
+
+Ces opérateurs vérifient si un élément **appartient** à une séquence.
+
+\`\`\`python
+# Dans une liste
+fruits = ["pomme", "banane", "cerise"]
+print("banane" in fruits)      # True
+print("orange" in fruits)      # False
+print("orange" not in fruits)  # True
+
+# Dans une chaîne de caractères
+texte = "Bonjour Python"
+print("Python" in texte)       # True
+print("python" in texte)       # False (sensible à la casse)
+print("java" not in texte)     # True
+
+# Dans un dictionnaire (vérifie les CLÉS, pas les valeurs !)
+utilisateur = {"nom": "Alice", "age": 25}
+print("nom" in utilisateur)    # True (clé existe)
+print("Alice" in utilisateur)  # False (c'est une valeur, pas une clé)
+print(25 in utilisateur.values())  # True (vérifier dans les valeurs)
+
+# Dans un set (très rapide : O(1))
+numeros_valides = {1, 2, 3, 4, 5}
+print(3 in numeros_valides)    # True
+print(10 in numeros_valides)   # False
+\`\`\`
+
+### Cas d'usage pratiques
+
+\`\`\`python
+# Validation d'entrée utilisateur
+choix_valides = ["oui", "non", "peut-être"]
+reponse = "oui"
+
+if reponse.lower() in choix_valides:
+    print("Choix valide")
+
+# Filtrer une liste noire
+mots_interdits = {"spam", "pub", "arnaque"}
+commentaire = "Super produit spam gratuit"
+
+mots_du_commentaire = commentaire.lower().split()
+for mot in mots_du_commentaire:
+    if mot in mots_interdits:
+        print(f"Mot interdit détecté: {mot}")
+\`\`\`
+
+---
+
+## 🆔 Opérateurs d'Identité : is, is not
+
+Ces opérateurs vérifient si deux variables pointent vers **le même objet en mémoire**.
+
+### Différence entre \`==\` et \`is\`
+
+\`\`\`
+┌────────────────────────────────────────────────────┐
+│   ==  compare les VALEURS                          │
+│   is  compare les IDENTITÉS (même objet mémoire)   │
+└────────────────────────────────────────────────────┘
+\`\`\`
+
+\`\`\`python
+# Deux listes avec les mêmes valeurs
 a = [1, 2, 3]
 b = [1, 2, 3]
-c = a
+c = a  # c pointe vers le même objet que a
 
-# == compare les valeurs
-print(a == b)   # True
+# Comparaison de valeurs (==)
+print(a == b)  # True - mêmes valeurs
+print(a == c)  # True - mêmes valeurs
 
-# is compare l'identité (même objet en mémoire)
-print(a is b)   # False (objets différents)
-print(a is c)   # True (même objet)
+# Comparaison d'identité (is)
+print(a is b)  # False - objets différents en mémoire !
+print(a is c)  # True - même objet en mémoire
 
-# None doit être comparé avec is
-x = None
-print(x is None)      # ✅ Correct
-print(x == None)      # ⚠️ Fonctionne mais déconseillé
+# Preuve avec id()
+print(f"id(a) = {id(a)}")
+print(f"id(b) = {id(b)}")  # Différent de id(a)
+print(f"id(c) = {id(c)}")  # Égal à id(a)
 \`\`\`
+
+### Le cas spécial de \`None\`
+
+\`None\` est un **singleton** : il n'existe qu'un seul objet \`None\` en Python.
+
+\`\`\`python
+resultat = None
+
+# ✅ CORRECT : utiliser 'is' avec None
+if resultat is None:
+    print("Pas de résultat")
+
+if resultat is not None:
+    print("Résultat disponible")
+
+# ⚠️ DÉCONSEILLÉ : utiliser '==' avec None
+if resultat == None:  # Fonctionne mais pas idiomatique
+    print("Pas de résultat")
+\`\`\`
+
+> 💡 **Règle d'or** : Toujours utiliser \`is None\` ou \`is not None\`, jamais \`== None\`.
+
+---
+
+## 🔢 Valeurs "Truthy" et "Falsy"
+
+En Python, toute valeur peut être évaluée comme \`True\` ou \`False\` dans un contexte booléen.
+
+### Valeurs "Falsy" (évaluées comme False)
+
+\`\`\`python
+# Toutes ces valeurs sont "Falsy"
+print(bool(False))     # False
+print(bool(None))      # False
+print(bool(0))         # False
+print(bool(0.0))       # False
+print(bool(""))        # False (string vide)
+print(bool([]))        # False (liste vide)
+print(bool({}))        # False (dict vide)
+print(bool(set()))     # False (set vide)
+\`\`\`
+
+### Valeurs "Truthy" (évaluées comme True)
+
+\`\`\`python
+# Toutes ces valeurs sont "Truthy"
+print(bool(True))      # True
+print(bool(1))         # True (tout entier non-zéro)
+print(bool(-1))        # True
+print(bool("hello"))   # True (string non-vide)
+print(bool([1, 2]))    # True (liste non-vide)
+print(bool({"a": 1}))  # True (dict non-vide)
+\`\`\`
+
+### Application pratique
+
+\`\`\`python
+liste = []
+
+# ❌ Façon verbeuse
+if len(liste) > 0:
+    print("Liste non vide")
+
+# ✅ Façon Pythonique
+if liste:
+    print("Liste non vide")
+
+# Vérifier si une string n'est pas vide
+nom = "Alice"
+if nom:
+    print(f"Bonjour {nom}")
+
+# Valeur par défaut avec 'or'
+utilisateur = ""
+nom_affiche = utilisateur or "Anonyme"
+print(nom_affiche)  # "Anonyme"
+\`\`\`
+
+---
+
+## 📋 Récapitulatif : Priorité des Opérateurs
+
+Du plus prioritaire au moins prioritaire :
+
+| Priorité | Opérateur | Description |
+|----------|-----------|-------------|
+| 1 | \`()\` | Parenthèses |
+| 2 | \`**\` | Puissance |
+| 3 | \`+x\`, \`-x\`, \`~x\` | Unaires |
+| 4 | \`*\`, \`/\`, \`//\`, \`%\` | Multiplication, division |
+| 5 | \`+\`, \`-\` | Addition, soustraction |
+| 6 | \`<\`, \`<=\`, \`>\`, \`>=\`, \`==\`, \`!=\`, \`is\`, \`in\` | Comparaisons |
+| 7 | \`not\` | Négation logique |
+| 8 | \`and\` | ET logique |
+| 9 | \`or\` | OU logique |
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Vérifier une plage
 \`\`\`python
-# Exercice : Vérifier si un nombre est dans une plage
 def dans_plage(n, min_val, max_val):
+    """Vérifie si n est entre min_val et max_val (inclus)."""
     return min_val <= n <= max_val
 
 print(dans_plage(5, 1, 10))   # True
 print(dans_plage(15, 1, 10))  # False
 \`\`\`
-`,
 
+### Exercice 2 : Validation d'accès
+\`\`\`python
+def peut_acceder(age, est_membre, a_invitation):
+    """Accès si majeur ET (membre OU invitation)."""
+    return age >= 18 and (est_membre or a_invitation)
+
+print(peut_acceder(25, True, False))   # True
+print(peut_acceder(16, True, True))    # False (mineur)
+\`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/07-comparaisons-exercice.py\`
+`,
     '08-conditions': `
 # Module 8 : Conditions (if/elif/else)
 
-## Structure if
+Les **structures conditionnelles** permettent à votre programme de prendre des **décisions** et d'exécuter différentes actions selon les circonstances. C'est ce qui rend vos programmes **intelligents** et **interactifs** !
+
+---
+
+## 🧠 Pourquoi les Conditions sont Essentielles ?
+
+Sans conditions, un programme exécuterait toujours les **mêmes instructions** dans le même ordre. Avec les conditions, vous pouvez :
+
+- Afficher un message différent selon l'heure de la journée
+- Valider les données saisies par l'utilisateur
+- Gérer les erreurs et les cas particuliers
+- Créer des menus et des options
+- Implémenter la logique métier de vos applications
+
+### Schéma Mental : Le Carrefour
+
+\`\`\`
+                    [Condition]
+                        │
+              ┌─────────┴─────────┐
+              │                   │
+         [True]               [False]
+              │                   │
+    ┌─────────▼─────────┐ ┌──────▼──────┐
+    │ Bloc d'instructions│ │Bloc alternatif│
+    │    (si vrai)       │ │  (si faux)   │
+    └───────────────────┘ └──────────────┘
+\`\`\`
+
+---
+
+## 📝 La Structure if Simple
+
+La structure \`if\` la plus basique exécute un bloc de code **seulement si** la condition est vraie.
 
 \`\`\`python
 age = 18
 
 if age >= 18:
     print("Vous êtes majeur")
+    print("Vous pouvez voter")
+
+# Le code continue ici, que la condition soit vraie ou fausse
+print("Fin du programme")
 \`\`\`
 
-## if/else
+### Points importants
+
+1. **Les deux-points (:)** sont obligatoires après la condition
+2. **L'indentation** définit le bloc de code (généralement 4 espaces)
+3. Si la condition est **False**, le bloc est simplement ignoré
+
+\`\`\`python
+temperature = 15
+
+if temperature < 0:
+    print("Il gèle !")  # Ne s'affiche PAS car 15 >= 0
+
+print("Bonne journée !")  # S'affiche toujours
+\`\`\`
+
+---
+
+## 🔀 La Structure if/else
+
+Ajoutez \`else\` pour définir ce qui se passe quand la condition est **fausse**.
 
 \`\`\`python
 age = 16
 
 if age >= 18:
-    print("Majeur")
+    print("Vous êtes majeur")
 else:
-    print("Mineur")
+    print("Vous êtes mineur")
 \`\`\`
 
-## if/elif/else
+### Exemple : Parité d'un nombre
 
 \`\`\`python
-note = 75
+nombre = 7
 
-if note >= 90:
-    mention = "Excellent"
-elif note >= 80:
-    mention = "Très bien"
-elif note >= 70:
-    mention = "Bien"
-elif note >= 60:
-    mention = "Passable"
+if nombre % 2 == 0:
+    print(f"{nombre} est pair")
 else:
-    mention = "Insuffisant"
-
-print(f"Mention: {mention}")
+    print(f"{nombre} est impair")
+# Résultat : "7 est impair"
 \`\`\`
 
-## Conditions Imbriquées
+### Exemple : Validation de connexion
+
+\`\`\`python
+mot_de_passe_correct = "secret123"
+saisie = input("Entrez le mot de passe : ")
+
+if saisie == mot_de_passe_correct:
+    print("Connexion réussie !")
+    print("Bienvenue dans votre espace")
+else:
+    print("Mot de passe incorrect !")
+    print("Veuillez réessayer")
+\`\`\`
+
+---
+
+## 🔄 La Structure if/elif/else
+
+Quand vous avez **plus de deux cas**, utilisez \`elif\` (contraction de "else if").
+
+\`\`\`python
+note = 15
+
+if note >= 16:
+    mention = "Très Bien"
+elif note >= 14:
+    mention = "Bien"
+elif note >= 12:
+    mention = "Assez Bien"
+elif note >= 10:
+    mention = "Passable"
+else:
+    mention = "Ajourné"
+
+print(f"Mention : {mention}")
+# Résultat : "Mention : Bien"
+\`\`\`
+
+### Comment ça fonctionne ?
+
+1. Python évalue les conditions **de haut en bas**
+2. Dès qu'une condition est **True**, il exécute ce bloc et **sort** de la structure
+3. Si **aucune** condition n'est True, il exécute le bloc \`else\`
+
+\`\`\`
+note = 15
+       │
+       ▼
+[note >= 16 ?] ─ Non ──┐
+       │               │
+      Oui              ▼
+       │         [note >= 14 ?] ─ Non ──┐
+       ▼               │               │
+  "Très Bien"         Oui              ▼
+                       │          [note >= 12 ?] ...
+                       ▼
+                    "Bien" ◄── Résultat
+\`\`\`
+
+### Exemple : Catégorie d'âge
+
+\`\`\`python
+age = 35
+
+if age < 2:
+    categorie = "Bébé"
+elif age < 12:
+    categorie = "Enfant"
+elif age < 18:
+    categorie = "Adolescent"
+elif age < 65:
+    categorie = "Adulte"
+else:
+    categorie = "Senior"
+
+print(f"Catégorie : {categorie}")  # "Adulte"
+\`\`\`
+
+### Exemple : Calculatrice simple
+
+\`\`\`python
+a = 10
+b = 3
+operation = "+"
+
+if operation == "+":
+    resultat = a + b
+elif operation == "-":
+    resultat = a - b
+elif operation == "*":
+    resultat = a * b
+elif operation == "/":
+    if b != 0:  # Vérifier la division par zéro
+        resultat = a / b
+    else:
+        resultat = "Erreur : division par zéro"
+else:
+    resultat = "Opération non reconnue"
+
+print(f"{a} {operation} {b} = {resultat}")
+\`\`\`
+
+---
+
+## 🏠 Conditions Imbriquées
+
+Vous pouvez placer des conditions **à l'intérieur** d'autres conditions pour des logiques plus complexes.
 
 \`\`\`python
 age = 25
 revenu = 30000
+a_garantie = True
 
 if age >= 18:
+    print("Majeur - éligible en principe")
+    
     if revenu >= 25000:
-        print("Éligible au prêt")
+        print("Revenu suffisant")
+        
+        if a_garantie:
+            print("✅ Prêt accordé !")
+        else:
+            print("❌ Garantie requise")
     else:
-        print("Revenu insuffisant")
+        print("❌ Revenu insuffisant")
 else:
-    print("Trop jeune")
+    print("❌ Mineur - non éligible")
 \`\`\`
 
-## Opérateur Ternaire
+### Attention à la complexité !
+
+Les conditions imbriquées peuvent devenir **difficiles à lire**. Préférez parfois combiner les conditions :
+
+\`\`\`python
+# ❌ Imbrication excessive
+if condition1:
+    if condition2:
+        if condition3:
+            faire_quelque_chose()
+
+# ✅ Combinaison plus lisible
+if condition1 and condition2 and condition3:
+    faire_quelque_chose()
+\`\`\`
+
+---
+
+## ⚡ L'Opérateur Ternaire
+
+Python offre une syntaxe concise pour les conditions simples : l'**expression conditionnelle** (ou opérateur ternaire).
+
+### Syntaxe
+
+\`\`\`python
+valeur_si_vrai if condition else valeur_si_faux
+\`\`\`
+
+### Exemples
 
 \`\`\`python
 age = 20
 
-# Syntaxe: valeur_si_vrai if condition else valeur_si_faux
-statut = "Majeur" if age >= 18 else "Mineur"
-
-# Équivalent à:
+# Forme classique
 if age >= 18:
     statut = "Majeur"
 else:
     statut = "Mineur"
+
+# Forme ternaire (équivalent)
+statut = "Majeur" if age >= 18 else "Mineur"
 \`\`\`
 
-## Match-Case (Python 3.10+)
+\`\`\`python
+# Trouver le maximum de deux nombres
+a, b = 10, 20
+maximum = a if a > b else b
+print(f"Maximum : {maximum}")  # 20
+
+# Valeur absolue
+nombre = -5
+absolu = nombre if nombre >= 0 else -nombre
+print(f"Valeur absolue : {absolu}")  # 5
+
+# Message conditionnel
+articles = 3
+message = "article" if articles == 1 else "articles"
+print(f"Vous avez {articles} {message}")  # "Vous avez 3 articles"
+\`\`\`
+
+### Quand utiliser le ternaire ?
+
+✅ **Utilisez-le pour** :
+- Des assignations simples
+- Des expressions courtes et lisibles
+
+❌ **Évitez-le pour** :
+- Des conditions complexes
+- Des blocs avec plusieurs instructions
+
+\`\`\`python
+# ✅ Simple et lisible
+resultat = "pair" if n % 2 == 0 else "impair"
+
+# ❌ Trop complexe - utilisez if/else classique
+# resultat = "A" if n > 90 else "B" if n > 80 else "C" if n > 70 else "D"
+\`\`\`
+
+---
+
+## 🎯 Match-Case (Python 3.10+)
+
+Python 3.10 a introduit le **pattern matching** avec \`match/case\`, similaire au \`switch\` d'autres langages.
+
+### Syntaxe de base
 
 \`\`\`python
 commande = "start"
 
 match commande:
     case "start":
-        print("Démarrage...")
+        print("Démarrage du programme...")
     case "stop":
-        print("Arrêt...")
-    case "pause" | "suspend":  # Plusieurs valeurs
-        print("Pause...")
-    case _:  # Cas par défaut
+        print("Arrêt du programme...")
+    case "pause":
+        print("Mise en pause...")
+    case _:  # Cas par défaut (underscore = wildcard)
         print("Commande inconnue")
 \`\`\`
 
-## Exercices 🎯
+### Plusieurs valeurs avec \`|\`
 
 \`\`\`python
-# Exercice 1 : Calculateur de mention
+jour = "samedi"
+
+match jour:
+    case "lundi" | "mardi" | "mercredi" | "jeudi" | "vendredi":
+        print("C'est un jour de semaine")
+    case "samedi" | "dimanche":
+        print("C'est le weekend !")
+    case _:
+        print("Jour invalide")
+\`\`\`
+
+### Pattern matching avec déstructuration
+
+\`\`\`python
+point = (3, 4)
+
+match point:
+    case (0, 0):
+        print("Origine")
+    case (0, y):
+        print(f"Sur l'axe Y à y={y}")
+    case (x, 0):
+        print(f"Sur l'axe X à x={x}")
+    case (x, y):
+        print(f"Point à ({x}, {y})")
+\`\`\`
+
+### Avec des conditions (guards)
+
+\`\`\`python
+age = 25
+
+match age:
+    case n if n < 0:
+        print("Âge invalide")
+    case n if n < 18:
+        print("Mineur")
+    case n if n < 65:
+        print("Adulte")
+    case _:
+        print("Senior")
+\`\`\`
+
+---
+
+## 📋 Bonnes Pratiques
+
+### 1. Gardez les conditions simples
+
+\`\`\`python
+# ❌ Trop complexe
+if (age >= 18 and age <= 65) and (revenu > 20000 or a_garantie) and not est_interdit:
+    accorder_pret()
+
+# ✅ Utilisez des variables intermédiaires
+est_adulte_actif = 18 <= age <= 65
+est_solvable = revenu > 20000 or a_garantie
+est_eligible = est_adulte_actif and est_solvable and not est_interdit
+
+if est_eligible:
+    accorder_pret()
+\`\`\`
+
+### 2. Évitez les comparaisons inutiles avec les booléens
+
+\`\`\`python
+est_actif = True
+
+# ❌ Redondant
+if est_actif == True:
+    print("Actif")
+
+# ✅ Direct et Pythonique
+if est_actif:
+    print("Actif")
+
+# ❌ Redondant
+if est_actif == False:
+    print("Inactif")
+
+# ✅ Utilisez not
+if not est_actif:
+    print("Inactif")
+\`\`\`
+
+### 3. Utilisez les valeurs truthy/falsy
+
+\`\`\`python
+liste = [1, 2, 3]
+
+# ❌ Verbeux
+if len(liste) > 0:
+    print("Liste non vide")
+
+# ✅ Pythonique
+if liste:
+    print("Liste non vide")
+\`\`\`
+
+### 4. Retournez tôt (early return)
+
+\`\`\`python
+# ❌ Imbrication profonde
+def traiter_utilisateur(user):
+    if user is not None:
+        if user.est_actif:
+            if user.a_permission:
+                # traitement...
+                return resultat
+
+# ✅ Retours anticipés
+def traiter_utilisateur(user):
+    if user is None:
+        return None
+    if not user.est_actif:
+        return "Utilisateur inactif"
+    if not user.a_permission:
+        return "Permission refusée"
+    
+    # traitement...
+    return resultat
+\`\`\`
+
+---
+
+## Exercices 🎯
+
+### Exercice 1 : Calculateur de mention
+\`\`\`python
 def calculer_mention(note):
+    """Retourne la mention selon la note (sur 20)."""
     if note >= 16:
         return "Très Bien"
     elif note >= 14:
@@ -1670,118 +2694,510 @@ def calculer_mention(note):
     else:
         return "Ajourné"
 
-# Exercice 2 : Année bissextile
-def est_bissextile(annee):
-    return (annee % 4 == 0 and annee % 100 != 0) or (annee % 400 == 0)
+print(calculer_mention(17))  # "Très Bien"
+print(calculer_mention(13))  # "Assez Bien"
 \`\`\`
+
+### Exercice 2 : Année bissextile
+\`\`\`python
+def est_bissextile(annee):
+    """
+    Vérifie si une année est bissextile.
+    Règle : divisible par 4, sauf les siècles qui doivent être divisibles par 400.
+    """
+    return (annee % 4 == 0 and annee % 100 != 0) or (annee % 400 == 0)
+
+print(est_bissextile(2024))  # True
+print(est_bissextile(2100))  # False
+print(est_bissextile(2000))  # True
+\`\`\`
+
+### Exercice 3 : Calculatrice avec match-case
+\`\`\`python
+def calculer(a, op, b):
+    """Calculatrice simple avec match-case."""
+    match op:
+        case "+":
+            return a + b
+        case "-":
+            return a - b
+        case "*":
+            return a * b
+        case "/":
+            return a / b if b != 0 else "Erreur"
+        case _:
+            return "Opération inconnue"
+\`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/08-conditions-exercice.py\`
 `,
 
     '09-boucles': `
 # Module 9 : Boucles (for/while)
 
-## Boucle for
+Les **boucles** permettent de **répéter des instructions** plusieurs fois. C'est l'un des concepts les plus puissants de la programmation : au lieu d'écrire 100 fois la même chose, vous écrivez une boucle qui le fait pour vous !
+
+---
+
+## 🧠 Pourquoi les Boucles sont Essentielles ?
+
+Sans boucles, pour afficher les nombres de 1 à 100, vous devriez écrire :
+\`\`\`python
+print(1)
+print(2)
+print(3)
+# ... 97 lignes plus tard ...
+print(100)
+\`\`\`
+
+Avec une boucle, c'est **2 lignes** :
+\`\`\`python
+for i in range(1, 101):
+    print(i)
+\`\`\`
+
+### Cas d'usage courants
+
+| Situation | Type de boucle |
+|-----------|---------------|
+| Parcourir une liste d'éléments | \`for\` |
+| Répéter n fois | \`for\` avec \`range()\` |
+| Continuer tant qu'une condition est vraie | \`while\` |
+| Lire un fichier ligne par ligne | \`for\` |
+| Attendre une entrée utilisateur valide | \`while\` |
+| Traiter tous les éléments d'un dictionnaire | \`for\` |
+
+---
+
+## 🔄 La Boucle for
+
+La boucle \`for\` est idéale pour **parcourir des séquences** (listes, strings, dictionnaires, etc.) ou répéter un nombre défini de fois.
+
+### Parcourir une liste
 
 \`\`\`python
-# Itérer sur une liste
-fruits = ["pomme", "banane", "cerise"]
-for fruit in fruits:
-    print(fruit)
+fruits = ["pomme", "banane", "cerise", "datte"]
 
-# Itérer sur une string
-for lettre in "Python":
+for fruit in fruits:
+    print(f"J'aime les {fruit}s")
+
+# Résultat :
+# J'aime les pommes
+# J'aime les bananes
+# J'aime les cerises
+# J'aime les dattes
+\`\`\`
+
+### Parcourir une chaîne de caractères
+
+\`\`\`python
+mot = "Python"
+
+for lettre in mot:
     print(lettre)
 
-# range()
-for i in range(5):          # 0, 1, 2, 3, 4
-    print(i)
-
-for i in range(2, 8):       # 2, 3, 4, 5, 6, 7
-    print(i)
-
-for i in range(0, 10, 2):   # 0, 2, 4, 6, 8
-    print(i)
+# Affiche : P y t h o n (une lettre par ligne)
 \`\`\`
 
-## enumerate() et zip()
+### La fonction range()
+
+\`range()\` génère une séquence de nombres. C'est **indispensable** pour répéter des actions un nombre précis de fois.
+
+\`\`\`python
+# range(stop) : de 0 à stop-1
+for i in range(5):
+    print(i)  # 0, 1, 2, 3, 4
+
+# range(start, stop) : de start à stop-1
+for i in range(2, 7):
+    print(i)  # 2, 3, 4, 5, 6
+
+# range(start, stop, step) : avec un pas
+for i in range(0, 10, 2):
+    print(i)  # 0, 2, 4, 6, 8 (nombres pairs)
+
+# Comptage à rebours
+for i in range(10, 0, -1):
+    print(i)  # 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+\`\`\`
+
+### Schéma mental de range()
+
+\`\`\`
+range(5)        → [0, 1, 2, 3, 4]       # start=0 par défaut
+range(2, 7)     → [2, 3, 4, 5, 6]       # stop exclusif !
+range(0, 10, 2) → [0, 2, 4, 6, 8]       # step=2
+range(5, 0, -1) → [5, 4, 3, 2, 1]       # comptage décroissant
+\`\`\`
+
+> ⚠️ **Attention** : Le paramètre \`stop\` est **exclusif** (jamais inclus) !
+
+---
+
+## 🔢 enumerate() : Index + Valeur
+
+Souvent, vous avez besoin de l'**index** ET de la **valeur**. Utilisez \`enumerate()\` !
 
 \`\`\`python
 fruits = ["pomme", "banane", "cerise"]
 
-# enumerate - index + valeur
-for i, fruit in enumerate(fruits):
-    print(f"{i}: {fruit}")
+# ❌ Façon moins élégante
+for i in range(len(fruits)):
+    print(f"{i}: {fruits[i]}")
 
-# enumerate avec start
-for i, fruit in enumerate(fruits, start=1):
-    print(f"{i}. {fruit}")
+# ✅ Façon Pythonique avec enumerate()
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")
 
-# zip - itérer sur plusieurs listes
-noms = ["Alice", "Bob"]
-ages = [25, 30]
-
-for nom, age in zip(noms, ages):
-    print(f"{nom} a {age} ans")
+# Résultat :
+# 0: pomme
+# 1: banane
+# 2: cerise
 \`\`\`
 
-## Boucle while
+### Commencer à un index différent
+
+\`\`\`python
+# Numéroter à partir de 1
+for numero, fruit in enumerate(fruits, start=1):
+    print(f"{numero}. {fruit}")
+
+# Résultat :
+# 1. pomme
+# 2. banane
+# 3. cerise
+\`\`\`
+
+---
+
+## 🔗 zip() : Parcourir Plusieurs Listes
+
+\`zip()\` permet de parcourir **plusieurs listes en parallèle**.
+
+\`\`\`python
+noms = ["Alice", "Bob", "Charlie"]
+ages = [25, 30, 35]
+villes = ["Paris", "Lyon", "Marseille"]
+
+for nom, age, ville in zip(noms, ages, villes):
+    print(f"{nom}, {age} ans, habite à {ville}")
+
+# Résultat :
+# Alice, 25 ans, habite à Paris
+# Bob, 30 ans, habite à Lyon
+# Charlie, 35 ans, habite à Marseille
+\`\`\`
+
+### Attention à la longueur !
+
+\`zip()\` s'arrête à la **liste la plus courte** :
+
+\`\`\`python
+a = [1, 2, 3, 4, 5]
+b = ["a", "b", "c"]
+
+for x, y in zip(a, b):
+    print(x, y)
+# 1 a
+# 2 b
+# 3 c
+# (4 et 5 sont ignorés car b est plus court)
+\`\`\`
+
+---
+
+## ⏳ La Boucle while
+
+La boucle \`while\` répète tant qu'une **condition est vraie**. Utilisez-la quand vous ne savez pas à l'avance combien d'itérations sont nécessaires.
+
+### Syntaxe de base
 
 \`\`\`python
 compteur = 0
 
 while compteur < 5:
-    print(compteur)
-    compteur += 1
+    print(f"Compteur : {compteur}")
+    compteur += 1  # N'OUBLIEZ JAMAIS d'incrémenter !
 
-# Boucle infinie
+print("Fin de la boucle")
+\`\`\`
+
+> ⚠️ **DANGER** : Sans la ligne \`compteur += 1\`, vous auriez une **boucle infinie** !
+
+### Exemple : Validation d'entrée utilisateur
+
+\`\`\`python
 while True:
-    reponse = input("Continuer ? (o/n): ")
-    if reponse == "n":
+    reponse = input("Entrez 'oui' ou 'non' : ").lower()
+    
+    if reponse in ["oui", "non"]:
+        break  # Sortir de la boucle si valide
+    
+    print("Réponse invalide, réessayez.")
+
+print(f"Vous avez répondu : {reponse}")
+\`\`\`
+
+### Exemple : Deviner un nombre
+
+\`\`\`python
+import random
+
+nombre_secret = random.randint(1, 100)
+tentatives = 0
+
+while True:
+    tentatives += 1
+    essai = int(input("Devinez le nombre (1-100) : "))
+    
+    if essai < nombre_secret:
+        print("Trop petit !")
+    elif essai > nombre_secret:
+        print("Trop grand !")
+    else:
+        print(f"Bravo ! Trouvé en {tentatives} tentatives !")
         break
 \`\`\`
 
-## break, continue, pass
+---
+
+## 🛑 break, continue et pass
+
+Ces mots-clés permettent de **contrôler le flux** à l'intérieur des boucles.
+
+### break : Sortir de la boucle
+
+\`break\` **interrompt immédiatement** la boucle et passe à la suite du code.
 
 \`\`\`python
-# break - sortir de la boucle
-for i in range(10):
-    if i == 5:
-        break
-    print(i)  # 0, 1, 2, 3, 4
+# Chercher un élément
+nombres = [1, 5, 3, 9, 2, 8, 4]
 
-# continue - passer à l'itération suivante
+for n in nombres:
+    if n == 9:
+        print("9 trouvé !")
+        break  # On sort dès qu'on trouve
+    print(f"Vérifié : {n}")
+
+# Résultat :
+# Vérifié : 1
+# Vérifié : 5
+# Vérifié : 3
+# 9 trouvé !
+\`\`\`
+
+### continue : Passer à l'itération suivante
+
+\`continue\` **saute le reste** du bloc et passe à l'itération suivante.
+
+\`\`\`python
+# Afficher seulement les nombres impairs
 for i in range(10):
     if i % 2 == 0:
-        continue
-    print(i)  # 1, 3, 5, 7, 9
+        continue  # Ignorer les pairs
+    print(i)
 
-# pass - ne rien faire (placeholder)
-for i in range(5):
-    pass  # À implémenter plus tard
+# Résultat : 1, 3, 5, 7, 9
 \`\`\`
 
-## Clause else sur les boucles
+### pass : Ne rien faire (placeholder)
+
+\`pass\` est un **placeholder** qui ne fait rien. Utile pour définir des structures vides.
 
 \`\`\`python
-# else s'exécute si la boucle n'a pas été interrompue par break
-for n in range(2, 10):
-    for x in range(2, n):
-        if n % x == 0:
-            print(f"{n} = {x} * {n//x}")
+for i in range(5):
+    pass  # TODO: implémenter plus tard
+
+# Ou pour des fonctions vides
+def fonction_a_implementer():
+    pass
+\`\`\`
+
+### Schéma récapitulatif
+
+\`\`\`
+for element in sequence:
+    if condition1:
+        break      # ← Sort de la boucle immédiatement
+    if condition2:
+        continue   # ← Passe à l'élément suivant
+    # Code normal exécuté si pas de break/continue
+\`\`\`
+
+---
+
+## 🔚 La Clause else sur les Boucles
+
+Particularité de Python : vous pouvez ajouter un \`else\` à une boucle ! Le bloc \`else\` s'exécute **si la boucle se termine normalement** (sans \`break\`).
+
+\`\`\`python
+# Chercher un nombre pair
+nombres = [1, 3, 5, 7, 9]
+
+for n in nombres:
+    if n % 2 == 0:
+        print(f"Nombre pair trouvé : {n}")
+        break
+else:
+    # Exécuté seulement si on n'a pas fait de break
+    print("Aucun nombre pair trouvé")
+
+# Résultat : "Aucun nombre pair trouvé"
+\`\`\`
+
+### Exemple : Vérifier si un nombre est premier
+
+\`\`\`python
+def est_premier(n):
+    if n < 2:
+        return False
+    
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False  # Diviseur trouvé
+    
+    return True  # Pas de diviseur trouvé
+
+# Version avec else
+def est_premier_v2(n):
+    if n < 2:
+        return False
+    
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
             break
     else:
-        # Exécuté si pas de break
-        print(f"{n} est premier")
+        return True  # Pas de break = pas de diviseur
+    
+    return False
+
+print(est_premier(17))  # True
+print(est_premier(15))  # False
 \`\`\`
+
+---
+
+## 🔁 Boucles Imbriquées
+
+Vous pouvez mettre une boucle **à l'intérieur** d'une autre boucle.
+
+### Exemple : Table de multiplication
+
+\`\`\`python
+for i in range(1, 6):
+    for j in range(1, 6):
+        print(f"{i} x {j} = {i*j:2}", end="   ")
+    print()  # Nouvelle ligne après chaque ligne de la table
+
+# Résultat :
+# 1 x 1 =  1   1 x 2 =  2   1 x 3 =  3   1 x 4 =  4   1 x 5 =  5   
+# 2 x 1 =  2   2 x 2 =  4   2 x 3 =  6   2 x 4 =  8   2 x 5 = 10   
+# ...
+\`\`\`
+
+### Exemple : Parcourir une matrice
+
+\`\`\`python
+matrice = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+for ligne in matrice:
+    for element in ligne:
+        print(element, end=" ")
+    print()
+
+# Avec les indices
+for i, ligne in enumerate(matrice):
+    for j, element in enumerate(ligne):
+        print(f"[{i},{j}]={element}", end=" ")
+    print()
+\`\`\`
+
+---
+
+## 📋 Comparaison for vs while
+
+| Critère | for | while |
+|---------|-----|-------|
+| Nombre d'itérations | **Connu** | **Inconnu** |
+| Cas d'usage | Parcourir une séquence | Attendre une condition |
+| Risque de boucle infinie | Faible | **Élevé** |
+| Syntaxe | Plus simple | Plus flexible |
+
+\`\`\`python
+# Préférez for quand vous parcourez une séquence
+for item in liste:
+    traiter(item)
+
+# Utilisez while quand vous attendez une condition
+while not condition_remplie:
+    attendre()
+\`\`\`
+
+---
+
+## 🎯 Bonnes Pratiques
+
+### 1. Évitez de modifier une liste pendant l'itération
+
+\`\`\`python
+# ❌ DANGER : modifier pendant l'itération
+nombres = [1, 2, 3, 4, 5]
+for n in nombres:
+    if n % 2 == 0:
+        nombres.remove(n)  # Bug ! Certains éléments seront sautés
+
+# ✅ Créer une nouvelle liste
+nombres = [1, 2, 3, 4, 5]
+nombres = [n for n in nombres if n % 2 != 0]  # Garde les impairs
+\`\`\`
+
+### 2. Utilisez des noms de variables explicites
+
+\`\`\`python
+# ❌ Noms génériques
+for i in items:
+    for j in i:
+        print(j)
+
+# ✅ Noms explicites
+for utilisateur in utilisateurs:
+    for commande in utilisateur.commandes:
+        print(commande)
+\`\`\`
+
+### 3. Préférez les compréhensions de liste quand c'est simple
+
+\`\`\`python
+# ❌ Boucle pour créer une liste
+carres = []
+for x in range(10):
+    carres.append(x ** 2)
+
+# ✅ List comprehension
+carres = [x ** 2 for x in range(10)]
+\`\`\`
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Table de multiplication
 \`\`\`python
-# Exercice 1 : Table de multiplication
 def table_multiplication(n):
+    """Affiche la table de multiplication de n."""
     for i in range(1, 11):
         print(f"{n} x {i} = {n * i}")
 
-# Exercice 2 : Fizz Buzz
+table_multiplication(7)
+\`\`\`
+
+### Exercice 2 : FizzBuzz
+\`\`\`python
+# Le classique des entretiens techniques !
 for i in range(1, 101):
     if i % 15 == 0:
         print("FizzBuzz")
@@ -1792,112 +3208,392 @@ for i in range(1, 101):
     else:
         print(i)
 \`\`\`
+
+### Exercice 3 : Somme des éléments
+\`\`\`python
+def somme_liste(liste):
+    """Calcule la somme d'une liste sans utiliser sum()."""
+    total = 0
+    for element in liste:
+        total += element
+    return total
+
+print(somme_liste([1, 2, 3, 4, 5]))  # 15
+\`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/09-boucles-exercice.py\`
 `,
 
     '10-fonctions-utiles': `
 # Module 10 : Fonctions Built-in Utiles
 
-## map()
+Python dispose de nombreuses **fonctions intégrées** (built-in) accessibles sans import. Ce sont vos outils de base pour manipuler, transformer et analyser des données efficacement.
 
-Applique une fonction à chaque élément.
+---
 
-\`\`\`python
-nombres = [1, 2, 3, 4, 5]
+## 🧠 Pourquoi les Fonctions Built-in ?
 
-# Avec fonction
-def carre(x):
-    return x ** 2
+Au lieu de réinventer la roue, Python fournit des fonctions optimisées pour les tâches courantes :
 
-carres = list(map(carre, nombres))
-# [1, 4, 9, 16, 25]
+| Catégorie | Fonctions | Usage |
+|-----------|-----------|-------|
+| 📊 **Agrégation** | \`sum()\`, \`min()\`, \`max()\`, \`len()\` | Résumer des données |
+| 🔄 **Transformation** | \`map()\`, \`filter()\`, \`sorted()\`, \`reversed()\` | Transformer des collections |
+| ✅ **Vérification** | \`any()\`, \`all()\`, \`isinstance()\` | Valider des conditions |
+| 🔢 **Conversion** | \`int()\`, \`float()\`, \`str()\`, \`list()\`, \`tuple()\` | Changer de type |
+| 🔗 **Itération** | \`enumerate()\`, \`zip()\`, \`range()\` | Parcourir des séquences |
+| 📋 **Introspection** | \`type()\`, \`dir()\`, \`help()\`, \`id()\` | Inspecter des objets |
 
-# Avec lambda
-carres = list(map(lambda x: x**2, nombres))
+> 💡 Pour voir toutes les fonctions built-in : \`print(dir(__builtins__))\`
 
-# Plusieurs listes
-a = [1, 2, 3]
-b = [10, 20, 30]
-sommes = list(map(lambda x, y: x + y, a, b))
-# [11, 22, 33]
-\`\`\`
+---
 
-## filter()
+## 📊 Fonctions d'Agrégation : min(), max(), sum(), len()
 
-Filtre les éléments selon une condition.
-
-\`\`\`python
-nombres = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-# Garder les pairs
-pairs = list(filter(lambda x: x % 2 == 0, nombres))
-# [2, 4, 6, 8, 10]
-
-# Garder les positifs
-valeurs = [-2, -1, 0, 1, 2]
-positifs = list(filter(lambda x: x > 0, valeurs))
-# [1, 2]
-\`\`\`
-
-## sorted() et reversed()
+Ces fonctions résument une collection en une seule valeur.
 
 \`\`\`python
 nombres = [3, 1, 4, 1, 5, 9, 2, 6]
 
-# Tri
-trie = sorted(nombres)              # Croissant
-trie_desc = sorted(nombres, reverse=True)  # Décroissant
-
-# Tri personnalisé
-mots = ["banane", "pomme", "kiwi"]
-par_longueur = sorted(mots, key=len)
-
-# Inversé
-inv = list(reversed(nombres))
-\`\`\`
-
-## any() et all()
-
-\`\`\`python
-valeurs = [True, True, False]
-
-print(any(valeurs))  # True (au moins un True)
-print(all(valeurs))  # False (pas tous True)
-
-# Utilisation pratique
-nombres = [2, 4, 6, 8]
-print(all(n % 2 == 0 for n in nombres))  # True (tous pairs)
-
-ages = [18, 25, 16, 30]
-print(any(age < 18 for age in ages))  # True (au moins un mineur)
-\`\`\`
-
-## min(), max(), sum()
-
-\`\`\`python
-nombres = [3, 1, 4, 1, 5, 9]
-
 print(min(nombres))      # 1
 print(max(nombres))      # 9
-print(sum(nombres))      # 23
-
-# Avec clé personnalisée
-mots = ["python", "est", "génial"]
-print(max(mots, key=len))  # "python"
+print(sum(nombres))      # 31
+print(len(nombres))      # 8
 
 # Moyenne
 moyenne = sum(nombres) / len(nombres)
+print(f"Moyenne : {moyenne:.2f}")  # 3.88
 \`\`\`
+
+### Le paramètre \`key\` (min et max)
+
+Le paramètre \`key\` permet de personnaliser le critère de comparaison.
+
+\`\`\`python
+# Plus long mot
+mots = ["python", "est", "un", "langage", "génial"]
+print(max(mots, key=len))  # "langage"
+print(min(mots, key=len))  # "un"
+
+# Personne la plus jeune
+personnes = [
+    {"nom": "Alice", "age": 30},
+    {"nom": "Bob", "age": 25},
+    {"nom": "Charlie", "age": 35}
+]
+plus_jeune = min(personnes, key=lambda p: p["age"])
+print(plus_jeune["nom"])  # "Bob"
+
+# Min/Max avec plusieurs arguments (pas une liste)
+print(min(5, 3, 8, 1))  # 1
+print(max(5, 3, 8, 1))  # 8
+\`\`\`
+
+### Le paramètre \`default\` (min et max)
+
+\`\`\`python
+# Éviter une erreur sur une séquence vide
+liste_vide = []
+# min(liste_vide)  # ❌ ValueError !
+print(min(liste_vide, default=0))  # 0
+
+# sum() avec valeur initiale
+print(sum([1, 2, 3], start=10))  # 16 (10 + 1 + 2 + 3)
+\`\`\`
+
+---
+
+## 🔄 sorted() et reversed()
+
+### sorted() : Tri sans modification
+
+\`sorted()\` retourne une **nouvelle liste triée** sans modifier l'originale.
+
+\`\`\`python
+nombres = [3, 1, 4, 1, 5, 9, 2, 6]
+
+# Tri croissant
+trie = sorted(nombres)
+print(trie)     # [1, 1, 2, 3, 4, 5, 6, 9]
+print(nombres)  # [3, 1, 4, 1, 5, 9, 2, 6] → Inchangée !
+
+# Tri décroissant
+trie_desc = sorted(nombres, reverse=True)
+print(trie_desc)  # [9, 6, 5, 4, 3, 2, 1, 1]
+\`\`\`
+
+### Tri personnalisé avec \`key\`
+
+\`\`\`python
+# Trier des mots par longueur
+mots = ["banane", "pomme", "kiwi", "cerise"]
+par_longueur = sorted(mots, key=len)
+print(par_longueur)  # ['kiwi', 'pomme', 'banane', 'cerise']
+
+# Trier sans tenir compte de la casse
+noms = ["alice", "Charlie", "Bob", "david"]
+par_alpha = sorted(noms, key=str.lower)
+print(par_alpha)  # ['alice', 'Bob', 'Charlie', 'david']
+
+# Trier des tuples par le 2ème élément
+etudiants = [("Alice", 15), ("Bob", 18), ("Charlie", 12)]
+par_note = sorted(etudiants, key=lambda e: e[1], reverse=True)
+print(par_note)  # [('Bob', 18), ('Alice', 15), ('Charlie', 12)]
+\`\`\`
+
+> ⚠️ **\`sorted()\` vs \`.sort()\`** : \`sorted()\` retourne une nouvelle liste, \`.sort()\` modifie la liste en place et retourne \`None\`.
+
+### reversed() : Inverser sans modifier
+
+\`\`\`python
+nombres = [1, 2, 3, 4, 5]
+
+# reversed() retourne un itérateur
+inv = list(reversed(nombres))
+print(inv)      # [5, 4, 3, 2, 1]
+print(nombres)  # [1, 2, 3, 4, 5] → Inchangée !
+
+# Utile dans une boucle
+for n in reversed(nombres):
+    print(n, end=" ")  # 5 4 3 2 1
+\`\`\`
+
+---
+
+## ✅ any() et all()
+
+Ces fonctions vérifient des conditions sur une collection entière.
+
+\`\`\`
+any()  → True si AU MOINS UN élément est True
+all()  → True si TOUS les éléments sont True
+\`\`\`
+
+\`\`\`python
+notes = [15, 12, 8, 18, 14]
+
+# Tous au-dessus de 10 ?
+print(all(n >= 10 for n in notes))  # False (8 < 10)
+
+# Au moins un au-dessus de 16 ?
+print(any(n > 16 for n in notes))   # True (18 > 16)
+\`\`\`
+
+### Cas d'usage pratiques
+
+\`\`\`python
+# Vérifier qu'un mot de passe est valide
+mot_de_passe = "Secret123!"
+
+a_majuscule = any(c.isupper() for c in mot_de_passe)
+a_chiffre = any(c.isdigit() for c in mot_de_passe)
+longueur_ok = len(mot_de_passe) >= 8
+
+mdp_valide = all([a_majuscule, a_chiffre, longueur_ok])
+print(f"Mot de passe valide : {mdp_valide}")  # True
+
+# Vérifier si une liste est triée
+def est_triee(liste):
+    return all(liste[i] <= liste[i+1] for i in range(len(liste)-1))
+
+print(est_triee([1, 2, 3, 4]))    # True
+print(est_triee([1, 3, 2, 4]))    # False
+\`\`\`
+
+### Cas limites
+
+\`\`\`python
+# Sur une liste vide
+print(any([]))  # False (aucun élément True)
+print(all([]))  # True  (aucun élément False → "vacuously true")
+\`\`\`
+
+---
+
+## 🔢 Fonctions de Conversion de Types
+
+\`\`\`python
+# int() - Convertir en entier
+print(int("42"))       # 42
+print(int(3.99))       # 3 (tronque, ne pas confondre avec round)
+print(int("1010", 2))  # 10 (binaire → décimal)
+print(int("ff", 16))   # 255 (hexadécimal → décimal)
+
+# float() - Convertir en flottant
+print(float("3.14"))   # 3.14
+print(float(42))       # 42.0
+
+# str() - Convertir en chaîne
+print(str(42))         # "42"
+print(str(3.14))       # "3.14"
+print(str([1, 2, 3]))  # "[1, 2, 3]"
+
+# bool() - Convertir en booléen
+print(bool(0))         # False
+print(bool(42))        # True
+print(bool(""))        # False
+print(bool("hello"))   # True
+
+# list(), tuple(), set(), dict()
+print(list("hello"))          # ['h', 'e', 'l', 'l', 'o']
+print(tuple([1, 2, 3]))      # (1, 2, 3)
+print(set([1, 2, 2, 3, 3]))  # {1, 2, 3}
+print(dict([("a", 1), ("b", 2)]))  # {'a': 1, 'b': 2}
+\`\`\`
+
+---
+
+## 🔗 enumerate() et zip()
+
+### enumerate() : Index + Valeur
+
+\`\`\`python
+fruits = ["pomme", "banane", "cerise"]
+
+# Obtenir l'index et la valeur
+for i, fruit in enumerate(fruits):
+    print(f"{i}: {fruit}")
+
+# Commencer à un index différent
+for num, fruit in enumerate(fruits, start=1):
+    print(f"{num}. {fruit}")
+\`\`\`
+
+### zip() : Parcourir en parallèle
+
+\`\`\`python
+noms = ["Alice", "Bob", "Charlie"]
+notes = [15, 18, 12]
+
+# Combiner deux listes
+for nom, note in zip(noms, notes):
+    print(f"{nom} : {note}/20")
+
+# Créer un dictionnaire avec zip
+bulletin = dict(zip(noms, notes))
+print(bulletin)  # {'Alice': 15, 'Bob': 18, 'Charlie': 12}
+
+# Dézipper avec *
+paires = [(1, "a"), (2, "b"), (3, "c")]
+nombres, lettres = zip(*paires)
+print(nombres)  # (1, 2, 3)
+print(lettres)  # ('a', 'b', 'c')
+\`\`\`
+
+---
+
+## 📋 Fonctions d'Introspection
+
+\`\`\`python
+x = [1, 2, 3]
+
+# type() - Connaître le type
+print(type(x))           # <class 'list'>
+print(type(42))          # <class 'int'>
+
+# isinstance() - Vérifier le type (préféré à type())
+print(isinstance(x, list))       # True
+print(isinstance(42, (int, float)))  # True (vérifie plusieurs types)
+
+# id() - Adresse mémoire de l'objet
+print(id(x))  # Ex: 140234567890
+
+# dir() - Lister les attributs et méthodes
+print(dir(str))  # Liste toutes les méthodes de str
+
+# help() - Documentation
+# help(len)  # Affiche l'aide de la fonction len
+\`\`\`
+
+---
+
+## 🎯 Fonctions Utilitaires
+
+\`\`\`python
+# abs() - Valeur absolue
+print(abs(-42))     # 42
+print(abs(3.14))    # 3.14
+
+# round() - Arrondir
+print(round(3.14159, 2))  # 3.14
+print(round(2.5))          # 2 (arrondi bancaire !)
+print(round(3.5))          # 4
+
+# pow() - Puissance
+print(pow(2, 10))      # 1024
+print(pow(2, 10, 100)) # 24 (2^10 % 100, modular exponentiation)
+
+# divmod() - Division entière + reste
+quotient, reste = divmod(17, 5)
+print(f"17 ÷ 5 = {quotient} reste {reste}")  # 3 reste 2
+
+# input() - Entrée utilisateur
+# nom = input("Votre nom : ")
+
+# print() - Affichage avancé
+print("A", "B", "C", sep=" - ")     # A - B - C
+print("Loading", end="...")          # Loading... (pas de retour à la ligne)
+\`\`\`
+
+---
+
+## 📋 Récapitulatif Rapide
+
+| Fonction | Description | Exemple |
+|----------|-------------|---------|
+| \`len()\` | Longueur | \`len([1,2,3])\` → \`3\` |
+| \`sum()\` | Somme | \`sum([1,2,3])\` → \`6\` |
+| \`min()\` | Minimum | \`min(3,1,2)\` → \`1\` |
+| \`max()\` | Maximum | \`max(3,1,2)\` → \`3\` |
+| \`sorted()\` | Tri (nouvelle liste) | \`sorted([3,1,2])\` → \`[1,2,3]\` |
+| \`reversed()\` | Inversé (itérateur) | \`list(reversed([1,2,3]))\` → \`[3,2,1]\` |
+| \`any()\` | Au moins un True | \`any([F,T,F])\` → \`True\` |
+| \`all()\` | Tous True | \`all([T,T,F])\` → \`False\` |
+| \`abs()\` | Valeur absolue | \`abs(-5)\` → \`5\` |
+| \`round()\` | Arrondi | \`round(3.14)\` → \`3\` |
+| \`enumerate()\` | Index + valeur | Boucles indexées |
+| \`zip()\` | Parcours parallèle | Combiner des listes |
+| \`isinstance()\` | Vérifier le type | \`isinstance(5, int)\` → \`True\` |
+
+---
 
 ## Exercices 🎯
 
+### Exercice 1 : Statistiques d'une liste
 \`\`\`python
-# Exercice : Pipeline de transformations
+def statistiques(nombres):
+    """Retourne min, max, somme et moyenne d'une liste."""
+    return {
+        "min": min(nombres),
+        "max": max(nombres),
+        "somme": sum(nombres),
+        "moyenne": round(sum(nombres) / len(nombres), 2)
+    }
+
+stats = statistiques([15, 8, 22, 10, 18])
+print(stats)  # {'min': 8, 'max': 22, 'somme': 73, 'moyenne': 14.6}
+\`\`\`
+
+### Exercice 2 : Pipeline de données
+\`\`\`python
 nombres = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 # Filtrer pairs → Élever au carré → Somme
 resultat = sum(map(lambda x: x**2, filter(lambda x: x % 2 == 0, nombres)))
 print(resultat)  # 220 (4 + 16 + 36 + 64 + 100)
 \`\`\`
+
+### Exercice 3 : Validation de données
+\`\`\`python
+def valider_notes(notes):
+    """Vérifie que toutes les notes sont entre 0 et 20."""
+    return all(0 <= n <= 20 for n in notes)
+
+print(valider_notes([15, 12, 18]))   # True
+print(valider_notes([15, -2, 18]))   # False
+\`\`\`
+
+> 📁 **Fichier d'exercices** : \`exercises/python/10-fonctions-utiles-exercice.py\`
 `
 };
 

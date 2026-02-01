@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__acp__Write",
+      "mcp__acp__Edit",
+      "Bash(tree:*)",
+      "Bash(wc -l:*)",
+      "Bash(npm run build)"
+    ]
+  }
+}

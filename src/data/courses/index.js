@@ -126,6 +126,67 @@ export const COURSES = {
             { id: '08-variables', title: 'Module 8 : Variables et Sous-Requêtes', duration: '40 min', part: 'Techniques Avancées' },
             { id: '09-best-practices', title: 'Module 9 : Bonnes Pratiques et Pièges', duration: '35 min', part: 'Techniques Avancées' },
         ]
+    },
+    'data-engineering': {
+        id: 'data-engineering',
+        title: 'Python Data Engineering',
+        description: 'Manipulation, nettoyage et préparation de données avec NumPy, Pandas. Préparez vos données pour le Machine Learning.',
+        icon: '📊',
+        color: 'from-orange-500 to-red-500',
+        duration: '~20 heures',
+        level: 'Intermédiaire',
+        parts: [
+            { id: 'part1', title: 'Partie 1 : NumPy', modules: ['00', '01', '02', '03'] },
+            { id: 'part2', title: 'Partie 2 : Pandas DataFrames', modules: ['04', '05', '06', '07', '08', '09'] },
+            { id: 'part3', title: 'Partie 3 : Nettoyage', modules: ['10', '11', '12', '13', '14'] },
+            { id: 'part4', title: 'Partie 4 : Feature Engineering', modules: ['15', '16', '17', '18'] },
+            { id: 'part5', title: 'Partie 5 : Sources de Données', modules: ['19', '20', '21'] },
+            { id: 'part6', title: 'Partie 6 : Analyse Exploratoire', modules: ['22', '23', '24'] },
+            { id: 'part7', title: 'Partie 7 : Pipelines', modules: ['25', '26', '27'] },
+        ],
+        chapters: [
+            // PARTIE 1 : NUMPY
+            { id: '00-numpy-intro', title: 'Module 0 : Introduction à NumPy', duration: '45 min', part: 'NumPy' },
+            { id: '01-numpy-indexing', title: 'Module 1 : Indexation et Slicing', duration: '40 min', part: 'NumPy' },
+            { id: '02-numpy-operations', title: 'Module 2 : Opérations et Agrégations', duration: '45 min', part: 'NumPy' },
+            { id: '03-numpy-advanced', title: 'Module 3 : Broadcasting et Reshape', duration: '50 min', part: 'NumPy' },
+
+            // PARTIE 2 : PANDAS DATAFRAMES
+            { id: '04-pandas-intro', title: 'Module 4 : Introduction à Pandas', duration: '50 min', part: 'Pandas DataFrames' },
+            { id: '05-pandas-selection', title: 'Module 5 : Sélection et Filtrage', duration: '55 min', part: 'Pandas DataFrames' },
+            { id: '06-pandas-missing', title: 'Module 6 : Valeurs Manquantes', duration: '45 min', part: 'Pandas DataFrames' },
+            { id: '07-pandas-transform', title: 'Module 7 : Transformations', duration: '60 min', part: 'Pandas DataFrames' },
+            { id: '08-pandas-groupby', title: 'Module 8 : GroupBy et Agrégations', duration: '55 min', part: 'Pandas DataFrames' },
+            { id: '09-pandas-merge', title: 'Module 9 : Jointures et Concaténation', duration: '50 min', part: 'Pandas DataFrames' },
+
+            // PARTIE 3 : NETTOYAGE
+            { id: '10-cleaning-text', title: 'Module 10 : Nettoyage de Texte', duration: '45 min', part: 'Nettoyage' },
+            { id: '11-cleaning-dates', title: 'Module 11 : Manipulation de Dates', duration: '40 min', part: 'Nettoyage' },
+            { id: '12-cleaning-duplicates', title: 'Module 12 : Doublons et Dédoublonnage', duration: '35 min', part: 'Nettoyage' },
+            { id: '13-cleaning-outliers', title: 'Module 13 : Valeurs Aberrantes', duration: '50 min', part: 'Nettoyage' },
+            { id: '14-cleaning-validation', title: 'Module 14 : Validation de Données', duration: '40 min', part: 'Nettoyage' },
+
+            // PARTIE 4 : FEATURE ENGINEERING
+            { id: '15-encoding-categorical', title: 'Module 15 : Encodage Catégoriel', duration: '55 min', part: 'Feature Engineering' },
+            { id: '16-scaling-normalization', title: 'Module 16 : Scaling et Normalisation', duration: '45 min', part: 'Feature Engineering' },
+            { id: '17-feature-creation', title: 'Module 17 : Création de Features', duration: '60 min', part: 'Feature Engineering' },
+            { id: '18-feature-selection', title: 'Module 18 : Sélection de Features', duration: '50 min', part: 'Feature Engineering' },
+
+            // PARTIE 5 : SOURCES DE DONNÉES
+            { id: '19-io-files', title: 'Module 19 : Fichiers (CSV, Excel, JSON)', duration: '45 min', part: 'Sources de Données' },
+            { id: '20-io-databases', title: 'Module 20 : Bases de Données SQL', duration: '55 min', part: 'Sources de Données' },
+            { id: '21-io-apis', title: 'Module 21 : APIs et Web', duration: '50 min', part: 'Sources de Données' },
+
+            // PARTIE 6 : ANALYSE EXPLORATOIRE
+            { id: '22-eda-statistics', title: 'Module 22 : Statistiques Descriptives', duration: '45 min', part: 'Analyse Exploratoire' },
+            { id: '23-eda-visualization', title: 'Module 23 : Visualisation avec Matplotlib/Seaborn', duration: '60 min', part: 'Analyse Exploratoire' },
+            { id: '24-eda-correlations', title: 'Module 24 : Corrélations et Relations', duration: '45 min', part: 'Analyse Exploratoire' },
+
+            // PARTIE 7 : PIPELINES
+            { id: '25-pipelines-sklearn', title: 'Module 25 : Pipelines scikit-learn', duration: '55 min', part: 'Pipelines' },
+            { id: '26-optimization', title: 'Module 26 : Optimisation et Performance', duration: '50 min', part: 'Pipelines' },
+            { id: '27-best-practices', title: 'Module 27 : Bonnes Pratiques', duration: '40 min', part: 'Pipelines' },
+        ]
     }
 };
 

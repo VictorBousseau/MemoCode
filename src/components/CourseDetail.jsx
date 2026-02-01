@@ -13,13 +13,60 @@ import { getCourse, getChapter } from '../data/courses/index';
 import { getChapterContent as getPythonChapterContent } from '../data/courses/python/chapters';
 import { getChapterContent as getBayesianChapterContent } from '../data/courses/bayesian/chapters';
 import { getChapterContent as getMongodbChapterContent } from '../data/courses/mongodb/chapters';
+import { dataEngineeringChapters, getDataEngineeringChapterContent } from '../data/courses/data-engineering/chapters';
+import { dataEngineeringChaptersAdvanced, getDataEngineeringAdvancedChapterContent } from '../data/courses/data-engineering/chapters-advanced';
 
 // Exercise files available for download
 const EXERCISE_FILES = {
+    // Python exercises
     '01-variables': { exercice: '01-variables-exercice.py', solution: '01-variables-solution.py' },
     '02-strings': { exercice: '02-strings-exercice.py', solution: '02-strings-solution.py' },
     '03-listes': { exercice: '03-listes-exercice.py', solution: '03-listes-solution.py' },
+    '04-dictionnaires': { exercice: '04-dictionnaires-exercice.py', solution: '04-dictionnaires-solution.py' },
+    '05-tuples-sets': { exercice: '05-tuples-sets-exercice.py', solution: '05-tuples-sets-solution.py' },
+    '06-fichiers': { exercice: '06-fichiers-exercice.py', solution: '06-fichiers-solution.py' },
+    '07-comparaisons': { exercice: '07-comparaisons-exercice.py', solution: '07-comparaisons-solution.py' },
+    '08-conditions': { exercice: '08-conditions-exercice.py', solution: '08-conditions-solution.py' },
+    '09-boucles': { exercice: '09-boucles-exercice.py', solution: '09-boucles-solution.py' },
+    '10-fonctions-utiles': { exercice: '10-fonctions-utiles-exercice.py', solution: '10-fonctions-utiles-solution.py' },
+    '11-methodes': { exercice: '11-methodes-exercice.py', solution: '11-methodes-solution.py' },
+    '12-fonctions': { exercice: '12-fonctions-exercice.py', solution: '12-fonctions-solution.py' },
+    '13-lambda': { exercice: '13-lambda-exercice.py', solution: '13-lambda-solution.py' },
+    '14-scope': { exercice: '14-scope-exercice.py', solution: '14-scope-solution.py' },
+    '15-poo-bases': { exercice: '15-poo-bases-exercice.py', solution: '15-poo-bases-solution.py' },
+    '16-poo-avancee': { exercice: '16-poo-avancee-exercice.py', solution: '16-poo-avancee-solution.py' },
+    '17-modules': { exercice: '17-modules-exercice.py', solution: '17-modules-solution.py' },
+    '18-erreurs': { exercice: '18-erreurs-exercice.py', solution: '18-erreurs-solution.py' },
+    '19-decorateurs': { exercice: '19-decorateurs-exercice.py', solution: '19-decorateurs-solution.py' },
+    '20-generateurs': { exercice: '20-generateurs-exercice.py', solution: '20-generateurs-solution.py' },
+    '21-modules-avances': { exercice: '21-modules-avances-exercice.py', solution: '21-modules-avances-solution.py' },
+    '22-regex': { exercice: '22-regex-exercice.py', solution: '22-regex-solution.py' },
+    '23-zip-files': { exercice: '23-zip-files-exercice.py', solution: '23-zip-files-solution.py' },
+    '24-web-scraping': { exercice: '24-web-scraping-exercice.py', solution: '24-web-scraping-solution.py' },
+    '25-images': { exercice: '25-images-exercice.py', solution: '25-images-solution.py' },
+    '26-pdf-excel': { exercice: '26-pdf-excel-exercice.py', solution: '26-pdf-excel-solution.py' },
+    '27-email': { exercice: '27-email-exercice.py', solution: '27-email-solution.py' },
+    '28-gui': { exercice: '28-gui-exercice.py', solution: '28-gui-solution.py' },
+    // Data Engineering exercises
+    '00-numpy-intro': { exercice: '00-numpy-intro-exercice.py', solution: '00-numpy-intro-solution.py' },
+    '01-numpy-indexing': { exercice: '01-numpy-indexing-exercice.py', solution: '01-numpy-indexing-solution.py' },
+    '02-numpy-operations': { exercice: '02-numpy-operations-exercice.py', solution: '02-numpy-operations-solution.py' },
+    '03-numpy-advanced': { exercice: '03-numpy-advanced-exercice.py', solution: '03-numpy-advanced-solution.py' },
+    '04-pandas-intro': { exercice: '04-pandas-intro-exercice.py', solution: '04-pandas-intro-solution.py' },
+    '05-pandas-selection': { exercice: '05-pandas-selection-exercice.py', solution: '05-pandas-selection-solution.py' },
+    '06-pandas-missing': { exercice: '06-pandas-missing-exercice.py', solution: '06-pandas-missing-solution.py' },
+    '07-pandas-transform': { exercice: '07-pandas-transform-exercice.py', solution: '07-pandas-transform-solution.py' },
+    '08-pandas-groupby': { exercice: '08-pandas-groupby-exercice.py', solution: '08-pandas-groupby-solution.py' },
+    '09-pandas-merge': { exercice: '09-pandas-merge-exercice.py', solution: '09-pandas-merge-solution.py' },
+    '10-cleaning-text': { exercice: '10-cleaning-text-exercice.py', solution: '10-cleaning-text-solution.py' },
 };
+
+// Get exercise folder based on course
+const getExerciseFolder = (courseId) => {
+    if (courseId === 'data-engineering') return 'data-engineering';
+    return 'python'; // Default for python course
+};
+
 
 // Get chapter content based on course
 const getChapterContent = (courseId, chapterId) => {
@@ -29,6 +76,8 @@ const getChapterContent = (courseId, chapterId) => {
         return getBayesianChapterContent(chapterId);
     } else if (courseId === 'mongodb') {
         return getMongodbChapterContent(chapterId);
+    } else if (courseId === 'data-engineering') {
+        return getDataEngineeringChapterContent(chapterId) || getDataEngineeringAdvancedChapterContent(chapterId);
     }
     return null;
 };
@@ -366,7 +415,7 @@ export default function CourseDetail() {
                                     </p>
                                     <div className="flex flex-wrap gap-3">
                                         <a
-                                            href={`${import.meta.env.BASE_URL}exercises/python/${EXERCISE_FILES[currentChapterId].exercice}`}
+                                            href={`${import.meta.env.BASE_URL}exercises/${getExerciseFolder(courseId)}/${EXERCISE_FILES[currentChapterId].exercice}`}
                                             download
                                             className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
                                         >
@@ -374,7 +423,7 @@ export default function CourseDetail() {
                                             Exercice (TODO)
                                         </a>
                                         <a
-                                            href={`${import.meta.env.BASE_URL}exercises/python/${EXERCISE_FILES[currentChapterId].solution}`}
+                                            href={`${import.meta.env.BASE_URL}exercises/${getExerciseFolder(courseId)}/${EXERCISE_FILES[currentChapterId].solution}`}
                                             download
                                             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
                                         >
