@@ -12,8 +12,36 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // Check localStorage for cached session SYNCHRONOUSLY at initialization
+    // This runs BEFORE the first render, so no loading spinner is ever shown
+    const getInitialAuthState = () => {
+        try {
+            const storageKey = Object.keys(localStorage).find(key =>
+                key.startsWith('sb-') && key.endsWith('-auth-token')
+            );
+            if (storageKey) {
+                const cached = localStorage.getItem(storageKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed?.user && parsed?.expires_at) {
+                        // Check if token is not expired (with 60s buffer)
+                        const expiresAt = parsed.expires_at * 1000;
+                        if (Date.now() < expiresAt - 60000) {
+                            console.log('⚡ Instant auth from cache');
+                            return { user: parsed.user, loading: false };
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Could not read cached session:', e);
+        }
+        return { user: null, loading: true };
+    };
+
+    const initialState = getInitialAuthState();
+    const [user, setUser] = useState(initialState.user);
+    const [loading, setLoading] = useState(initialState.loading);
     const [userRole, setUserRole] = useState('user'); // Default to 'user' instead of null
     const [permissions, setPermissions] = useState({});
 
@@ -82,10 +110,15 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         let isMounted = true;
-        let isInitialized = false; // Prevent duplicate role fetches
+        let isInitialized = initialState.user !== null; // Already initialized if we have cached user
 
-        // Initialize auth state - runs ONCE on mount
-        const initAuth = async () => {
+        // Fetch role if we have a cached user
+        if (initialState.user) {
+            fetchUserRole(initialState.user.id).catch(console.error);
+        }
+
+        // Verify session with Supabase (async) - updates if needed
+        const verifySession = async () => {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -95,9 +128,12 @@ export const AuthProvider = ({ children }) => {
 
                 if (isMounted) {
                     if (session?.user) {
-                        console.log('👤 Session found:', session.user.email);
+                        console.log('👤 Session verified:', session.user.email);
                         setUser(session.user);
-                        await fetchUserRole(session.user.id);
+                        // Fetch role if we didn't have cached user before
+                        if (!initialState.user) {
+                            await fetchUserRole(session.user.id);
+                        }
                     } else {
                         console.log('🚫 No active session');
                         setUser(null);
@@ -105,11 +141,10 @@ export const AuthProvider = ({ children }) => {
                         setPermissions({});
                     }
                     isInitialized = true;
-                    console.log('✅ initAuth complete, setting loading=false');
                     setLoading(false);
                 }
             } catch (error) {
-                console.error('❌ Error in initAuth:', error);
+                console.error('❌ Error in verifySession:', error);
                 if (isMounted) {
                     isInitialized = true;
                     setLoading(false);
@@ -117,7 +152,7 @@ export const AuthProvider = ({ children }) => {
             }
         };
 
-        initAuth();
+        verifySession();
 
         // Listen for auth changes AFTER initialization
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {

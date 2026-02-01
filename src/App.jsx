@@ -212,46 +212,37 @@ function PrivateApp({ initialSection = 'quiz' }) {
   );
 }
 
-// Wrapper components with ConditionalAccess for Learning Zone
+// Wrapper components for Learning Zone - All PUBLIC (no auth required)
 const QuizPage = () => (
   <LearningLayout>
-    <ConditionalAccess featureName="les quiz et exercices">
-      <QuizList />
-    </ConditionalAccess>
+    <QuizList />
   </LearningLayout>
 );
 
 const FlashcardsPage = () => (
   <LearningLayout>
-    <ConditionalAccess featureName="les flashcards">
-      <FlashcardDeck />
-    </ConditionalAccess>
+    <FlashcardDeck />
   </LearningLayout>
 );
 
 const PlaygroundPage = () => (
   <LearningLayout>
-    <ConditionalAccess featureName="le playground">
-      <CodePlayground />
-    </ConditionalAccess>
+    <CodePlayground />
   </LearningLayout>
 );
 
 const CoursesPageWrapper = () => (
   <LearningLayout>
-    <ConditionalAccess featureName="les cours">
-      <CoursesPage />
-    </ConditionalAccess>
+    <CoursesPage />
   </LearningLayout>
 );
 
 const CourseDetailWrapper = () => (
   <LearningLayout>
-    <ConditionalAccess featureName="ce cours">
-      <CourseDetail />
-    </ConditionalAccess>
+    <CourseDetail />
   </LearningLayout>
 );
+
 
 export default function App() {
   return (
