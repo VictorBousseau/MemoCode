@@ -59,6 +59,23 @@ const EXERCISE_FILES = {
     '08-pandas-groupby': { exercice: '08-pandas-groupby-exercice.py', solution: '08-pandas-groupby-solution.py' },
     '09-pandas-merge': { exercice: '09-pandas-merge-exercice.py', solution: '09-pandas-merge-solution.py' },
     '10-cleaning-text': { exercice: '10-cleaning-text-exercice.py', solution: '10-cleaning-text-solution.py' },
+    '11-cleaning-dates': { exercice: '11-cleaning-dates-exercice.py', solution: '11-cleaning-dates-solution.py' },
+    '12-cleaning-duplicates': { exercice: '12-cleaning-duplicates-exercice.py', solution: '12-cleaning-duplicates-solution.py' },
+    '13-cleaning-outliers': { exercice: '13-cleaning-outliers-exercice.py', solution: '13-cleaning-outliers-solution.py' },
+    '14-cleaning-validation': { exercice: '14-cleaning-validation-exercice.py', solution: '14-cleaning-validation-solution.py' },
+    '15-encoding-categorical': { exercice: '15-encoding-categorical-exercice.py', solution: '15-encoding-categorical-solution.py' },
+    '16-scaling-normalization': { exercice: '16-scaling-normalization-exercice.py', solution: '16-scaling-normalization-solution.py' },
+    '17-feature-creation': { exercice: '17-feature-creation-exercice.py', solution: '17-feature-creation-solution.py' },
+    '18-feature-selection': { exercice: '18-feature-selection-exercice.py', solution: '18-feature-selection-solution.py' },
+    '19-io-files': { exercice: '19-io-files-exercice.py', solution: '19-io-files-solution.py' },
+    '20-io-databases': { exercice: '20-io-databases-exercice.py', solution: '20-io-databases-solution.py' },
+    '21-io-apis': { exercice: '21-io-apis-exercice.py', solution: '21-io-apis-solution.py' },
+    '22-eda-statistics': { exercice: '22-eda-statistics-exercice.py', solution: '22-eda-statistics-solution.py' },
+    '23-eda-visualization': { exercice: '23-eda-visualization-exercice.py', solution: '23-eda-visualization-solution.py' },
+    '24-eda-correlations': { exercice: '24-eda-correlations-exercice.py', solution: '24-eda-correlations-solution.py' },
+    '25-pipelines-sklearn': { exercice: '25-pipelines-sklearn-exercice.py', solution: '25-pipelines-sklearn-solution.py' },
+    '26-optimization': { exercice: '26-optimization-exercice.py', solution: '26-optimization-solution.py' },
+    '27-best-practices': { exercice: '27-best-practices-exercice.py', solution: '27-best-practices-solution.py' },
 };
 
 // Get exercise folder based on course
