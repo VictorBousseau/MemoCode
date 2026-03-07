@@ -38,6 +38,47 @@ Contrairement à \`COUNT(colonne)\` qui ignore les BLANKs (comme \`df['col'].cou
 L'opérateur \`/\` plante ou renvoie Infinity si le dénominateur est 0.
 \`DIVIDE(N, D, 0)\` est l'équivalent d'un \`np.where(D == 0, 0, N / D)\`. Indispensable pour les ratios S/P.`,
                             code: `Ratio S/P = DIVIDE([Montant Sinistres], [Primes Acquises], 0)`
+                        },
+                        {
+                            id: 'sum_basic',
+                            title: 'Somme (SUM)',
+                            description: 'Additionner une colonne numérique.',
+                            level: 'beginner',
+                            tags: ['dax', 'sum', 'aggregation'],
+                            markdown: `💡 **SUM et le filter context**
+SUM respecte le filter context : un slicer sur la Région ne retournera que les cotisations de cette région. Préférer SUM à SUMX quand aucun calcul ligne à ligne n'est nécessaire.`,
+                            code: `Total Cotisations = SUM('Portefeuille'[Cotisation])`
+                        },
+                        {
+                            id: 'average_basic',
+                            title: 'Moyenne (AVERAGE)',
+                            description: 'Calculer la moyenne d\'une colonne.',
+                            level: 'beginner',
+                            tags: ['dax', 'average', 'aggregation'],
+                            markdown: `💡 **AVERAGE et les valeurs aberrantes**
+AVERAGE divise la somme par le nombre de lignes visibles. Sensible aux valeurs aberrantes — envisager AVERAGEX avec un FILTER pour les exclure.`,
+                            code: `Cotisation Moyenne = AVERAGE('Portefeuille'[Cotisation])`
+                        },
+                        {
+                            id: 'min_max',
+                            title: 'Min / Max (MIN, MAX)',
+                            description: 'Valeur minimale ou maximale d\'une colonne.',
+                            level: 'beginner',
+                            tags: ['dax', 'min', 'max', 'aggregation'],
+                            markdown: `💡 **MIN/MAX dans un tableau croisé**
+Utile pour les bornes de KPI. Dans un tableau croisé, MIN/MAX retournent le min/max pour chaque contexte de ligne.`,
+                            code: `Cotisation Min = MIN('Portefeuille'[Cotisation])
+Cotisation Max = MAX('Portefeuille'[Cotisation])`
+                        },
+                        {
+                            id: 'count_numeric',
+                            title: 'Compter les numériques (COUNT)',
+                            description: 'Compter les valeurs numériques non-vides.',
+                            level: 'beginner',
+                            tags: ['dax', 'count', 'aggregation'],
+                            markdown: `⚠️ **COUNT vs COUNTROWS vs COUNTA**
+COUNT ignore les BLANK et ne compte que les colonnes numériques. Pour compter les lignes (même avec des BLANK), utiliser COUNTROWS. Pour les colonnes texte, utiliser COUNTA.`,
+                            code: `Nb Contrats Numériques = COUNT('Portefeuille'[Cotisation])`
                         }
                     ]
                 },
@@ -83,11 +124,95 @@ CALCULATE(
                             description: 'Calculer des parts de marché (Ratio vs Global).',
                             level: 'intermediate',
                             tags: ['dax', 'all', 'filter'],
-                            code: `Part de Marché = 
+                            code: `Part de Marché =
 VAR SinistresAgence = [Montant Sinistres]
 VAR SinistresGlobal = CALCULATE([Montant Sinistres], ALL('Agence'))
 RETURN
     DIVIDE(SinistresAgence, SinistresGlobal)`
+                        },
+                        {
+                            id: 'calculatetable_function',
+                            title: 'Table filtrée (CALCULATETABLE)',
+                            description: 'Retourner une table filtrée (version table de CALCULATE).',
+                            level: 'advanced',
+                            tags: ['dax', 'calculatetable', 'context'],
+                            markdown: `💡 **CALCULATETABLE vs CALCULATE**
+Comme CALCULATE mais retourne une table au lieu d'un scalaire. Utilisé dans des mesures intermédiaires ou avec COUNTROWS/SUMX.`,
+                            code: `Contrats Haute Valeur =
+CALCULATETABLE(
+    'Portefeuille',
+    'Portefeuille'[Cotisation] > 5000
+)`
+                        },
+                        {
+                            id: 'filter_core',
+                            title: 'Filtrer une table (FILTER)',
+                            description: 'Filtrer une table selon une condition complexe.',
+                            level: 'advanced',
+                            tags: ['dax', 'filter', 'context'],
+                            markdown: `💡 **Quand utiliser FILTER ?**
+FILTER retourne une table et crée un row context. À utiliser dans CALCULATE quand le filtre est complexe (plusieurs colonnes, expressions calculées). Pour des filtres simples sur une colonne, préférer la syntaxe directe dans CALCULATE.`,
+                            code: `Cotisations Rentables =
+CALCULATE(
+    SUM('Portefeuille'[Cotisation]),
+    FILTER('Portefeuille', 'Portefeuille'[Sinistre] < 'Portefeuille'[Cotisation])
+)`
+                        },
+                        {
+                            id: 'allexcept_function',
+                            title: 'Filtres partiels (ALLEXCEPT)',
+                            description: 'Supprimer tous les filtres sauf sur certaines colonnes.',
+                            level: 'advanced',
+                            tags: ['dax', 'allexcept', 'context'],
+                            markdown: `💡 **ALLEXCEPT**
+ALLEXCEPT('Table', Col1, Col2) supprime tous les filtres de la table SAUF sur Col1 et Col2. Utile pour stabiliser un total par groupe tout en conservant une dimension.`,
+                            code: `Cotisations Région (stable) =
+CALCULATE(
+    SUM('Portefeuille'[Cotisation]),
+    ALLEXCEPT('Portefeuille', 'Portefeuille'[Region])
+)`
+                        },
+                        {
+                            id: 'allselected_function',
+                            title: 'Respecter les slicers (ALLSELECTED)',
+                            description: 'Respecter les slicers mais ignorer les filtres visuels.',
+                            level: 'advanced',
+                            tags: ['dax', 'allselected', 'context'],
+                            markdown: `💡 **ALLSELECTED vs ALL**
+ALLSELECTED garde les filtres posés par l'utilisateur (slicers) mais ignore les filtres internes au visuel (ex: filtres de lignes d'un tableau). Idéal pour les % dans un tableau avec slicers.`,
+                            code: `% Cotisations (sélection) =
+DIVIDE(
+    SUM('Portefeuille'[Cotisation]),
+    CALCULATE(SUM('Portefeuille'[Cotisation]), ALLSELECTED('Portefeuille'))
+)`
+                        },
+                        {
+                            id: 'removefilters_function',
+                            title: 'Supprimer les filtres (REMOVEFILTERS)',
+                            description: 'Supprimer explicitement tous les filtres (alias clair de ALL).',
+                            level: 'advanced',
+                            tags: ['dax', 'removefilters', 'context'],
+                            markdown: `💡 **REMOVEFILTERS vs ALL**
+REMOVEFILTERS est fonctionnellement équivalent à ALL mais sémantiquement plus lisible — il exprime clairement l'intention de supprimer des filtres. Préféré dans le code de production.`,
+                            code: `Total Global =
+CALCULATE(
+    SUM('Portefeuille'[Cotisation]),
+    REMOVEFILTERS('Portefeuille')
+)`
+                        },
+                        {
+                            id: 'keepfilters_function',
+                            title: 'Filtres additifs (KEEPFILTERS)',
+                            description: 'Ajouter un filtre sans écraser les filtres existants.',
+                            level: 'advanced',
+                            tags: ['dax', 'keepfilters', 'context'],
+                            markdown: `💡 **KEEPFILTERS**
+Par défaut, CALCULATE remplace les filtres existants sur une colonne. KEEPFILTERS empêche cet écrasement : le filtre s'ajoute à l'intersection. Évite des bugs silencieux avec les slicers.`,
+                            code: `Cotisations Nord (slicer safe) =
+CALCULATE(
+    SUM('Portefeuille'[Cotisation]),
+    KEEPFILTERS('Portefeuille'[Region] = "Nord")
+)`
                         }
                     ]
                 },
@@ -116,10 +241,49 @@ RETURN
                             description: 'Calcul ligne par ligne avant agrégation.',
                             level: 'intermediate',
                             tags: ['dax', 'sumx', 'iterator'],
-                            code: `Prime Totale Ajustée = 
+                            code: `Prime Totale Ajustée =
 SUMX(
     'Portefeuille',
     'Portefeuille'[Prime de Base] * 'Portefeuille'[Coeff Bonus-Malus]
+)`
+                        },
+                        {
+                            id: 'averagex_example',
+                            title: 'Moyenne calculée (AVERAGEX)',
+                            description: 'Moyenne d\'une expression calculée ligne à ligne.',
+                            level: 'beginner',
+                            tags: ['dax', 'averagex', 'iterator'],
+                            markdown: `💡 **AVERAGEX vs AVERAGE**
+Contrairement à AVERAGE qui moyenne une colonne existante, AVERAGEX permet de moyenner un calcul (ex: taux de sinistralité par contrat).`,
+                            code: `Taux Sinistralité Moyen =
+AVERAGEX(
+    'Portefeuille',
+    DIVIDE('Portefeuille'[Sinistre], 'Portefeuille'[Cotisation])
+)`
+                        },
+                        {
+                            id: 'minx_maxx_example',
+                            title: 'Min/Max calculé (MINX, MAXX)',
+                            description: 'Min ou max d\'une expression calculée ligne à ligne.',
+                            level: 'advanced',
+                            tags: ['dax', 'minx', 'maxx', 'iterator'],
+                            markdown: `💡 **MINX/MAXX vs MIN/MAX**
+Utile pour trouver la meilleure/pire performance calculée, pas une valeur brute de colonne.`,
+                            code: `Marge Min = MINX('Portefeuille', 'Portefeuille'[Cotisation] - 'Portefeuille'[Sinistre])
+Marge Max = MAXX('Portefeuille', 'Portefeuille'[Cotisation] - 'Portefeuille'[Sinistre])`
+                        },
+                        {
+                            id: 'countx_example',
+                            title: 'Compter avec condition (COUNTX)',
+                            description: 'Compter les lignes où une expression est non-vide.',
+                            level: 'advanced',
+                            tags: ['dax', 'countx', 'iterator'],
+                            markdown: `💡 **COUNTX et les expressions**
+COUNTX compte les résultats non-BLANK de l'expression. Ici : compter les contrats en perte (sinistre > cotisation).`,
+                            code: `Contrats en Perte =
+COUNTX(
+    'Portefeuille',
+    IF('Portefeuille'[Sinistre] > 'Portefeuille'[Cotisation], 1)
 )`
                         }
                     ]
@@ -218,11 +382,105 @@ DIVIDE(
 )
 
 // ✅ AVEC VAR : [Montant Total] n'est calculé qu'UNE fois
-Rentabilité % = 
+Rentabilité % =
 VAR Total = [Montant Total]
 VAR Profit = Total - [Coûts]
 RETURN
     DIVIDE(Profit, Total)`
+                        }
+                    ]
+                },
+                {
+                    id: 'logic_conditions',
+                    title: '5. Logique & Conditions',
+                    description: 'IF, SWITCH, opérateurs logiques et gestion des erreurs.',
+                    snippets: [
+                        {
+                            id: 'if_function',
+                            title: 'Condition simple (IF)',
+                            description: 'Condition simple vrai/faux.',
+                            level: 'beginner',
+                            tags: ['dax', 'if', 'logic'],
+                            markdown: `💡 **IF dans une mesure**
+IF dans une mesure s'applique au niveau du filter context (pas ligne par ligne). Pour du ligne à ligne, utiliser IF dans une colonne calculée ou dans un SUMX/COUNTX.`,
+                            code: `Statut Contrat =
+IF(
+    'Portefeuille'[Sinistre] > 'Portefeuille'[Cotisation],
+    "Déficitaire",
+    "Rentable"
+)`
+                        },
+                        {
+                            id: 'switch_true',
+                            title: 'Multi-conditions (SWITCH TRUE)',
+                            description: 'Classification multi-conditions lisible.',
+                            level: 'beginner',
+                            tags: ['dax', 'switch', 'logic'],
+                            markdown: `💡 **Pattern SWITCH(TRUE())**
+SWITCH(TRUE(), ...) est le pattern idiomatique DAX pour remplacer les IF imbriqués. Les conditions sont évaluées dans l'ordre — dès qu'une est vraie, SWITCH retourne le résultat associé.`,
+                            code: `Catégorie Cotisation =
+SWITCH(
+    TRUE(),
+    'Portefeuille'[Cotisation] >= 10000, "Haute",
+    'Portefeuille'[Cotisation] >= 5000,  "Moyenne",
+    "Faible"
+)`
+                        },
+                        {
+                            id: 'and_or_logic',
+                            title: 'Opérateurs logiques (AND, OR, NOT)',
+                            description: 'Combiner des conditions logiques.',
+                            level: 'beginner',
+                            tags: ['dax', 'and', 'or', 'logic'],
+                            markdown: `💡 **&& et || vs AND() et OR()**
+En DAX, && et || sont les équivalents opérateurs de AND() et OR(). Préférer && et || pour la lisibilité dans les expressions complexes.`,
+                            code: `Contrat à Risque =
+IF(
+    'Portefeuille'[Sinistre] > 'Portefeuille'[Cotisation] &&
+    'Portefeuille'[Cotisation] < 'Portefeuille'[Objectif],
+    "Risque élevé",
+    "OK"
+)`
+                        },
+                        {
+                            id: 'iferror_coalesce',
+                            title: 'Gestion des erreurs (IFERROR, COALESCE)',
+                            description: 'Gérer les erreurs et les valeurs nulles.',
+                            level: 'beginner',
+                            tags: ['dax', 'iferror', 'coalesce', 'error-handling'],
+                            markdown: `💡 **IFERROR vs COALESCE vs DIVIDE**
+IFERROR capture toute erreur de calcul. COALESCE retourne la première valeur non-BLANK parmi ses arguments — plus léger qu'un IF(ISBLANK(...)). Pour les divisions, préférer DIVIDE() qui gère nativement le zéro.`,
+                            code: `Taux Sécurisé = IFERROR(DIVIDE([Sinistres], [Cotisations]), 0)
+Cotisation Fallback = COALESCE('Portefeuille'[Cotisation], 0)`
+                        },
+                        {
+                            id: 'selectedvalue_function',
+                            title: 'Valeur du slicer (SELECTEDVALUE)',
+                            description: 'Récupérer la valeur sélectionnée dans un slicer.',
+                            level: 'beginner',
+                            tags: ['dax', 'selectedvalue', 'context'],
+                            markdown: `💡 **SELECTEDVALUE**
+SELECTEDVALUE retourne la valeur de la colonne si et seulement si une seule valeur est sélectionnée dans le filter context. Sinon retourne la valeur de remplacement. Parfait pour les titres dynamiques.`,
+                            code: `Titre Région =
+SELECTEDVALUE(
+    'Portefeuille'[Region],
+    "Toutes régions"
+)`
+                        },
+                        {
+                            id: 'hasonevalue_isinscope',
+                            title: 'Granularité du visuel (HASONEVALUE, ISINSCOPE)',
+                            description: 'Détecter le niveau de granularité dans un visuel.',
+                            level: 'advanced',
+                            tags: ['dax', 'hasonevalue', 'isinscope', 'context'],
+                            markdown: `💡 **HASONEVALUE vs ISINSCOPE**
+HASONEVALUE vérifie qu'une seule valeur est dans le context. ISINSCOPE détecte si une colonne est active dans une hiérarchie (matrice). Utiles pour adapter le comportement d'une mesure selon le niveau d'affichage.`,
+                            code: `KPI Adaptatif =
+IF(
+    ISINSCOPE('Portefeuille'[Produit]),
+    SUM('Portefeuille'[Cotisation]),
+    BLANK()
+)`
                         }
                     ]
                 }
@@ -713,6 +971,70 @@ Permet de changer dynamiquement les axes ou les légendes d'un graphique.
 4. Mettez cette colonne dans l'axe X de votre graphique.
 
 L'utilisateur peut maintenant cliquer sur "Pays" ou "Produit" pour changer l'analyse instantanément.`
+                        }
+                    ]
+                },
+                {
+                    id: 'patterns_avances',
+                    title: '9. Patterns Avancés',
+                    description: '% du total, % de la sélection et EARLIER.',
+                    snippets: [
+                        {
+                            id: 'percent_total_all',
+                            title: '% du Total (ALL)',
+                            description: 'Part de chaque ligne dans le total global.',
+                            level: 'advanced',
+                            tags: ['dax', 'all', 'pattern', 'percentage'],
+                            markdown: `💡 **Pattern % du Total**
+Le numérateur garde le filter context du visuel. Le dénominateur utilise ALL() pour effacer tous les filtres et obtenir le total absolu. Ce pattern fonctionne dans toutes les versions de Power BI.`,
+                            code: `Part des Cotisations =
+VAR Numerateur   = SUM('Portefeuille'[Cotisation])
+VAR Denominateur = CALCULATE(SUM('Portefeuille'[Cotisation]), ALL('Portefeuille'))
+RETURN DIVIDE(Numerateur, Denominateur)`
+                        },
+                        {
+                            id: 'percent_selection_allselected',
+                            title: '% de la Sélection (ALLSELECTED)',
+                            description: 'Part d\'une ligne dans la sélection courante du slicer.',
+                            level: 'advanced',
+                            tags: ['dax', 'allselected', 'pattern', 'percentage'],
+                            markdown: `💡 **Différence clé avec ALL**
+Le dénominateur ici tient compte des slicers. Si l'utilisateur filtre sur Nord+Sud, le total = cotisations Nord+Sud. Idéal pour les analyses comparatives.`,
+                            code: `Part dans Sélection =
+VAR Numerateur   = SUM('Portefeuille'[Cotisation])
+VAR Denominateur = CALCULATE(SUM('Portefeuille'[Cotisation]), ALLSELECTED('Portefeuille'))
+RETURN DIVIDE(Numerateur, Denominateur)`
+                        },
+                        {
+                            id: 'earlier_pattern',
+                            title: 'Rang dans une colonne calculée (EARLIER)',
+                            description: 'Comparer chaque ligne à l\'ensemble dans une colonne calculée.',
+                            level: 'advanced',
+                            tags: ['dax', 'earlier', 'row-context', 'calculated-column'],
+                            markdown: `⚠️ **EARLIER — Colonnes calculées uniquement**
+EARLIER ne fonctionne QUE dans une colonne calculée, jamais dans une mesure. Il accède au row context externe dans un iterator imbriqué. Dans la pratique moderne, préférer VAR pour capter la valeur de la ligne courante.`,
+                            code: `-- Colonne calculée (pas une mesure !)
+Rang par Région =
+COUNTROWS(
+    FILTER(
+        'Portefeuille',
+        'Portefeuille'[Region] = EARLIER('Portefeuille'[Region]) &&
+        'Portefeuille'[Cotisation] >= EARLIER('Portefeuille'[Cotisation])
+    )
+)
+
+-- Équivalent moderne avec VAR (recommandé)
+Rang par Région V2 =
+VAR CotisationCourante = 'Portefeuille'[Cotisation]
+VAR RegionCourante     = 'Portefeuille'[Region]
+RETURN
+    COUNTROWS(
+        FILTER(
+            'Portefeuille',
+            'Portefeuille'[Region] = RegionCourante &&
+            'Portefeuille'[Cotisation] >= CotisationCourante
+        )
+    )`
                         }
                     ]
                 }

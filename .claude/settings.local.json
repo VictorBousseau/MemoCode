@@ -5,7 +5,8 @@
       "mcp__acp__Edit",
       "Bash(tree:*)",
       "Bash(wc -l:*)",
-      "Bash(npm run build)"
+      "Bash(npm run build)",
+      "Bash(node:*)"
     ]
   }
 }
