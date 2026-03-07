@@ -1,26 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
 import UnifiedSidebar from './UnifiedSidebar';
-import { Search, Menu, X, User, LogOut, GraduationCap } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import ThemeSelector from './ThemeSelector';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { drawer, modalBackdrop } from '../utils/animations';
-import { useAuth } from '../context/AuthContext';
 import FeedbackWidget from './FeedbackWidget';
 
 export default function Layout({ children, selectedLanguage, onSelectLanguage, searchQuery, setSearchQuery }) {
     const searchInputRef = React.useRef(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const isMobile = useIsMobile();
-    const { user, signOut } = useAuth();
-    const navigate = useNavigate();
-
-    const handleSignOut = () => {
-        console.log('🚪 Logout clicked');
-        signOut(); // Don't await - instant logout
-        navigate('/');
-    };
 
     React.useEffect(() => {
         const handleKeyDown = (e) => {
@@ -107,45 +97,6 @@ export default function Layout({ children, selectedLanguage, onSelectLanguage, s
                         </div>
 
                         <div className="flex items-center gap-2 sm:gap-4">
-                            {/* Auth Buttons */}
-                            {user ? (
-                                // Logged in - Show Profile + Logout
-                                <div className="flex items-center gap-2">
-                                    <Link
-                                        to="/profile"
-                                        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                                    >
-                                        <User className="w-4 h-4" />
-                                        Mon Profil
-                                    </Link>
-                                    <button
-                                        onClick={handleSignOut}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg transition-colors text-sm cursor-pointer"
-                                        title="Se déconnecter"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        {!isMobile && <span>Logout</span>}
-                                    </button>
-                                </div>
-                            ) : (
-                                // Not logged in - Show Sign In + Sign Up
-                                <div className="flex items-center gap-2">
-                                    <Link
-                                        to="/login"
-                                        className="flex items-center gap-1.5 px-3 py-1.5 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors text-sm"
-                                    >
-                                        <User className="w-4 h-4" />
-                                        {!isMobile && <span>Sign In</span>}
-                                    </Link>
-                                    <Link
-                                        to="/signup"
-                                        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                                    >
-                                        Sign Up
-                                    </Link>
-                                </div>
-                            )}
-
                             {/* Feedback Widget */}
                             <FeedbackWidget />
 

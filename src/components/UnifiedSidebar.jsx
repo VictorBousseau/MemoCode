@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2, Brain, BookMarked, Code2, Lock, GraduationCap, Home, FileSpreadsheet, Bot } from 'lucide-react';
+import { FileCode2, BarChart3, Zap, TrendingUp, Database, GitBranch, Table, LayoutGrid, Github, Settings, X, Wand2, Brain, BookMarked, Code2, GraduationCap, Home, FileSpreadsheet, Bot } from 'lucide-react';
 import DataSettings from './DataSettings';
-import { useAuth } from '../context/AuthContext';
 
 const languages = [
     { name: 'Python', icon: FileCode2 },
@@ -20,7 +19,6 @@ const languages = [
 
 export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onClose }) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const { user } = useAuth();
     const location = useLocation();
     const isInLearningZone = location.pathname.startsWith('/learn');
 
@@ -109,9 +107,6 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                         <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                             Learning Zone
                         </h3>
-                        {!user && (
-                            <Lock className="w-3 h-3 text-zinc-600" />
-                        )}
                     </div>
 
                     {/* Learning Zone links - Consolidated */}
@@ -125,7 +120,6 @@ export default function UnifiedSidebar({ selectedLanguage, onSelectLanguage, onC
                     >
                         <GraduationCap className="w-5 h-5 group-hover:scale-110 transition-transform" />
                         <span className="font-medium">Learning Zone</span>
-                        {!user && <Lock className="w-4 h-4 ml-auto text-zinc-600" />}
                     </Link>
                 </div>
             </nav>

@@ -1,27 +1,17 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
 import {
-    Home, Brain, BookMarked, Code2, LogOut, User,
-    GraduationCap, Lock, ChevronLeft, BookOpen
+    Home, Brain, BookMarked, Code2,
+    GraduationCap, ChevronLeft, BookOpen
 } from 'lucide-react';
 import FeedbackWidget from './FeedbackWidget';
 
 /**
  * LearningLayout - Layout component for the Learning Zone pages
- * Includes navigation sidebar and logout functionality
  */
 export default function LearningLayout({ children }) {
-    const { user, signOut } = useAuth();
     const location = useLocation();
-    const navigate = useNavigate();
-
-    const handleSignOut = () => {
-        console.log('🚪 Logout clicked');
-        signOut(); // Don't await - instant logout
-        navigate('/');
-    };
 
     const navItems = [
         { path: '/learn/courses', label: 'Cours', icon: BookOpen, color: 'blue' },
@@ -53,38 +43,9 @@ export default function LearningLayout({ children }) {
                             </div>
                         </div>
 
-                        {/* Right - Feedback & User Info & Logout */}
+                        {/* Right - Feedback */}
                         <div className="flex items-center gap-3">
                             <FeedbackWidget />
-                            {user ? (
-                                <>
-                                    <Link
-                                        to="/profile"
-                                        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-700 rounded-lg transition-colors"
-                                        title="Mon Profil"
-                                    >
-                                        <User className="w-4 h-4 text-zinc-400" />
-                                        <span className="text-sm text-zinc-300 truncate max-w-[150px]">
-                                            {user.email}
-                                        </span>
-                                    </Link>
-                                    <button
-                                        onClick={handleSignOut}
-                                        className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm font-medium cursor-pointer"
-                                    >
-                                        <LogOut className="w-4 h-4" />
-                                        <span>Déconnexion</span>
-                                    </button>
-                                </>
-                            ) : (
-                                <Link
-                                    to="/login"
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                                >
-                                    <Lock className="w-4 h-4" />
-                                    <span>Se connecter</span>
-                                </Link>
-                            )}
                         </div>
                     </div>
                 </div>

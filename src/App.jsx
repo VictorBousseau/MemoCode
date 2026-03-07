@@ -20,17 +20,9 @@ import CodeGenerator from './components/CodeGenerator';
 import QuizList from './components/QuizList';
 import FlashcardDeck from './components/FlashcardDeck';
 import CodePlayground from './components/CodePlayground';
-import Login from './components/auth/Login';
-import Signup from './components/auth/Signup';
-import Profile from './components/auth/Profile';
-import ConditionalAccess from './components/ConditionalAccess';
 import LearningLayout from './components/LearningLayout';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
-import AdminDashboard from './components/AdminDashboard';
 import CoursesPage from './components/CoursesPage';
 import CourseDetail from './components/CourseDetail';
-import { useAuth } from './context/AuthContext';
 
 function PublicApp() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
@@ -254,27 +246,18 @@ export default function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<PublicApp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
 
-        {/* Learning Zone Routes - All protected individually via wrappers */}
+        {/* Learning Zone Routes */}
         <Route path="/learn/quiz" element={<QuizPage />} />
         <Route path="/learn/flashcards" element={<FlashcardsPage />} />
         <Route path="/learn/playground" element={<PlaygroundPage />} />
         <Route path="/learn/courses" element={<CoursesPageWrapper />} />
         <Route path="/courses/:courseId/:chapterId" element={<CourseDetailWrapper />} />
         <Route path="/courses/:courseId" element={<CourseDetailWrapper />} />
-        {/* Legacy /courses route redirects to /learn/courses or handles valid routes */}
         <Route path="/courses" element={<Navigate to="/learn/courses" replace />} />
 
         {/* Default redirect for /learn */}
         <Route path="/learn" element={<Navigate to="/learn/courses" replace />} />
-
-        {/* Protected Routes */}
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

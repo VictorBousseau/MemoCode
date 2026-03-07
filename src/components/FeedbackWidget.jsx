@@ -6,7 +6,6 @@ import {
     MessageSquarePlus, X, Bug, Lightbulb, HelpCircle,
     Send, CheckCircle, AlertCircle, Loader2
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const FEEDBACK_TYPES = [
     { id: 'bug', label: 'Signaler un bug', icon: Bug, color: 'red' },
@@ -15,12 +14,11 @@ const FEEDBACK_TYPES = [
 ];
 
 export default function FeedbackWidget() {
-    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [feedbackType, setFeedbackType] = useState('bug');
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
-    const [email, setEmail] = useState(user?.email || '');
+    const [email, setEmail] = useState('');
     const [status, setStatus] = useState('idle'); // idle, sending, success, error
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -28,7 +26,7 @@ export default function FeedbackWidget() {
         setFeedbackType('bug');
         setTitle('');
         setMessage('');
-        setEmail(user?.email || '');
+        setEmail('');
         setStatus('idle');
         setErrorMessage('');
     };
