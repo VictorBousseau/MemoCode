@@ -14,6 +14,7 @@ import { examplesContent } from './data/examplesContent';
 import { mContent } from './data/mContent';
 import { nosqlContent } from './data/nosqlContent';
 import { excelContent } from './data/excelContent';
+import { iaContent } from './data/iaContent';
 import Overview from './components/Overview';
 import CodeGenerator from './components/CodeGenerator';
 import QuizList from './components/QuizList';
@@ -58,7 +59,8 @@ function PublicApp() {
         ...addLang(nosqlContent, 'javascript', 'NoSQL').themes,
         ...addLang(rContent, 'r', 'R').themes,
         ...addLang(excelContent, 'excel', 'Excel').themes,
-        ...addLang(examplesContent, 'python', 'Exemples').themes
+        ...addLang(examplesContent, 'python', 'Exemples').themes,
+        ...addLang(iaContent, 'python', 'IA & Agents').themes
       ]
     };
   }, []);
@@ -87,6 +89,8 @@ function PublicApp() {
         return excelContent;
       case 'Exemples':
         return examplesContent;
+      case 'IA & Agents':
+        return iaContent;
       default:
         return pythonContent;
     }
