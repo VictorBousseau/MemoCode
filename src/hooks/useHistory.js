@@ -1,18 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useHistory() {
-    const [history, setHistory] = useState([]);
-
-    useEffect(() => {
-        const stored = localStorage.getItem('memocode_history');
-        if (stored) {
-            try {
-                setHistory(JSON.parse(stored));
-            } catch (e) {
-                console.error('Failed to parse history:', e);
-            }
-        }
-    }, []);
+    const [history, setHistory] = useLocalStorage('memocode_history', []);
 
     const addToHistory = (snippet, themeTitle, categoryTitle) => {
         setHistory(prev => {
@@ -30,15 +19,12 @@ export function useHistory() {
                 timestamp: Date.now()
             };
 
-            const newHistory = [newItem, ...filtered].slice(0, 10); // Keep last 10
-            localStorage.setItem('memocode_history', JSON.stringify(newHistory));
-            return newHistory;
+            return [newItem, ...filtered].slice(0, 10); // Keep last 10
         });
     };
 
     const clearHistory = () => {
         setHistory([]);
-        localStorage.removeItem('memocode_history');
     };
 
     return { history, addToHistory, clearHistory };

@@ -17,7 +17,7 @@ import { useStats } from '../hooks/useStats';
 import { useTheme } from '../hooks/useTheme';
 import { useNavigation } from '../context/NavigationContext';
 
-export default function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb, priority = 0, onPriorityChange, dragHandleProps }) {
+export default React.memo(function CodeCard({ snippet, language = 'python', isFavorite = false, onToggleFavorite, onClick, note, onNoteChange, onTagClick, theme, searchQuery, breadcrumb, priority = 0, onPriorityChange, dragHandleProps }) {
     const [copied, setCopied] = useState(false);
     const [showNote, setShowNote] = useState(false);
     const { logView } = useStats();
@@ -332,4 +332,4 @@ export default function CodeCard({ snippet, language = 'python', isFavorite = fa
             )}
         </motion.div>
     );
-}
+});

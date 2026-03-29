@@ -1,26 +1,7 @@
-import { useState, useEffect } from 'react';
-
-const STORAGE_KEY = 'memocode_user_data';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useUserData() {
-    const [userData, setUserData] = useState(() => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? JSON.parse(saved) : { priorities: {}, sortOrders: {} };
-        } catch (e) {
-            console.error('Failed to load user data', e);
-            return { priorities: {}, sortOrders: {} };
-        }
-    });
-
-    // Save to localStorage whenever data changes
-    useEffect(() => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-        } catch (e) {
-            console.error('Failed to save user data', e);
-        }
-    }, [userData]);
+    const [userData, setUserData] = useLocalStorage('memocode_user_data', { priorities: {}, sortOrders: {} });
 
     const setPriority = (snippetId, level) => {
         setUserData(prev => ({

@@ -23,6 +23,7 @@ import CodePlayground from './components/CodePlayground';
 import LearningLayout from './components/LearningLayout';
 import CoursesPage from './components/CoursesPage';
 import CourseDetail from './components/CourseDetail';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function PublicApp() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
@@ -235,7 +236,9 @@ const CoursesPageWrapper = () => (
 
 const CourseDetailWrapper = () => (
   <LearningLayout>
-    <CourseDetail />
+    <ErrorBoundary>
+      <CourseDetail />
+    </ErrorBoundary>
   </LearningLayout>
 );
 
@@ -245,7 +248,7 @@ export default function App() {
     <Router basename="/MemoCode">
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<PublicApp />} />
+        <Route path="/" element={<ErrorBoundary><PublicApp /></ErrorBoundary>} />
 
         {/* Learning Zone Routes */}
         <Route path="/learn/quiz" element={<QuizPage />} />

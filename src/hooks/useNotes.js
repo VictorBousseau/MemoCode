@@ -1,38 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useNotes() {
-    const [notes, setNotes] = useState({});
-
-    useEffect(() => {
-        const stored = localStorage.getItem('memocode_notes');
-        if (stored) {
-            try {
-                setNotes(JSON.parse(stored));
-            } catch (e) {
-                console.error('Failed to parse notes:', e);
-            }
-        }
-    }, []);
-
-    const saveNotes = (newNotes) => {
-        setNotes(newNotes);
-        localStorage.setItem('memocode_notes', JSON.stringify(newNotes));
-    };
+    const [notes, setNotes] = useLocalStorage('memocode_notes', {});
 
     const getNote = (id) => notes[id] || '';
 
     const setNote = (id, text) => {
-        const newNotes = { ...notes, [id]: text };
-        if (!text) {
-            delete newNotes[id];
-        }
-        saveNotes(newNotes);
+        setNotes(prev => {
+            const newNotes = { ...prev, [id]: text };
+            if (!text) {
+                delete newNotes[id];
+            }
+            return newNotes;
+        });
     };
 
     const deleteNote = (id) => {
-        const newNotes = { ...notes };
-        delete newNotes[id];
-        saveNotes(newNotes);
+        setNotes(prev => {
+            const newNotes = { ...prev };
+            delete newNotes[id];
+            return newNotes;
+        });
     };
 
     return { notes, getNote, setNote, deleteNote };

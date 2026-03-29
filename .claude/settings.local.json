@@ -10,7 +10,11 @@
       "Bash(xargs ls:*)",
       "Bash(ls:*)",
       "Bash(python3:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(grep:*)",
+      "Bash(du:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

@@ -1,16 +1,12 @@
-import { useState, useEffect } from 'react';
-
-const STORAGE_KEY = 'memocode_stats';
+import { useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 export function useStats() {
-    const [stats, setStats] = useState(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : {
-            views: [],
-            lastVisit: null,
-            currentStreak: 0,
-            longestStreak: 0
-        };
+    const [stats, setStats] = useLocalStorage('memocode_stats', {
+        views: [],
+        lastVisit: null,
+        currentStreak: 0,
+        longestStreak: 0
     });
 
     // Update streak on mount
@@ -22,10 +18,6 @@ export function useStats() {
             updateStreak();
         }
     }, []);
-
-    useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-    }, [stats]);
 
     const updateStreak = () => {
         const today = new Date();

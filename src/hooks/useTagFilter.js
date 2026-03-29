@@ -1,64 +1,50 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { matchesTags } from '../data/tagHierarchy';
-
-const STORAGE_KEY = 'memocode_tag_filters';
+import { useLocalStorage } from './useLocalStorage';
 
 /**
  * Custom hook for managing tag filters
  */
 export function useTagFilter() {
-    const [selectedTags, setSelectedTags] = useState([]);
-    const [filterMode, setFilterMode] = useState('AND'); // 'AND' or 'OR'
-    const [expandedNodes, setExpandedNodes] = useState([]);
+    const [filterState, setFilterState] = useLocalStorage('memocode_tag_filters', {
+        selectedTags: [],
+        filterMode: 'AND',
+        expandedNodes: []
+    });
 
-    // Load from localStorage on mount
-    useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                const data = JSON.parse(stored);
-                setSelectedTags(data.selectedTags || []);
-                setFilterMode(data.filterMode || 'AND');
-                setExpandedNodes(data.expandedNodes || []);
-            } catch (e) {
-                console.error('Failed to load tag filters:', e);
-            }
-        }
-    }, []);
-
-    // Save to localStorage whenever filters change
-    useEffect(() => {
-        const data = {
-            selectedTags,
-            filterMode,
-            expandedNodes
-        };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }, [selectedTags, filterMode, expandedNodes]);
+    const { selectedTags, filterMode, expandedNodes } = filterState;
 
     const toggleTag = useCallback((tagId) => {
-        setSelectedTags(prev =>
-            prev.includes(tagId)
-                ? prev.filter(t => t !== tagId)
-                : [...prev, tagId]
-        );
-    }, []);
+        setFilterState(prev => ({
+            ...prev,
+            selectedTags: prev.selectedTags.includes(tagId)
+                ? prev.selectedTags.filter(t => t !== tagId)
+                : [...prev.selectedTags, tagId]
+        }));
+    }, [setFilterState]);
 
     const clearTags = useCallback(() => {
-        setSelectedTags([]);
-    }, []);
+        setFilterState(prev => ({
+            ...prev,
+            selectedTags: []
+        }));
+    }, [setFilterState]);
 
     const toggleFilterMode = useCallback(() => {
-        setFilterMode(prev => prev === 'AND' ? 'OR' : 'AND');
-    }, []);
+        setFilterState(prev => ({
+            ...prev,
+            filterMode: prev.filterMode === 'AND' ? 'OR' : 'AND'
+        }));
+    }, [setFilterState]);
 
     const toggleNode = useCallback((nodeId) => {
-        setExpandedNodes(prev =>
-            prev.includes(nodeId)
-                ? prev.filter(n => n !== nodeId)
-                : [...prev, nodeId]
-        );
-    }, []);
+        setFilterState(prev => ({
+            ...prev,
+            expandedNodes: prev.expandedNodes.includes(nodeId)
+                ? prev.expandedNodes.filter(n => n !== nodeId)
+                : [...prev.expandedNodes, nodeId]
+        }));
+    }, [setFilterState]);
 
     const filterSnippets = useCallback((snippets) => {
         if (selectedTags.length === 0) return snippets;
