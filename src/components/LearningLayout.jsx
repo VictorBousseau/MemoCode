@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Home, Brain, BookMarked, Code2,
-    GraduationCap, ChevronLeft, BookOpen
+    GraduationCap, ChevronLeft, BookOpen, FileDown
 } from 'lucide-react';
 import FeedbackWidget from './FeedbackWidget';
 
@@ -18,6 +18,7 @@ export default function LearningLayout({ children }) {
         { path: '/learn/quiz', label: 'Quiz & Exercices', icon: Brain, color: 'green' },
         { path: '/learn/flashcards', label: 'Flashcards', icon: BookMarked, color: 'orange' },
         { path: '/learn/playground', label: 'Playground', icon: Code2, color: 'purple' },
+        { path: '/learn/resources', label: 'Ressources', icon: FileDown, color: 'red' },
     ];
 
     return (

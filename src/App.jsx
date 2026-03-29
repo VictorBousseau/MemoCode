@@ -24,6 +24,7 @@ import LearningLayout from './components/LearningLayout';
 import CoursesPage from './components/CoursesPage';
 import CourseDetail from './components/CourseDetail';
 import ErrorBoundary from './components/ErrorBoundary';
+import ResourcesPage from './components/ResourcesPage';
 
 function PublicApp() {
   const [selectedLanguage, setSelectedLanguage] = useState('Overview');
@@ -234,6 +235,12 @@ const CoursesPageWrapper = () => (
   </LearningLayout>
 );
 
+const ResourcesPageWrapper = () => (
+  <LearningLayout>
+    <ResourcesPage />
+  </LearningLayout>
+);
+
 const CourseDetailWrapper = () => (
   <LearningLayout>
     <ErrorBoundary>
@@ -255,6 +262,7 @@ export default function App() {
         <Route path="/learn/flashcards" element={<FlashcardsPage />} />
         <Route path="/learn/playground" element={<PlaygroundPage />} />
         <Route path="/learn/courses" element={<CoursesPageWrapper />} />
+        <Route path="/learn/resources" element={<ResourcesPageWrapper />} />
         <Route path="/courses/:courseId/:chapterId" element={<CourseDetailWrapper />} />
         <Route path="/courses/:courseId" element={<CourseDetailWrapper />} />
         <Route path="/courses" element={<Navigate to="/learn/courses" replace />} />
