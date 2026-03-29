@@ -14,7 +14,23 @@
       "Bash(grep:*)",
       "Bash(du:*)",
       "Bash(npm install:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c \":*)",
+      "Bash(pip3 install:*)",
+      "Bash(where python:*)",
+      "Bash(npx --version)",
+      "Bash(where.exe python:*)",
+      "Bash(/c/Python*/python.exe)",
+      "Bash(--version)",
+      "Bash(/c/Users/bouss/AppData/Local/Programs/Python/*/python.exe)",
+      "Bash(py --version)",
+      "Bash(py -m pip install PyPDF2)",
+      "Bash(rm \"python__1768739756.pdf\")",
+      "Bash(mv \"Deep_learning__1768739658.pdf\" \"deep-learning.pdf\")",
+      "Bash(mv \"Mastering RAG Guide.pdf\" \"mastering-rag-guide.pdf\")",
+      "Bash(mv \"mathematics__1768064985.pdf\" \"mathematics-machine-learning.pdf\")",
+      "Bash(mv \"mflgc_release2.pdf\" \"microsoft-fabric-guide.pdf\")"
     ]
   }
 }
