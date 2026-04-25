@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Wand2, BarChart3, Database, AlertTriangle } from 'lucide-react';
+import { Copy, Check, Wand2, BarChart3, Database, AlertTriangle, GitBranch } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '../hooks/useTheme';
+import PipelineBuilder from './PipelineBuilder';
 
 export default function CodeGenerator() {
     const [mode, setMode] = useState('data'); // 'data' or 'viz'
@@ -277,8 +278,19 @@ export default function CodeGenerator() {
                     <BarChart3 className="w-4 h-4" />
                     Visuels
                 </button>
+                <button
+                    onClick={() => setMode('pipeline')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${mode === 'pipeline' ? 'bg-purple-600/20 text-purple-400 border border-purple-600/20 shadow-sm' : 'text-zinc-400 hover:text-white'
+                        }`}
+                >
+                    <GitBranch className="w-4 h-4" />
+                    Pipeline ETL
+                </button>
             </div>
 
+            {mode === 'pipeline' ? (
+                <PipelineBuilder columns={columns} />
+            ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Configuration Panel */}
                 <div className="space-y-6 bg-zinc-900/50 p-6 rounded-xl border border-zinc-800">
@@ -500,6 +512,7 @@ export default function CodeGenerator() {
                     </div>
                 </div>
             </div>
+            )}
             {/* Global Datalist for Column Suggestions */}
             <datalist id="column-suggestions">
                 {columns.map((col, idx) => (
