@@ -6,9 +6,14 @@ export default React.memo(function ThemeSidebar({ activeTheme, activeCategoryId,
         <div className="w-64 flex-shrink-0 sticky top-8 space-y-6">
             {/* Categories */}
             <div className="space-y-1">
-                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
+                <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1 px-3">
                     {activeTheme?.title}
                 </h3>
+                {activeTheme?.updatedAt && (
+                    <p className="text-[10px] text-zinc-600 px-3 mb-3">
+                        Mis à jour : {activeTheme.updatedAt.split('-').reverse().join('/')}
+                    </p>
+                )}
                 {activeTheme?.categories?.map((category) => (
                     <button
                         key={category.id}
