@@ -1,4 +1,4 @@
-export const pythonContent = {
+const _pythonContentRaw = {
     themes: [
 
         {
@@ -5676,6 +5676,7 @@ except ValidationError as e:
         },
         {
             id: 'bayesian_networks',
+            archived: true,
             title: 'Réseaux Bayésiens',
             description: 'Modèles Graphiques Probabilistes avec pgmpy',
             categories: [
@@ -6100,5 +6101,10 @@ print("Cambriolage ⊥ Tremblement | Alarme ?",
             ]
         }
     ]
+};
+
+export const pythonContent = {
+    ..._pythonContentRaw,
+    themes: _pythonContentRaw.themes.filter(t => !t.archived)
 };
 

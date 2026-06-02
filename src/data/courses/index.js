@@ -66,6 +66,7 @@ export const COURSES = {
     },
     bayesian: {
         id: 'bayesian',
+        archived: true,
         title: 'Réseaux Bayésiens',
         description: 'Modélisation probabiliste, inférence et apprentissage avec pgmpy',
         icon: '🎲',
@@ -198,4 +199,4 @@ export const getChapter = (courseId, chapterId) => {
     return course.chapters.find(ch => ch.id === chapterId) || null;
 };
 
-export const getAllCourses = () => Object.values(COURSES);
+export const getAllCourses = () => Object.values(COURSES).filter(c => !c.archived);
